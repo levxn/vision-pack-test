@@ -1,0 +1,475 @@
+# Reusable: every test job of one night. Called only by nightly.yml (the
+# runner's pre-job hook admits nothing else to the self-hosted runners).
+#
+# Hosted jobs validate the packages; the self-hosted jobs prepare the ROCm
+# prefix once and run each suite of the tier in its own container. Every job
+# uploads results-<name> (results.jsonl, JUnit, summary, logs) even when it
+# fails, and report.yml turns them into the verdict.
+name: test
+
+on:
+  workflow_call:
+    inputs:
+      tier:
+        type: string
+        required: true
+      suites:
+        type: string
+        default: ""
+      extended_deps:
+        type: boolean
+        default: false
+      sha:
+        type: string
+        required: true
+      tag:
+        type: string
+        default: ""
+      version:
+        type: string
+        required: true
+      deb_artifact:
+        type: string
+        required: true
+      rpm_artifact:
+        type: string
+        required: true
+      tarball_artifact:
+        type: string
+        required: true
+      rocm_sdk_family:
+        type: string
+        default: ""
+      rocm_sdk_date:
+        type: string
+        default: ""
+      rocm_sdk_url:
+        type: string
+        default: ""
+      has_cpu_runner:
+        type: boolean
+        default: false
+      expected_gfx:
+        type: string
+        default: ""
+    outputs:
+      expected:
+        description: Suites the tier should have produced results for
+        value: ${{ jobs.plan.outputs.expected }}
+      gfx:
+        description: GPU architecture tested
+        value: ${{ jobs.prepare-rocm.outputs.gfx }}
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+env:
+  VP_ROOT: /srv/vp-ci
+  RUN_DIR: /srv/vp-ci/runs/${{ github.run_id }}-${{ github.run_attempt }}
+  SMOKE_IMAGE_DEB: ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+  SMOKE_IMAGE_RPM: rockylinux:9@sha256:d7be1c094cc5845ee815d4632fe377514ee6ebcf8efaed6892889657e5ddaaa6
+
+jobs:
+  plan:
+    name: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      gpu_matrix: ${{ steps.plan.outputs.gpu_matrix }}
+      cpu_matrix: ${{ steps.plan.outputs.cpu_matrix }}
+      hosted: ${{ steps.plan.outputs.hosted }}
+      expected: ${{ steps.plan.outputs.expected }}
+      has_gpu: ${{ steps.plan.outputs.has_gpu }}
+      has_cpu: ${{ steps.plan.outputs.has_cpu }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Plan the tier
+        id: plan
+        env:
+          TIER: ${{ inputs.tier }}
+          SUITES: ${{ inputs.suites }}
+          HAS_CPU: ${{ inputs.has_cpu_runner }}
+          EXTENDED: ${{ inputs.extended_deps }}
+        run: |
+          python3 -c 'import yaml' 2>/dev/null \
+            || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml >/dev/null; }
+          python3 build_tools/plan_matrix.py --tier "${TIER}" --suites "${SUITES}" \
+            --has-cpu-runner "${HAS_CPU}" --extended "${EXTENDED}" --github
+
+  # --- hosted: packaging -----------------------------------------------------
+
+  validate-packages:
+    name: validate-packages
+    needs: plan
+    if: contains(needs.plan.outputs.hosted, 'packaging')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.deb_artifact }}
+          path: ${{ runner.temp }}/in
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.rpm_artifact }}
+          path: ${{ runner.temp }}/in
+      - name: Unpack
+        run: |
+          mkdir -p "${RUNNER_TEMP}/assets"
+          for t in "${RUNNER_TEMP}"/in/*.tar; do tar -xf "${t}" -C "${RUNNER_TEMP}/assets"; done
+          sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends rpm cpio jq >/dev/null
+      # No ROCM_PATH: the scripts point vp_init at an empty prefix of their own.
+      - name: DEB validation (Package validation summary)
+        run: |
+          suites/packaging/validate_debs.sh --debs "${RUNNER_TEMP}/assets/deb" \
+            --out "${RUNNER_TEMP}/results/packaging-deb"
+      - name: RPM validation
+        if: ${{ !cancelled() }}
+        run: |
+          suites/packaging/validate_rpms.sh --rpms "${RUNNER_TEMP}/assets/rpm" --debs "${RUNNER_TEMP}/assets/deb" \
+            --out "${RUNNER_TEMP}/results/packaging-rpm"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-packaging-packages
+          path: ${{ runner.temp }}/results
+          retention-days: 30
+          if-no-files-found: warn
+
+  verify-tarball:
+    name: verify-tarball
+    needs: plan
+    if: contains(needs.plan.outputs.hosted, 'packaging')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.tarball_artifact }}
+          path: ${{ runner.temp }}/in
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.deb_artifact }}
+          path: ${{ runner.temp }}/in
+      - name: Unpack
+        run: |
+          mkdir -p "${RUNNER_TEMP}/assets"
+          for t in "${RUNNER_TEMP}"/in/*.tar; do tar -xf "${t}" -C "${RUNNER_TEMP}/assets"; done
+      - name: Verify the dist tarball
+        run: |
+          tarball="$(find "${RUNNER_TEMP}/assets/tarball" -name 'vision-pack-dist-linux-multiarch-*.tar.gz' | head -n 1)"
+          args=(--tarball "${tarball}" --debs "${RUNNER_TEMP}/assets/deb" --out "${RUNNER_TEMP}/results/packaging-tarball")
+          # release.json travels in the tarball artifact of fetched releases (not in build mode).
+          [[ -f "${RUNNER_TEMP}/assets/release.json" ]] && args+=(--release-json "${RUNNER_TEMP}/assets/release.json")
+          suites/packaging/verify_tarball.sh "${args[@]}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-packaging-tarball
+          path: ${{ runner.temp }}/results
+          retention-days: 30
+          if-no-files-found: warn
+
+  install-smoke:
+    name: install-smoke (${{ matrix.kind }})
+    needs: plan
+    if: contains(needs.plan.outputs.hosted, 'packaging')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [deb, rpm]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ matrix.kind == 'deb' && inputs.deb_artifact || inputs.rpm_artifact }}
+          path: ${{ runner.temp }}/in
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.tarball_artifact }}
+          path: ${{ runner.temp }}/in
+      - name: Install in a clean container
+        env:
+          KIND: ${{ matrix.kind }}
+          TIER: ${{ inputs.tier }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/assets" "${RUNNER_TEMP}/results/packaging-install-${KIND}"
+          for t in "${RUNNER_TEMP}"/in/*.tar; do tar -xf "${t}" -C "${RUNNER_TEMP}/assets"; done
+          # TheRock package build of the manifest's SDK date (…10.2.0a20260926.tar.gz -> 20260926).
+          sdk_date="$(jq -r '.rocm_sdk // ""' "${RUNNER_TEMP}/assets/manifest.json" | grep -oE 'a20[0-9]{6}' | tr -d a || true)"
+          image="${SMOKE_IMAGE_DEB}" flag=--debs
+          [[ "${KIND}" == rpm ]] && image="${SMOKE_IMAGE_RPM}" flag=--rpms
+          docker run --rm --network host -e GITHUB_ACTIONS -e "VP_TIER=${TIER}" \
+            -v "${GITHUB_WORKSPACE}:/w" -v "${RUNNER_TEMP}/assets:/in:ro" \
+            -v "${RUNNER_TEMP}/results/packaging-install-${KIND}:/out" -w /w \
+            "${image}" bash "/w/suites/packaging/install_smoke_${KIND}.sh" "${flag}" "/in/${KIND}" --out /out \
+            ${sdk_date:+--therock-date "${sdk_date}"}
+          sudo chown -R "$(id -u):$(id -g)" "${RUNNER_TEMP}/results" "${GITHUB_WORKSPACE}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-packaging-install-${{ matrix.kind }}
+          path: ${{ runner.temp }}/results
+          retention-days: 30
+          if-no-files-found: warn
+
+  # --- self-hosted: prefix, pre-flight, suites --------------------------------
+
+  prepare-rocm:
+    name: prepare-rocm
+    needs: plan
+    if: needs.plan.outputs.has_gpu == 'true' || needs.plan.outputs.has_cpu == 'true'
+    runs-on: [self-hosted, vp-gpu]
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      prefix: ${{ steps.prepare.outputs.prefix }}
+      tarball: ${{ steps.dist.outputs.tarball }}
+      gfx: ${{ steps.gpu.outputs.gfx }}
+      render_minor: ${{ steps.gpu.outputs.render_minor }}
+      gpu_index: ${{ steps.gpu.outputs.gpu_index }}
+      unsupported: ${{ steps.gpu.outputs.unsupported_gpus }}
+      sdk_family: ${{ steps.prepare.outputs.sdk_family }}
+      image_test: ${{ steps.img-test.outputs.image }}
+      image_media: ${{ steps.img-media.outputs.image }}
+      image_extended: ${{ steps.img-extended.outputs.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.tarball_artifact }}
+          path: ${{ env.RUN_DIR }}/in
+      - name: Unpack the dist tarball
+        id: dist
+        run: |
+          tar -xf "${RUN_DIR}"/in/*.tar -C "${RUN_DIR}/in"
+          tarball="$(find "${RUN_DIR}/in/tarball" -name 'vision-pack-dist-linux-multiarch-*.tar.gz' | head -n 1)"
+          tar -xzOf "${tarball}" ./share/vision-pack/vision-pack-manifest.json > "${RUN_DIR}/manifest.json"
+          echo "tarball=${tarball}" >> "$GITHUB_OUTPUT"
+      - name: Detect the GPU
+        id: gpu
+        env:
+          EXPECTED_GFX: ${{ inputs.expected_gfx }}
+        run: build_tools/detect_gpu.sh --manifest "${RUN_DIR}/manifest.json" --github
+      - name: Prepare the ROCm prefix
+        id: prepare
+        env:
+          TARBALL: ${{ steps.dist.outputs.tarball }}
+          GFX: ${{ steps.gpu.outputs.gfx }}
+          SDK_FAMILY: ${{ inputs.rocm_sdk_family }}
+          SDK_DATE: ${{ inputs.rocm_sdk_date }}
+          SDK_URL: ${{ inputs.rocm_sdk_url }}
+        run: |
+          args=(--tarball "${TARBALL}" --run-dir "${RUN_DIR}" --gfx "${GFX}" --cache "${VP_ROOT}/cache/sdk" --github)
+          [[ -n "${SDK_FAMILY}" ]] && args+=(--family "${SDK_FAMILY}")
+          [[ -n "${SDK_DATE}" ]] && args+=(--date "${SDK_DATE}")
+          [[ -n "${SDK_URL}" ]] && args+=(--url "${SDK_URL}")
+          timeout -k 60 3600 build_tools/prepare_rocm.sh "${args[@]}"
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test image
+        id: img-test
+        run: build_tools/ensure_image.sh --kind test --github
+      - name: Media image
+        id: img-media
+        if: contains(needs.plan.outputs.gpu_matrix, '"media"') || contains(needs.plan.outputs.cpu_matrix, '"media"')
+        run: build_tools/ensure_image.sh --kind media --github
+      - name: Extended image
+        id: img-extended
+        if: contains(needs.plan.outputs.gpu_matrix, '"extended"') || contains(needs.plan.outputs.cpu_matrix, '"extended"')
+        env:
+          FAMILY: ${{ steps.prepare.outputs.sdk_family }}
+        run: build_tools/ensure_image.sh --kind extended --family "${FAMILY}" --github
+      - name: GPU pre-flight (in the test container)
+        env:
+          PREFIX: ${{ steps.prepare.outputs.prefix }}
+          IMAGE: ${{ steps.img-test.outputs.image }}
+          GFX: ${{ steps.gpu.outputs.gfx }}
+          MINOR: ${{ steps.gpu.outputs.render_minor }}
+        run: |
+          timeout -k 30 240 build_tools/run_in_container.sh --suite preflight --prefix "${PREFIX}" \
+            --out "${RUN_DIR}/results/preflight" --image "${IMAGE}" --gfx "${GFX}" --render-minor "${MINOR}" \
+            -- bash /opt/vp/repo/build_tools/preflight.sh
+      - name: Record the environment
+        if: ${{ !cancelled() }}
+        env:
+          RUNNER: ${{ runner.name }}
+          IMAGE_TEST: ${{ steps.img-test.outputs.image }}
+          IMAGE_MEDIA: ${{ steps.img-media.outputs.image }}
+          IMAGE_EXTENDED: ${{ steps.img-extended.outputs.image }}
+          GPU_LIST: ${{ steps.gpu.outputs.gpu_list }}
+        run: |
+          mkdir -p "${RUN_DIR}/results/environment"
+          cp "${RUN_DIR}/prepared.json" "${RUN_DIR}/results/environment/" 2>/dev/null || true
+          cp "${RUN_DIR}/manifest.json" "${RUN_DIR}/results/environment/" 2>/dev/null || true
+          jq -n --arg runner "${RUNNER}" --arg kernel "$(uname -r)" \
+            --arg driver "$(cat /sys/module/amdgpu/version 2>/dev/null || echo in-tree)" \
+            --arg docker "$(docker version --format '{{.Server.Version}}' 2>/dev/null || true)" \
+            --arg gpus "${GPU_LIST}" --arg test "${IMAGE_TEST}" --arg media "${IMAGE_MEDIA}" \
+            --arg extended "${IMAGE_EXTENDED}" \
+            '{runner:$runner, kernel:$kernel, amdgpu_driver:$driver, docker:$docker, gpus:$gpus,
+              images:{test:$test, media:$media, extended:$extended}}' \
+            > "${RUN_DIR}/results/environment/environment.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-environment
+          path: |
+            ${{ env.RUN_DIR }}/results/environment
+            ${{ env.RUN_DIR }}/results/preflight
+          retention-days: 90
+          if-no-files-found: warn
+
+  test-gpu:
+    name: ${{ matrix.suite }}
+    needs: [plan, prepare-rocm]
+    if: needs.plan.outputs.has_gpu == 'true' && needs.prepare-rocm.result == 'success'
+    runs-on: [self-hosted, vp-gpu]
+    timeout-minutes: ${{ matrix.timeout }}
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.plan.outputs.gpu_matrix) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: matrix.suite == 'install-test'
+        with:
+          name: ${{ inputs.deb_artifact }}
+          path: ${{ env.RUN_DIR }}/results/install-test/input
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run ${{ matrix.suite }}
+        id: run
+        env:
+          SUITE: ${{ matrix.suite }}
+          ENTRY: ${{ matrix.entrypoint }}
+          KIND: ${{ matrix.image }}
+          ACCESS: ${{ matrix.gpu_access }}
+          TIMEOUT_MIN: ${{ matrix.timeout }}
+          TIER: ${{ inputs.tier }}
+          PREFIX: ${{ needs.prepare-rocm.outputs.prefix }}
+          DIST_TARBALL: ${{ needs.prepare-rocm.outputs.tarball }}
+          GFX: ${{ needs.prepare-rocm.outputs.gfx }}
+          MINOR: ${{ needs.prepare-rocm.outputs.render_minor }}
+          VP_UNSUPPORTED_GPUS: ${{ needs.prepare-rocm.outputs.unsupported }}
+          VP_SDK_FAMILY: ${{ needs.prepare-rocm.outputs.sdk_family }}
+          IMAGE_TEST: ${{ needs.prepare-rocm.outputs.image_test }}
+          IMAGE_MEDIA: ${{ needs.prepare-rocm.outputs.image_media }}
+          IMAGE_EXTENDED: ${{ needs.prepare-rocm.outputs.image_extended }}
+        run: build_tools/ci_run_suite.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-${{ matrix.suite }}
+          path: |
+            ${{ env.RUN_DIR }}/results/${{ matrix.suite }}
+            !${{ env.RUN_DIR }}/results/${{ matrix.suite }}/work/**
+            !${{ env.RUN_DIR }}/results/${{ matrix.suite }}/input/**
+          retention-days: 30
+          if-no-files-found: warn
+
+  test-cpu:
+    name: ${{ matrix.suite }} (vp-cpu)
+    needs: [plan, prepare-rocm]
+    if: needs.plan.outputs.has_cpu == 'true' && needs.prepare-rocm.result == 'success'
+    runs-on: [self-hosted, vp-cpu]
+    timeout-minutes: ${{ matrix.timeout }}
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.plan.outputs.cpu_matrix) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run ${{ matrix.suite }}
+        id: run
+        env:
+          SUITE: ${{ matrix.suite }}
+          ENTRY: ${{ matrix.entrypoint }}
+          KIND: ${{ matrix.image }}
+          ACCESS: ${{ matrix.gpu_access }}
+          TIMEOUT_MIN: ${{ matrix.timeout }}
+          TIER: ${{ inputs.tier }}
+          PREFIX: ${{ needs.prepare-rocm.outputs.prefix }}
+          DIST_TARBALL: ${{ needs.prepare-rocm.outputs.tarball }}
+          GFX: ${{ needs.prepare-rocm.outputs.gfx }}
+          MINOR: ${{ needs.prepare-rocm.outputs.render_minor }}
+          VP_UNSUPPORTED_GPUS: ${{ needs.prepare-rocm.outputs.unsupported }}
+          VP_SDK_FAMILY: ${{ needs.prepare-rocm.outputs.sdk_family }}
+          IMAGE_TEST: ${{ needs.prepare-rocm.outputs.image_test }}
+          IMAGE_MEDIA: ${{ needs.prepare-rocm.outputs.image_media }}
+          IMAGE_EXTENDED: ${{ needs.prepare-rocm.outputs.image_extended }}
+        run: build_tools/ci_run_suite.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-${{ matrix.suite }}
+          path: |
+            ${{ env.RUN_DIR }}/results/${{ matrix.suite }}
+            !${{ env.RUN_DIR }}/results/${{ matrix.suite }}/work/**
+          retention-days: 30
+          if-no-files-found: warn

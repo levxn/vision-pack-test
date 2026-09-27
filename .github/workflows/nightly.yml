@@ -1,0 +1,334 @@
+# Orchestrator: find tonight's vision-pack nightly, fetch (or build) it, test
+# it on the self-hosted GPU runner and publish the report.
+#
+# This is the only workflow the runner's pre-job hook admits (and only on
+# main, for schedule and workflow_dispatch), so every self-hosted job must be
+# reached from here. It never runs on pull requests.
+name: nightly
+
+# TEMPORARILY DISABLED: every trigger below is commented out so this workflow
+# cannot run (automatically or via manual dispatch) while it's still under
+# review. Uncomment the whole `on:` block to re-enable.
+# on:
+#   schedule:
+#     # Poll three times a day after upstream publishes (~07:50 UTC): 09:07,
+#     # 13:07 and 17:07 UTC. A poll whose release was already tested exits in
+#     # resolve-release.
+#     - cron: "37 14,18,22 * * *"
+#       timezone: "Asia/Kolkata"
+#   workflow_dispatch:
+#     inputs:
+#       mode:
+#         description: "release: test a published nightly; build: build vision_pack_ref from source"
+#         type: choice
+#         options: [release, build]
+#         default: release
+#       release_tag:
+#         description: "nightly-YYYYMMDD tag (default: newest)"
+#         type: string
+#         default: ""
+#       vision_pack_ref:
+#         description: "vision-pack branch or SHA for mode=build"
+#         type: string
+#         default: main
+#       tier:
+#         description: "quick, standard, comprehensive or full"
+#         type: choice
+#         options: [quick, standard, comprehensive, full]
+#         default: comprehensive
+#       suites:
+#         description: "Comma-separated subset of suites (default: all in the tier)"
+#         type: string
+#         default: ""
+#       extended_deps:
+#         description: "Use the extended image (ROCm torch, tensorflow, jax); full tier only"
+#         type: boolean
+#         default: false
+#       rocm_sdk_family:
+#         description: "Override the runtime TheRock SDK family (e.g. gfx120X-all-tests)"
+#         type: string
+#         default: ""
+#       rocm_sdk_date:
+#         description: "Override the runtime SDK date (YYYYMMDD)"
+#         type: string
+#         default: ""
+#       rocm_sdk_url:
+#         description: "Pin the runtime SDK tarball URL (overrides family and date)"
+#         type: string
+#         default: ""
+#       force:
+#         description: "Test even if this release/tier was already tested"
+#         type: boolean
+#         default: false
+
+permissions: {}
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  resolve-release:
+    name: resolve-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      mode: ${{ steps.resolve.outputs.mode }}
+      tag: ${{ steps.resolve.outputs.tag }}
+      date: ${{ steps.resolve.outputs.date }}
+      version: ${{ steps.resolve.outputs.version }}
+      sha: ${{ steps.resolve.outputs.sha }}
+      fingerprint: ${{ steps.resolve.outputs.fingerprint }}
+      skip: ${{ steps.resolve.outputs.skip }}
+      stale: ${{ steps.resolve.outputs.stale }}
+      problems: ${{ steps.resolve.outputs.problems }}
+      upstream_conclusion: ${{ steps.resolve.outputs.upstream_conclusion }}
+      tier: ${{ steps.params.outputs.tier }}
+      suites: ${{ steps.params.outputs.suites }}
+      extended: ${{ steps.params.outputs.extended }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run parameters
+        id: params
+        env:
+          EVENT: ${{ github.event_name }}
+          IN_TIER: ${{ inputs.tier }}
+          IN_SUITES: ${{ inputs.suites }}
+          IN_EXTENDED: ${{ inputs.extended_deps }}
+        run: |
+          tier="${IN_TIER:-comprehensive}"
+          if [[ "${EVENT}" == schedule ]]; then
+            # Nightly default; the weekly full tier runs on Sunday (IST).
+            tier=comprehensive
+            [[ "$(TZ=Asia/Kolkata date +%u)" == 7 ]] && tier=full
+          fi
+          if [[ ! "${IN_SUITES}" =~ ^[a-z0-9,-]*$ ]]; then
+            echo "::error::suites must be a comma-separated list of suite names"
+            exit 1
+          fi
+          {
+            echo "tier=${tier}"
+            echo "suites=${IN_SUITES}"
+            echo "extended=${IN_EXTENDED:-false}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Fingerprints already tested (qa-history)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${GITHUB_REPOSITORY}/contents/tested.txt?ref=qa-history" \
+            -H "Accept: application/vnd.github.raw" > "${RUNNER_TEMP}/tested.txt" 2>/dev/null \
+            || : > "${RUNNER_TEMP}/tested.txt"
+          echo "$(grep -vc '^#' "${RUNNER_TEMP}/tested.txt" || true) fingerprints on record"
+
+      - name: Resolve
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ inputs.mode || 'release' }}
+          TAG: ${{ inputs.release_tag }}
+          REF: ${{ inputs.vision_pack_ref || 'main' }}
+          TIER: ${{ steps.params.outputs.tier }}
+          SDK_FAMILY: ${{ inputs.rocm_sdk_family }}
+          SDK_DATE: ${{ inputs.rocm_sdk_date }}
+          SDK_URL: ${{ inputs.rocm_sdk_url }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          args=(--mode "${MODE}" --ref "${REF}" --tier "${TIER}" --tested-file "${RUNNER_TEMP}/tested.txt"
+                --sdk-family "${SDK_FAMILY}" --sdk-date "${SDK_DATE}" --sdk-url "${SDK_URL}"
+                --out "${RUNNER_TEMP}/run-plan.json" --github)
+          [[ -n "${TAG}" ]] && args+=(--tag "${TAG}")
+          [[ "${FORCE}" == true ]] && args+=(--force)
+          python3 build_tools/resolve_release.py "${args[@]}"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: run-plan
+          path: ${{ runner.temp }}/run-plan.json
+          retention-days: 90
+          if-no-files-found: error
+
+  stale-alert:
+    name: stale-alert
+    needs: resolve-release
+    if: needs.resolve-release.outputs.stale == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Report that no new nightly has appeared
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve-release.outputs.tag }}
+        run: |
+          title="Nightly QA: no new vision-pack nightly"
+          body="The newest vision-pack release is still ${TAG} (checked $(date -u +%F)). Upstream's nightly may be failing: https://github.com/kiritigowda/vision-pack/actions/workflows/nightly.yml"
+          num="$(gh issue list -R "${GITHUB_REPOSITORY}" --state open --search "\"${title}\" in:title" --json number --jq '.[0].number // empty')"
+          if [[ -z "${num}" ]]; then
+            gh issue create -R "${GITHUB_REPOSITORY}" --title "${title}" --body "${body}"
+          else
+            # At most one comment a day, although the schedule polls three times.
+            updated="$(gh issue view -R "${GITHUB_REPOSITORY}" "${num}" --json updatedAt --jq .updatedAt)"
+            if (( $(date -u +%s) - $(date -u -d "${updated}" +%s) > 72000 )); then
+              gh issue comment -R "${GITHUB_REPOSITORY}" "${num}" --body "${body}"
+            fi
+          fi
+
+  fetch-release:
+    name: fetch-release
+    needs: resolve-release
+    if: needs.resolve-release.outputs.skip != 'true' && needs.resolve-release.outputs.mode == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.fetch.outputs.version }}
+      date: ${{ steps.fetch.outputs.date }}
+      deb_artifact: ${{ steps.fetch.outputs.deb_artifact }}
+      rpm_artifact: ${{ steps.fetch.outputs.rpm_artifact }}
+      tarball_artifact: ${{ steps.fetch.outputs.tarball_artifact }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download and verify the release
+        id: fetch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve-release.outputs.tag }}
+          SHA: ${{ needs.resolve-release.outputs.sha }}
+        run: |
+          build_tools/fetch_release.sh --tag "${TAG}" --sha "${SHA}" \
+            --dest "${RUNNER_TEMP}/release" --pack "${RUNNER_TEMP}/artifacts" --github
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.fetch.outputs.deb_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.fetch.outputs.deb_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.fetch.outputs.rpm_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.fetch.outputs.rpm_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.fetch.outputs.tarball_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.fetch.outputs.tarball_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+
+  build:
+    name: build
+    needs: resolve-release
+    if: needs.resolve-release.outputs.skip != 'true' && needs.resolve-release.outputs.mode == 'build'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ needs.resolve-release.outputs.sha }}
+      rocm_sdk_date: ${{ inputs.rocm_sdk_date }}
+
+  test:
+    name: test
+    needs: [resolve-release, fetch-release, build]
+    if: >-
+      !cancelled() && needs.resolve-release.outputs.skip != 'true'
+      && (needs.fetch-release.result == 'success' || needs.build.result == 'success')
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/test.yml
+    with:
+      tier: ${{ needs.resolve-release.outputs.tier }}
+      suites: ${{ needs.resolve-release.outputs.suites }}
+      extended_deps: ${{ needs.resolve-release.outputs.extended == 'true' }}
+      sha: ${{ needs.resolve-release.outputs.sha }}
+      tag: ${{ needs.resolve-release.outputs.tag }}
+      version: ${{ needs.fetch-release.outputs.version || needs.build.outputs.version }}
+      deb_artifact: ${{ needs.fetch-release.outputs.deb_artifact || needs.build.outputs.deb_artifact }}
+      rpm_artifact: ${{ needs.fetch-release.outputs.rpm_artifact || needs.build.outputs.rpm_artifact }}
+      tarball_artifact: ${{ needs.fetch-release.outputs.tarball_artifact || needs.build.outputs.tarball_artifact }}
+      rocm_sdk_family: ${{ inputs.rocm_sdk_family }}
+      rocm_sdk_date: ${{ inputs.rocm_sdk_date }}
+      rocm_sdk_url: ${{ inputs.rocm_sdk_url }}
+      has_cpu_runner: ${{ vars.VP_HAS_CPU_RUNNER == 'true' }}
+      expected_gfx: ${{ vars.EXPECTED_GFX }}
+
+  report:
+    name: report
+    needs: [resolve-release, fetch-release, build, test]
+    if: >-
+      !cancelled() && needs.resolve-release.result == 'success'
+      && needs.resolve-release.outputs.skip != 'true'
+    permissions:
+      contents: write
+      issues: write
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/report.yml
+    with:
+      tier: ${{ needs.resolve-release.outputs.tier }}
+      mode: ${{ needs.resolve-release.outputs.mode }}
+      tag: ${{ needs.resolve-release.outputs.tag }}
+      sha: ${{ needs.resolve-release.outputs.sha }}
+      fingerprint: ${{ needs.resolve-release.outputs.fingerprint }}
+      expected: ${{ needs.test.outputs.expected }}
+      gfx: ${{ needs.test.outputs.gfx }}
+      upstream_conclusion: ${{ needs.resolve-release.outputs.upstream_conclusion }}
+      fetch_result: ${{ needs.fetch-release.result }}
+      build_result: ${{ needs.build.result }}
+      test_result: ${{ needs.test.result }}
+      record_tested: ${{ github.event_name == 'schedule' || inputs.suites == '' }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+
+  bump-submodules:
+    name: bump-submodules
+    needs: [resolve-release, report]
+    if: >-
+      vars.VP_COMMIT_PIN == 'true' && needs.report.result == 'success'
+      && needs.resolve-release.outputs.mode == 'release'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: true  # zizmor: ignore[artipacked] this job pushes the pin
+      - name: Pin the vision-pack submodule to the tested release
+        env:
+          SHA: ${{ needs.resolve-release.outputs.sha }}
+          TAG: ${{ needs.resolve-release.outputs.tag }}
+        run: |
+          git submodule update --init --depth 1 vision-pack
+          git -C vision-pack fetch --depth 1 origin "${SHA}"
+          git -C vision-pack checkout --detach "${SHA}"
+          if git diff --quiet -- vision-pack; then
+            echo "vision-pack is already pinned to ${SHA}"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Pin vision-pack to ${TAG} (${SHA:0:12})" -- vision-pack
+          git push origin HEAD:main
