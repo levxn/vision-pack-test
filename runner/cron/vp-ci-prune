@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Daily host maintenance for the vision-pack-test runner.
+# Installed by runner/setup.sh as /etc/cron.daily/vp-ci-prune (root).
+set -uo pipefail
+
+VP_ROOT="/srv/vp-ci"
+VP_KEEP_SDKS=6          # last 5 nightlies plus the last known-good one
+if [[ -r /etc/vp-ci/hooks.conf ]]; then
+  # shellcheck source=/dev/null
+  . /etc/vp-ci/hooks.conf
+fi
+
+# Docker: dangling images, stopped containers, build cache older than a week.
+if command -v docker >/dev/null 2>&1; then
+  docker container prune -f --filter "until=24h" >/dev/null 2>&1 || true
+  docker image prune -f --filter "until=168h" >/dev/null 2>&1 || true
+  docker builder prune -f --filter "until=168h" >/dev/null 2>&1 || true
+fi
+
+# SDK cache: keep the newest VP_KEEP_SDKS tarballs (plus anything pinned as
+# known-good via a *.keep marker next to the tarball).
+sdk="${VP_ROOT}/cache/sdk"
+if [[ -d "${sdk}" ]]; then
+  mapfile -t tarballs < <(ls -1t "${sdk}"/*.tar.gz 2>/dev/null)
+  i=0
+  for t in "${tarballs[@]}"; do
+    i=$((i + 1))
+    (( i <= VP_KEEP_SDKS )) && continue
+    [[ -e "${t}.keep" ]] && continue
+    echo "vp-ci-prune: removing ${t}"
+    rm -f -- "${t}" "${t}.sha256"
+  done
+fi
+
+# Stale partial downloads.
+find "${VP_ROOT}/cache" -name '*.part' -mmin +720 -delete 2>/dev/null || true
