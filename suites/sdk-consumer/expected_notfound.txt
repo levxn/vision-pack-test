@@ -1,0 +1,13 @@
+# SONAME globs that the vision-pack dist tarball may leave unresolved when it is
+# extracted on its own: they come from the ROCm SDK the tarball is overlaid on.
+# A NOTFOUND is expected only if it matches a glob here AND the SDK part of
+# $ROCM_PATH actually provides it; anything else is an unexpected NOTFOUND.
+libamdhip64.so*
+libhipfile.so*
+libomp.so*
+librocdecode.so*
+librocjpeg.so*
+librpp.so*
+libhsa-runtime64.so*
+libamd_comgr.so*
+librocm_sysdeps_*.so*
