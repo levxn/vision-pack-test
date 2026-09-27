@@ -1,0 +1,268 @@
+# Reusable: turn one night's results into the verdict, the HTML report, the
+# qa-history record, GitHub Pages, issues and notifications. Called by
+# nightly.yml; runs on GitHub-hosted runners only.
+name: report
+
+on:
+  workflow_call:
+    inputs:
+      tier:
+        type: string
+        required: true
+      mode:
+        type: string
+        default: release
+      tag:
+        type: string
+        default: ""
+      sha:
+        type: string
+        default: ""
+      fingerprint:
+        type: string
+        default: ""
+      expected:
+        description: Comma-separated suites that should have produced results
+        type: string
+        default: ""
+      gfx:
+        type: string
+        default: ""
+      upstream_conclusion:
+        type: string
+        default: ""
+      fetch_result:
+        type: string
+        default: ""
+      build_result:
+        type: string
+        default: ""
+      test_result:
+        type: string
+        default: ""
+      record_tested:
+        description: Record the fingerprint in tested.txt (full, completed runs only)
+        type: boolean
+        default: true
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: false
+      TEAMS_WEBHOOK_URL:
+        required: false
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  report:
+    name: triage and publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      issues: write
+    outputs:
+      verdict: ${{ steps.triage.outputs.verdict }}
+    env:
+      NIGHT_DIR: ${{ github.event_name == 'schedule' && 'nightly' || 'runs' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -c 'import yaml' 2>/dev/null \
+            || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml >/dev/null; }
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: results-*
+          path: ${{ runner.temp }}/downloaded
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: run-plan
+          path: ${{ runner.temp }}/plan
+
+      - name: qa-history checkout
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "${url}" qa-history >/dev/null 2>&1; then
+            git clone --quiet --depth 1 --branch qa-history "${url}" "${RUNNER_TEMP}/history"
+          else
+            git init --quiet -b qa-history "${RUNNER_TEMP}/history"
+            git -C "${RUNNER_TEMP}/history" remote add origin "${url}"
+          fi
+
+      - name: Record orchestration failures
+        env:
+          FETCH: ${{ inputs.fetch_result }}
+          BUILD: ${{ inputs.build_result }}
+          TEST: ${{ inputs.test_result }}
+        run: |
+          d="${RUNNER_TEMP}/downloaded/results-orchestrator"
+          mkdir -p "${d}"
+          : > "${d}/results.jsonl"
+          rec() { jq -cn --arg id "$1" --arg m "$2" '{suite:"orchestrator", id:$id, status:"error", message:$m,
+                  duration_s:0, log:"", backend:"", attempts:1, repro:""}' >> "${d}/results.jsonl"; }
+          [[ "${FETCH}" == failure ]] && rec "orchestrator::infra::fetch-release" "fetch-release failed: the release could not be downloaded or verified"
+          [[ "${BUILD}" == failure ]] && rec "orchestrator::infra::build" "the source build failed"
+          [[ "${TEST}" == cancelled ]] && rec "orchestrator::infra::test-cancelled" "the test workflow was cancelled"
+          [[ -s "${d}/results.jsonl" ]] || rm -rf "${d}"
+
+      - name: Merge and triage
+        id: triage
+        env:
+          EXPECTED: ${{ inputs.expected }}
+          TIER: ${{ inputs.tier }}
+          GFX: ${{ inputs.gfx }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          night="$(date -u +%F)"
+          dir="${NIGHT_DIR}/${night}"
+          [[ "${NIGHT_DIR}" == runs ]] && dir="runs/${GITHUB_RUN_ID}"
+          owner="${GITHUB_REPOSITORY%%/*}"
+          report_url="https://${owner,,}.github.io/${GITHUB_REPOSITORY#*/}/${dir}/"
+          python3 build_tools/results/merge.py --results "${RUNNER_TEMP}/downloaded" --out "${RUNNER_TEMP}/merged" --expect "${EXPECTED}"
+          python3 report/triage.py --merged "${RUNNER_TEMP}/merged" --history "${RUNNER_TEMP}/history" \
+            --plan "${RUNNER_TEMP}/plan/run-plan.json" --tier "${TIER}" --gfx "${GFX}" --night "${night}" \
+            --run-url "${RUN_URL}" --report-url "${report_url}" \
+            --out "${RUNNER_TEMP}/triage.json" --summary "${RUNNER_TEMP}/summary.md" \
+            --status-out "${RUNNER_TEMP}/status.json.gz" --perf-out "${RUNNER_TEMP}/perf.jsonl" \
+            --issues-state-out "${RUNNER_TEMP}/issues-state.json" --site "${RUNNER_TEMP}/site"
+          verdict="$(jq -r .verdict "${RUNNER_TEMP}/triage.json")"
+          prev="$(jq -r --arg t "${TIER}" '[.nights[]? | select(.tier == $t)] | last | .verdict // ""' \
+            "${RUNNER_TEMP}/history/index.json" 2>/dev/null || true)"
+          {
+            echo "verdict=${verdict}"
+            echo "previous=${prev}"
+            echo "report_url=${report_url}"
+          } >> "$GITHUB_OUTPUT"
+          cat "${RUNNER_TEMP}/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Test results (annotations)
+        if: ${{ !cancelled() }}
+        uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
+        with:
+          files: ${{ runner.temp }}/downloaded/**/junit/*.xml
+          check_run: false
+          comment_mode: "off"
+          action_fail: false
+          job_summary: false
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: report
+          path: |
+            ${{ runner.temp }}/site
+            ${{ runner.temp }}/summary.md
+            ${{ runner.temp }}/merged/results.jsonl
+          retention-days: 90
+
+      - name: File the night in qa-history
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECORD: ${{ inputs.record_tested && inputs.test_result == 'success' && (inputs.gfx != '' || inputs.expected == 'packaging') }}
+          EVENT: ${{ github.event_name }}
+          VERDICT: ${{ steps.triage.outputs.verdict }}
+        run: |
+          args=(--history "${RUNNER_TEMP}/history" --triage "${RUNNER_TEMP}/triage.json" --site "${RUNNER_TEMP}/site"
+                --status "${RUNNER_TEMP}/status.json.gz" --perf "${RUNNER_TEMP}/perf.jsonl"
+                --issues-state "${RUNNER_TEMP}/issues-state.json" --summary "${RUNNER_TEMP}/summary.md"
+                --event "${EVENT}" --run-id "${GITHUB_RUN_ID}")
+          [[ "${RECORD}" == true ]] && args+=(--record-tested)
+          python3 report/publish_history.py "${args[@]}"
+          cd "${RUNNER_TEMP}/history"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit --quiet -m "$(date -u +%F): ${VERDICT} (run ${GITHUB_RUN_ID})"
+          for i in 1 2 3; do
+            git push --quiet origin HEAD:qa-history && break
+            git pull --quiet --rebase origin qa-history || true
+            sleep $((i * 5))
+          done
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ${{ runner.temp }}/history
+
+      - name: Rolling status issue number
+        id: status-issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          num="$(gh issue list -R "${GITHUB_REPOSITORY}" --state open --search '"Nightly QA status" in:title' \
+            --json number,title --jq '[.[] | select(.title == "Nightly QA status")][0].number // empty')"
+          echo "number=${num}" >> "$GITHUB_OUTPUT"
+      - uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+        with:
+          title: Nightly QA status
+          content-filepath: ${{ runner.temp }}/summary.md
+          issue-number: ${{ steps.status-issue.outputs.number }}
+          labels: nightly-qa
+
+      - name: Regression issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          jq -c '.issue_actions[]' "${RUNNER_TEMP}/triage.json" | while read -r act; do
+            fp="$(jq -r .fingerprint <<<"${act}")"
+            title="$(jq -r .title <<<"${act}")"
+            body="$(jq -r .body <<<"${act}")"
+            num="$(gh issue list -R "${GITHUB_REPOSITORY}" --state open --search "\"[${fp}]\" in:title" \
+              --json number --jq '.[0].number // empty')"
+            case "$(jq -r .action <<<"${act}")" in
+              open_or_comment)
+                if [[ -z "${num}" ]]; then
+                  gh issue create -R "${GITHUB_REPOSITORY}" --title "${title}" --body "${body}" --label nightly-regression \
+                    || gh issue create -R "${GITHUB_REPOSITORY}" --title "${title}" --body "${body}"
+                else
+                  gh issue comment -R "${GITHUB_REPOSITORY}" "${num}" \
+                    --body "Still failing ($(jq -r .nights <<<"${act}") nights). ${body}"
+                fi ;;
+              close)
+                [[ -n "${num}" ]] && gh issue close -R "${GITHUB_REPOSITORY}" "${num}" --comment "${body}" ;;
+            esac
+          done
+
+      - name: Notify on verdict change
+        if: steps.triage.outputs.verdict != steps.triage.outputs.previous
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          VERDICT: ${{ steps.triage.outputs.verdict }}
+          PREVIOUS: ${{ steps.triage.outputs.previous }}
+          REPORT_URL: ${{ steps.triage.outputs.report_url }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          text="vision-pack nightly QA ${TAG}: ${PREVIOUS:-none} -> ${VERDICT^^}. ${REPORT_URL}"
+          if [[ -n "${SLACK_WEBHOOK_URL}" ]]; then
+            jq -cn --arg t "${text}" '{text:$t}' | curl -fsS -X POST -H 'Content-Type: application/json' -d @- "${SLACK_WEBHOOK_URL}" || true
+          fi
+          if [[ -n "${TEAMS_WEBHOOK_URL}" ]]; then
+            jq -cn --arg t "${text}" '{type:"message", attachments:[{contentType:"application/vnd.microsoft.card.adaptive",
+              content:{type:"AdaptiveCard", version:"1.4", body:[{type:"TextBlock", wrap:true, text:$t}]}}]}' \
+              | curl -fsS -X POST -H 'Content-Type: application/json' -d @- "${TEAMS_WEBHOOK_URL}" || true
+          fi
+
+  deploy:
+    name: deploy-pages
+    needs: report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
