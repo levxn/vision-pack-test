@@ -1,0 +1,94 @@
+# Build mode, packaging (called by build.yml): CPack DEB/RPM, the meta
+# packages and the dist tarball from the staged tree, as upstream's
+# package.yml does, uploaded as vision-pack-{deb,rpm,tarball}-<ver>-<run_id>
+# in the same tar-packed layout fetch-release produces. No release is made.
+name: package
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: Staged-tree artifact from build.yml
+        type: string
+        required: true
+      package_version:
+        type: string
+        required: true
+      sha:
+        type: string
+        required: true
+    outputs:
+      version:
+        value: ${{ jobs.package.outputs.version }}
+      deb_artifact:
+        value: ${{ jobs.package.outputs.deb_artifact }}
+      rpm_artifact:
+        value: ${{ jobs.package.outputs.rpm_artifact }}
+      tarball_artifact:
+        value: ${{ jobs.package.outputs.tarball_artifact }}
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  package:
+    name: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    container:
+      image: ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+      options: --user root
+    outputs:
+      version: ${{ inputs.package_version }}
+      deb_artifact: ${{ steps.pack.outputs.deb_artifact }}
+      rpm_artifact: ${{ steps.pack.outputs.rpm_artifact }}
+      tarball_artifact: ${{ steps.pack.outputs.tarball_artifact }}
+    steps:
+      - name: git for checkout
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates >/dev/null
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: |
+          git config --global --add safe.directory '*'
+          build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ${{ runner.temp }}/staged
+      - name: CPack DEB/RPM, metas, dist tarball
+        id: pack
+        env:
+          VERSION: ${{ inputs.package_version }}
+        run: |
+          build_tools/package_vision_pack.sh --staging "${RUNNER_TEMP}/staged/vision-pack-staging.tar.gz" \
+            --version "${VERSION}" --build-id "${GITHUB_RUN_ID}" --out "${RUNNER_TEMP}/artifacts"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.pack.outputs.deb_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.pack.outputs.deb_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.pack.outputs.rpm_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.pack.outputs.rpm_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.pack.outputs.tarball_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.pack.outputs.tarball_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error

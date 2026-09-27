@@ -1,0 +1,94 @@
+# Build mode (nightly dispatch with mode: build): build a vision-pack commit
+# from source the way upstream's build.yml does (same TheRock manylinux
+# image, same steps, via build_tools/build_vision_pack.sh), then package it
+# with package.yml. The artifacts carry the same names and layout as a
+# fetched nightly, so test.yml runs unchanged. Nothing is published and no
+# upstream workflow is called.
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: vision-pack commit to build
+        type: string
+        required: true
+      rocm_sdk_date:
+        description: Build SDK date YYYYMMDD (default latest)
+        type: string
+        default: ""
+      rocm_sdk_url:
+        description: Pin the build SDK tarball URL
+        type: string
+        default: ""
+    outputs:
+      version:
+        value: ${{ jobs.package.outputs.version }}
+      deb_artifact:
+        value: ${{ jobs.package.outputs.deb_artifact }}
+      rpm_artifact:
+        value: ${{ jobs.package.outputs.rpm_artifact }}
+      tarball_artifact:
+        value: ${{ jobs.package.outputs.tarball_artifact }}
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+jobs:
+  build:
+    name: build (manylinux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    permissions:
+      contents: read
+    container:
+      image: ghcr.io/rocm/therock_build_manylinux_x86_64@sha256:cf4f6d9909056906e4a1c0bc4c245658a0af4c6a6174082a86adfa2d518b7aeb
+      options: --user root
+      env:
+        ROCM_PATH: /opt/rocm-nightly
+    outputs:
+      version: ${{ steps.build.outputs.version }}
+      staged: vision-pack-staged-multiarch-${{ steps.short.outputs.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack (recursive)
+        env:
+          SHA: ${{ inputs.ref }}
+        run: |
+          git config --global --add safe.directory '*'
+          build_tools/pin_submodule.sh "${SHA}" --recursive
+      - id: short
+        env:
+          SHA: ${{ inputs.ref }}
+        run: echo "sha=${SHA:0:8}" >> "$GITHUB_OUTPUT"
+      - name: Build, stage, verify, pack
+        id: build
+        env:
+          SDK_DATE: ${{ inputs.rocm_sdk_date }}
+          SDK_URL: ${{ inputs.rocm_sdk_url }}
+        run: |
+          build_tools/build_vision_pack.sh --out "${RUNNER_TEMP}/staged" \
+            --sdk-family gfx94X-dcgpu-tests --sdk-date "${SDK_DATE}" --sdk-url "${SDK_URL}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: vision-pack-staged-multiarch-${{ steps.short.outputs.sha }}
+          path: ${{ runner.temp }}/staged/vision-pack-staging.tar.gz
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error
+
+  package:
+    name: package
+    needs: build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/package.yml
+    with:
+      artifact_name: ${{ needs.build.outputs.staged }}
+      package_version: ${{ needs.build.outputs.version }}
+      sha: ${{ inputs.ref }}
