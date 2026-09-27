@@ -1,0 +1,1076 @@
+# Known findings: the only place a failing result becomes "known".
+#
+# Seeded from the manual QA report of 25 Sep 2026 (C1-C2 critical, H1-H19 high,
+# M1-M23 medium, low items L-*) and the provisional findings N1-N4 of the plan;
+# N5 onwards were found while porting the suites (27 Sep 2026).
+#
+# Each entry:
+#   id, title, severity (critical|high|medium|low), owner
+#   kind:   xfail (expected to fail; a pass is reported as "fixed"),
+#           flaky, skip (expected to be blocked/skipped), quarantine (ignored)
+#   match:  shell-style globs over result IDs <suite>::<group>::<name>. Match
+#           only the failing tests: a glob that also covers passing tests turns
+#           them into "fixed" every night. "[" must be written "[[]".
+#   gfx:    optional globs over the tested GPU (default: every GPU)
+#   tiers:  optional; issue: upstream URL; added / review_by: YYYY-MM-DD
+#   strict: report the entry in the verdict reasons once all its tests pass
+# See docs/triage.md for the workflow. lint.yml fails once review_by passes.
+schema: 1
+issues:
+  # ------------------------------------------------------------------ critical
+  - id: C1
+    title: GPU 1-bit threshold kernel writes wrong bits, so threshold -> AND/OR/XOR graphs are wrong on GPU
+    severity: critical
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.*.GPU::U1_Threshold_And"
+      - "mivisionx::parity.*.GPU::U1_Threshold_And3"
+      - "mivisionx::parity.*.GPU::U1_Threshold_Or"
+      - "mivisionx::parity.*.GPU::U1_Threshold_Xor"
+      - "mivisionx::samples.GPU::skintone"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: C2
+    title: Bundled LMDB 1.0.1 cannot open standard LMDB 0.9 databases; rocAL Caffe/Caffe2 readers fail
+    severity: critical
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "rocal::lmdb::bundled-open.*"
+      - "rocal::readers.*::caffe*-lmdb*"
+    # Golden cases read through the Caffe/Caffe2 readers, attributed by their
+    # abort message (most IDs are plain augmentation names).
+    match_file: lists/C2-rocal-golden.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+
+  # ---------------------------------------------------------------------- high
+  - id: H1
+    title: librocal needs libpython (113 undefined CPython symbols, no libpython dependency)
+    severity: high
+    owner: rocAL
+    kind: xfail
+    match:
+      - "loader-audit::ldd.undefined::lib/librocal.so*"
+      - "loader-audit::dlopen::lib/librocal.so*"
+      - "loader-audit::link::rocal-c-consumer"
+      - "loader-audit::link::rocal-c-consumer-run"
+      - "sdk-consumer::consumer.rocal::build"
+      - "rocal::probe::h1-link-without-libpython"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H2
+    title: Built without FFmpeg - rocAL video readers compiled out, rocPyDecode has no PyVideoDemuxer or host backend
+    severity: high
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "rocpydecode::api::ffmpeg-demuxer-bindings"
+      - "rocpydecode::api::host-backend-bindings"
+      - "rocpydecode::video::demuxer_test"
+      - "rocpydecode::video::decoder_test"
+      - "rocpydecode::video::decoder_rgb_dlpack_test"
+      - "rocpydecode::video::decodercpu_test"
+      - "rocpydecode::samples::videodecode"
+      - "rocpydecode::samples::videodecodemem"
+      - "rocpydecode::samples::videodecodergb"
+      - "rocpydecode::samples::videodecode_cpu_backend"
+      - "rocpydecode::samples::videodecodetorch*"
+      - "rocal::ctest::video_tests_*"
+      - "rocal::readers.*::video"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H3
+    title: FindMIVisionX.cmake exports include/ instead of include/mivisionx
+    severity: high
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "sdk-consumer::consumer.mivisionx::build"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H4
+    title: No license texts for redistributed third-party code (libsndfile, protobuf, libjpeg-turbo, LMDB, rapidjson, pybind11, dlpack)
+    severity: high
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::license::libjpeg-turbo"
+      - "loader-audit::license::libsndfile"
+      - "loader-audit::license::lmdb"
+      - "loader-audit::license::protobuf"
+      - "loader-audit::license::rapidjson"
+      - "loader-audit::license.bundled::rocal/*"
+      - "loader-audit::license.bundled::roccv/*"
+      - "packaging::*::amdrocm-pydecode::license.*"
+      - "packaging::*::amdrocm-rocal::license.dlpack"
+      - "packaging::*::amdrocm-rocal::license.pybind11"
+      - "packaging::*::amdrocm-rocal::license.rapidjson"
+      - "packaging::*::amdrocm-roccv::license.dlpack"
+      - "packaging::*::amdrocm-roccv::license.pybind11"
+      - "packaging::*::amdrocm-vision-sysdeps::license.*"
+      - "packaging::tarball::license.libjpeg-turbo"
+      - "packaging::tarball::license.libsndfile"
+      - "packaging::tarball::license.lmdb"
+      - "packaging::tarball::license.protobuf"
+      - "packaging::tarball::license.rapidjson"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H5
+    title: All rocAL audio augmentations fail - the SDK's RPP is built without audio support
+    severity: high
+    owner: ROCm SDK
+    kind: xfail
+    # Every audio case except the decoder (audio_decoder passes), in the C++
+    # audio_tests (audio-cpp.*), the Python QA (audio.*) and the torch-free check.
+    match:
+      - "rocal::audio*::downmix"
+      - "rocal::audio*::mel_filter_bank"
+      - "rocal::audio*::non_silent_region"
+      - "rocal::audio*::normalize"
+      - "rocal::audio*::preemphasis_filter"
+      - "rocal::audio*::resample"
+      - "rocal::audio*::slice"
+      - "rocal::audio*::spectrogram"
+      - "rocal::audio*::tensor_add_tensor"
+      - "rocal::audio*::tensor_mul_scalar"
+      - "rocal::audio*::to_decibels"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H6
+    title: vx_rpp Blur, Median, Gaussian, Dilate and Erode return an image shifted by 12 bytes
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::vxrpp.*.ref::Blur"
+      - "mivisionx::vxrpp.*.ref::Dilate3"
+      - "mivisionx::vxrpp.*.ref::Erode3"
+      - "mivisionx::vxrpp.*.ref::GaussianFilter5"
+      - "mivisionx::vxrpp.*.ref::MedianFilter3"
+      # rocAL uses the same vx_rpp nodes (Dilate/Erode fail on hip only).
+      - "rocal::golden-*::MedianFilter_*"
+      - "rocal::golden-*::GaussianFilter_*"
+      - "rocal::golden-*::Dilate_*_hip"
+      - "rocal::golden-*::Erode_*_hip"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H7
+    title: RPP multi-threaded CPU resize zeroes the first 8 bytes of images
+    severity: high
+    owner: ROCm SDK
+    kind: xfail
+    match:
+      - "sdk-consumer::consumer.rocal::cpu-threads-2"
+      - "sdk-consumer::consumer.rocal::cpu-threads-4"
+      - "rocal::probe::cpu-threads-resize.cpu"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H8
+    title: rocalLog / fn.log / fn.log1p return garbage (CPU wrong or NaN, GPU all zeros)
+    severity: high
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::probe::log.*"
+      - "rocal::probe::log1p.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H9
+    title: rocJPEG hardware decode fails with more than 6 images in flight on gfx1201
+    severity: high
+    owner: ROCm SDK
+    kind: xfail
+    # Batch 8 is the crash-guarded reproducer (CI only); batch 6 is its passing control.
+    match:
+      - "rocal::probe::rocjpeg-batch8.gpu"
+    gfx: ["gfx120*"]
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H10
+    title: vx_rpp on GPU corrupts output from the 2nd graph execution onward
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::vxrpp.GPU.repeat::FishEye"
+      - "mivisionx::vxrpp.GPU.repeat::Flip"
+      - "mivisionx::vxrpp.GPU.repeat::LensCorrection"
+      - "mivisionx::vxrpp.GPU.repeat::Pixelate"
+      - "mivisionx::vxrpp.GPU.repeat::Resize_*"
+      - "mivisionx::vxrpp.GPU.repeat::Rotate"
+      - "mivisionx::vxrpp.GPU.repeat::WarpAffine"
+      - "mivisionx::vxrpp.GPU.repeat::WarpPerspective"
+      - "mivisionx::vxrpp.GPU.repeat::Water"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H11
+    title: CPU Box3x3 segfaults for image widths below 16
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::vision.CPU.5x3::Box_U8_U8_3x3"
+      - "mivisionx::vision.CPU.10x10::Box_U8_U8_3x3"
+      # The width sweep (CI containers only): widths below 16 crash, 16 and up are controls.
+      - "mivisionx::crash.CPU::box_3x3/3x3"
+      - "mivisionx::crash.CPU::box_3x3/4x4"
+      - "mivisionx::crash.CPU::box_3x3/5x3"
+      - "mivisionx::crash.CPU::box_3x3/8x8"
+      - "mivisionx::crash.CPU::box_3x3/10x10"
+      - "mivisionx::crash.CPU::box_3x3/15x15"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H12
+    title: Use-after-free when a parent image is released before its ROI child
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::crash.*::roi-release/*"
+      - "mivisionx::crash.cts.*::Image.DISABLED_testAccessCopyWriteUniformImage"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H13
+    title: CPU S16 threshold is wrong when the width is not a multiple of 16
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.1282x722.CPU::Threshold_U8_S16_Binary"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H14
+    title: AREA scaling is wrong at specific ratios (CPU 2x rows, GPU 3x)
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.*.CPU::ScaleImage_U8_U8_Area"
+      - "mivisionx::parity.1282x722.CPU::ScaleImage_U8_U8_Area_3x"
+      - "mivisionx::parity.*.GPU::ScaleImage_U8_U8_Area_3x"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H15
+    title: GPU packed RGB/RGBX outputs race when the width is not a multiple of 8
+    severity: high
+    owner: MIVisionX
+    # A race: which conversions fail changes between identical runs, so passes are not "fixed".
+    kind: flaky
+    match:
+      - "mivisionx::parity.1282x722.GPU::ColorConvert_RGB*"
+      - "mivisionx::parity.1282x722.GPU::ChannelCombine_*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H16
+    title: runVisionTests.py never fails (ignores runvx exit codes)
+    severity: high
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "robustness::exit-code::runvisiontests-ignores-runvx-failure"
+      - "mivisionx::vision.*::script-exit-honesty"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H17
+    title: copy_to() of non-contiguous tensor views silently corrupts data
+    severity: high
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::strided-copy.h_crop::copy_to_*"
+      - "roccv::strided-copy.hw_roi::copy_to_*"
+      - "roccv::strided-copy.hw_roi_single::copy_to_*"
+      - "roccv::strided-copy.hw_transpose::copy_to_*"
+      - "roccv::strided-copy.w_step2::copy_to_*"
+      - "roccv::strided-copy.channel_slice::copy_to_*"
+      - "roccv::strided-copy.h_crop::flip_GPU"
+      - "roccv::strided-copy.hw_roi::flip_GPU"
+      - "roccv::strided-copy.hw_roi_single::flip_GPU"
+      - "roccv::strided-copy.hw_transpose::flip_GPU"
+      - "roccv::strided-copy.w_step2::flip_GPU"
+      - "roccv::dlpack::noncontig_*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H18
+    title: custom_crop accepts a negative origin (GPU memory access fault, CPU garbage)
+    severity: high
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::negative.*::custom_crop_Box(-5,-5,4,4)"
+      - "roccv::negative.*::custom_crop_Box(-1000,0,4,4)"
+      - "roccv::negative.*::custom_crop_Box(0,-100000,4,4)"
+      - "roccv::oob.CPU::custom_crop_negative_origin_content"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+  - id: H19
+    title: C++ TensorWrapData frees memory the caller owns; wrapped host memory reports device GPU
+    severity: high
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::cpp-probe.wrap::host_buffer_*"
+      - "roccv::cpp-probe.wrap::caller_owned_gpu_memory"
+      - "roccv::cpp-probe.strided::*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+    strict: true
+
+  # -------------------------------------------------------------------- medium
+  - id: M1
+    title: Bundled-library isolation is file-level only - symbols bind to host copies loaded first; stock version names leak into RPM Provides
+    severity: medium
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::interpose::*"
+      - "packaging::rpm::amdrocm-vision-sysdeps::provides.isolation"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M2
+    title: runvx ships without OpenCV; documented canny.gdf and skintonedetect.gdf fail with a misleading error
+    severity: medium
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "mivisionx::samples.gdf::canny.gdf"
+      - "mivisionx::samples.gdf::skintonedetect.gdf"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M3
+    title: No install or usage documentation for the tarball (location, PYTHONPATH, Python 3.12 only, numpy)
+    severity: medium
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::docs::install-usage"
+      - "packaging::tarball::docs.install"
+      - "rocpydecode::layout::sample-readme-links"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  # M4 (hip_cu_mask ctest script not installed) is fixed in nightly-20260926 (0.2.0+gd440925):
+  # the tarball now ships share/mivisionx/test/hip_cu_mask_tests/ and openvx_hip_cu_mask_remap_4K
+  # passes. Entry removed 27 Sep 2026 after the validation run.
+  - id: M5
+    title: Python API is unsafe for concurrent pipeline construction
+    severity: medium
+    owner: rocAL
+    # A race: some nights all concurrent runs agree.
+    kind: flaky
+    match:
+      - "rocal::probe::concurrent-*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M6
+    title: SSD box-encoder pipelines segfault in rocalRelease
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::golden-*::CropResizeRandom_*"
+      - "rocal::probe::box-encoder-release*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M7
+    title: fn.crop ignores crop_pos_x / crop_pos_y
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::probe::crop-pos.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M8
+    title: Pipeline.build() calls exit(0) when verification fails
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "robustness::exit-code::rocal-build-exit0"
+      - "robustness-nogpu::rocal::cpu-decode-resize"
+      - "rocal::probe::build-exit-status"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M9
+    title: rocalCopyToOutput returns OK without copying on a size mismatch
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::probe::copy-to-output-size.*"
+      # The black numpy Crop / CropMirrorNormalize and blank BlendRandom outputs.
+      - "rocal::golden-*::Crop_*_numpy"
+      - "rocal::golden-*::CropMirrorNormalize_*_numpy"
+      - "rocal::golden-cpp-strict.hip.*::BlendRandom_*_hip"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M10
+    title: Symlinked datasets break every label reader
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::probe::labels-symlink-dataset.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M11
+    title: One-hot labels fail on GPU pipelines
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::probe::one-hot*.gpu"
+      - "rocal::golden-py.gpu.*::OneHot_*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M12
+    title: external_source_reader hangs (reported for a missing path separator; on 27 Sep it also hung with the separator)
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "robustness::hang::external-source-no-separator*"
+      - "robustness::hang::external-source-with-separator"
+      - "rocal::probe::external-source-nosep.*"
+      - "rocal::probe::external-source-sep.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M13
+    title: CPU mode still requires a GPU (hipSetDevice failed without a visible GPU)
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "robustness-nogpu::rocal::cpu-decode-only"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M14
+    title: LMDB readers write to the dataset (read-write open, no MDB_NOLOCK)
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::lmdb::lock-unchanged.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M15
+    title: GPU S16 multiply with round-to-nearest loses precision
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.*.GPU::Mul_S16_S16S16_Wrap_Round"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M16
+    title: CPU and GPU disagree on half-scale Gaussian and Canny L2
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.*.GPU::ScaleGaussianHalf_U8_U8_3x3"
+      - "mivisionx::parity.*.GPU::Canny_3x3_L2Norm"
+      - "mivisionx::parity.1282x722.GPU::GaussianPyramid_4L"
+      - "mivisionx::samples.CPU::canny_3_NORM_L2"
+      - "mivisionx::cts.CPU.optional::vxuCanny.DISABLED_BitExactL1/0/3x3 thresh=120 output=VX_DF_IMAGE_U8"
+      - "mivisionx::cts.CPU.optional::vxCanny.DISABLED_BitExactL1/0/3x3 thresh=120 output=VX_DF_IMAGE_U8"
+      - "mivisionx::cts.*.optional::vxuCanny.DISABLED_BitExactL1/1/5x5 thresh=100 output=VX_DF_IMAGE_U8"
+      - "mivisionx::cts.*.optional::vxCanny.DISABLED_BitExactL1/1/5x5 thresh=100 output=VX_DF_IMAGE_U8"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M17
+    title: REPLICATE / CONSTANT border modes are accepted but ignored
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.*.CPU::Box3x3_Border_*"
+      - "mivisionx::parity.1920x1080.GPU::Box3x3_Border_*"
+      - "mivisionx::parity.1282x722.GPU::Box3x3_Border_Replicate"
+      - "sdk-consumer::consumer.mivisionx::CPU.border-*"
+      - "sdk-consumer::consumer.mivisionx::GPU.border-*"
+    # The CTS optional tests with border modes (full tier): passing and failing
+    # parameter combinations interleave, so the failing ones are listed exactly.
+    match_file: lists/M17-cts-optional-borders.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M18
+    title: 71 functions declared in shipped headers but not exported
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match_file: lists/M18-missing-exports.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M19
+    title: runVisionTests case definitions have defects (invalid RGBA format, duplicate and swapped names)
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::vision.static::case-names"
+      - "mivisionx::vision.static::duplicate-cases"
+      - "mivisionx::vision.static::rgba-format"
+    match_file: lists/M19-vision-rgba.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M20
+    title: Unbatched HWC layout crashes 7 operators
+    severity: medium
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::hwc.brightness_contrast::*"
+      - "roccv::hwc.center_crop::*"
+      - "roccv::hwc.custom_crop::*"
+      - "roccv::hwc.cvtcolor::*"
+      - "roccv::hwc.cvtcolor_gray::*"
+      - "roccv::hwc.gamma_contrast::*"
+      - "roccv::hwc.remap::*"
+      - "roccv::hwc.threshold::*"
+      - "roccv::hwc.composite::alloc.*"
+      - "roccv::cpp-probe.hwc::CvtColor.*"
+      - "roccv::cpp-probe.hwc::GammaContrast.*"
+      - "roccv::cpp-probe.hwc::CenterCrop.*"
+      - "roccv::cpp-probe.hwc::CustomCrop.*"
+      - "roccv::cpp-probe.hwc::BrightnessContrast.*"
+      - "roccv::cpp-probe.hwc::Threshold.*"
+      - "roccv::cpp-probe.hwc::Remap.*"
+      - "roccv::gpu-vs-cpu.cvtcolor::HWC_BGR2RGB"
+      - "roccv::numpy-ref.cvtcolor::HWC_BGR2RGB"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M21
+    title: Kernel launch failures are never reported (no code object - success and zeros)
+    severity: medium
+    owner: rocCV
+    kind: xfail
+    match:
+      - "robustness::unsupported-gpu.gfx*::roccv-*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M22
+    title: Shipped rocpycv.pyi is not valid Python and misses several functions
+    severity: medium
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::stub::syntax"
+      - "roccv::stub::functions_declared"
+      - "roccv::stub::constants_declared"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M23
+    title: roccv::roccv forces a HIP compiler and follows ROCM_PATH into other ROCm installs
+    severity: medium
+    owner: rocCV
+    kind: xfail
+    match:
+      - "sdk-consumer::consumer.roccv::build-gxx"
+      - "sdk-consumer::contamination.decoy.implicit::roccv"
+      - "sdk-consumer::contamination.decoy.*::roccv-offload-arch"
+    added: 2026-09-25
+    review_by: 2026-12-31
+
+  # ----------------------------------------------------- provisional (N1-N4)
+  - id: N1
+    title: rocPyDecode samples ship in no DEB/RPM, but its regression tests call ../samples
+    severity: medium
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "packaging::deb::amdrocm-pydecode-test::refs.*"
+      - "install-test::rocpydecode::n1.samples"
+      - "install-test::rocpydecode::raw_regression_test"
+      - "install-test::rocpyjpegdecode::jpeg_regression_test"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N2
+    title: The -test packages omit their -devel build dependencies; MIVisionX openvx_graph reads samples from mivisionx-devel
+    severity: medium
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "packaging::deb::amdrocm-*-test::depends.devel"
+      - "packaging::deb::amdrocm-mivisionx-test::refs.closure"
+      - "install-test::*::n2.*"
+      - "install-test::*::shipped::*"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N3
+    title: rocAL's pybind test CMake sets a literal PYTHONPATH that replaces the environment
+    severity: low
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::env::pybind-pythonpath"
+    added: 2026-09-27
+    review_by: 2026-12-31
+
+  # ------------------------------------------- found while porting (N5 onwards)
+  - id: N5
+    title: DEB/RPM Depends cannot be satisfied from TheRock's nightly repos (no hip-runtime-amd; '>= 10.2.0' vs '10.2.0~<date>' versions)
+    severity: high
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "packaging::install-deb::depends::amdrocm-decode"
+      - "packaging::install-deb::depends::amdrocm-jpeg"
+      - "packaging::install-deb::depends::amdrocm-rpp"
+      - "packaging::install-deb::depends::hip-runtime-amd"
+      - "packaging::install-rpm::depends::amdrocm-decode"
+      - "packaging::install-rpm::depends::amdrocm-jpeg"
+      - "packaging::install-rpm::depends::amdrocm-rpp"
+      - "packaging::install-rpm::depends::hip-runtime-amd"
+    added: 2026-09-27
+    review_by: 2026-12-31
+    strict: true
+  - id: N6
+    title: amdrocm-rocal RPM auto-requires libsndfile/libturbojpeg version capabilities that no package provides
+    severity: high
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "packaging::rpm::amdrocm-rocal::requires.closure"
+      - "packaging::install-rpm::depends::capabilities"
+    added: 2026-09-27
+    review_by: 2026-12-31
+    strict: true
+  - id: N7
+    title: RPM pythonpath package is not relocatable, uses the Debian dist-packages path, and its %post .pth is untracked and python3.9-only
+    severity: medium
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "packaging::rpm::amdrocm-vision-pythonpath::payload.relocatable"
+      - "packaging::rpm::amdrocm-vision-pythonpath::pth.site-dir"
+      - "packaging::rpm::amdrocm-vision-pythonpath::scriptlets"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N8
+    title: Packages and the tarball own empty foreign directories (CPack)
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "packaging::rpm::amdrocm-mivisionx::payload.empty-dirs"
+      - "packaging::rpm::amdrocm-pydecode::payload.empty-dirs"
+      - "packaging::rpm::amdrocm-rocal::payload.empty-dirs"
+      - "packaging::rpm::amdrocm-roccv::payload.empty-dirs"
+      - "packaging::rpm::amdrocm-vision-pythonpath::payload.empty-dirs"
+      - "packaging::rpm::amdrocm-vision-sysdeps::payload.empty-dirs"
+      - "packaging::tarball::empty-dirs"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N9
+    title: Scripts exit 0 on bad input (readers.tfrecord() calls exit() on a bad key map; rocPyDecode decoder_test exits 0 without arguments)
+    severity: low
+    owner: rocAL
+    kind: xfail
+    match:
+      - "robustness::exit-code::rocal-tfrecord-missing-key-exit0"
+      - "robustness::exit-code::rocpydecode-decoder-test-bad-args-exit0"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N10
+    title: rocPyJpegDecode initialize_hip() terminates the interpreter without a GPU instead of raising
+    severity: low
+    owner: rocPyDecode
+    kind: xfail
+    match:
+      - "robustness-nogpu::rocpydecode::jpeg-decoder-clean-error"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N14
+    title: rocAL host Phase and Bitwise golden outputs differ on 0.05-0.09% of pixels (host only; consistent with the H7 zeroed bytes)
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::golden-*::Phase_*_host"
+      - "rocal::golden-*::BitwiseAnd_*_host"
+      - "rocal::golden-*::BitwiseOr_*_host"
+      - "rocal::golden-*::BitwiseXor_*_host"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N11
+    title: MIVisionX Copy kernel is not supported ("not supported yet") - vxCopyNode and Copy graphs fail
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.*::Copy_U8"
+      - "mivisionx::api-probe.*::copy-node"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N12
+    title: vx_rpp CPU second execution zeroes 3-8 bytes at the start of the second image (RPP multi-thread family, H7)
+    severity: medium
+    owner: ROCm SDK
+    # Which cases are hit varies between runs.
+    kind: flaky
+    match:
+      - "mivisionx::vxrpp.CPU.repeat::ChannelPermute"
+      - "mivisionx::vxrpp.CPU.repeat::ColorJitter"
+      - "mivisionx::vxrpp.CPU.repeat::Resize_*"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: N13
+    title: GPU Phase differs from CPU by up to 128 at width 1282 (also breaks the Magnitude/Phase-via-Sobel graph)
+    severity: medium
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::parity.1282x722.GPU::Phase_U8_S16S16"
+      - "mivisionx::parity.1282x722.GPU::Magnitude_Phase_via_Sobel"
+    added: 2026-09-27
+    review_by: 2026-12-31
+
+  # ----------------------------------------------------------------- low items
+  - id: L-build-paths
+    title: bin/runvx RUNPATH lists build-machine directories; CI paths (/__w/...) in binaries and error strings
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::verify-install::runvx-runpath"
+      - "loader-audit::hardcoded-paths.elf::bin/runvx"
+      - "loader-audit::hardcoded-paths.elf::lib/librocal.so*"
+      - "loader-audit::hardcoded-paths.elf::lib/libvx_rpp.so*"
+      - "loader-audit::hardcoded-paths.elf::lib/rocm_sysdeps/lib/libjpeg-rocm-vision.so*"
+      - "loader-audit::hardcoded-paths.elf::lib/rocm_sysdeps/lib/libprotobuf-rocm-vision.so*"
+      - "loader-audit::hardcoded-paths.elf::lib/rocm_sysdeps/lib/libturbojpeg-rocm-vision.so*"
+      - "loader-audit::hardcoded-paths.elf::lib/rocpydecode.cpython-*"
+      - "loader-audit::hardcoded-paths.elf::lib/rocpyjpegdecode.cpython-*"
+      - "packaging::tarball::runpath::bin/runvx"
+      - "packaging::tarball::elf.ci-paths"
+      - "packaging::rpm::amdrocm-mivisionx::payload.build-paths"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-reexports
+    title: libvxu and libvx_rpp re-export hundreds of libopenvx symbols and carry duplicate 11 MB GPU kernels
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::symbols.dup-exports::lib/libvxu.so*"
+      - "loader-audit::symbols.dup-exports::lib/libvx_rpp.so*"
+      - "loader-audit::fatbin.duplicate::lib/libvxu.so*"
+      - "loader-audit::fatbin.duplicate::lib/libvx_rpp.so*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-stdcxx-leak
+    title: Leaked C++ standard-library symbols in vision libraries and Python modules
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::symbols.stdcxx-leak::lib/libopenvx.so*"
+      - "loader-audit::symbols.stdcxx-leak::lib/libroccv.so*"
+      - "loader-audit::symbols.stdcxx-leak::lib/rocpycv.cpython-*"
+      - "loader-audit::symbols.stdcxx-leak::lib/rocpydecode.cpython-*"
+      - "loader-audit::symbols.stdcxx-leak::lib/rocpyjpegdecode.cpython-*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-hardening
+    title: Bundled parsers built without stack-protector and FORTIFY
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::elf-hardening.canary-fortify::lib/rocm_sysdeps/lib/*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-elf-hygiene
+    title: Bundled .so files are mode 0644 and vision objects have no GNU build IDs
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::elf-hygiene.mode::lib/rocm_sysdeps/lib/*"
+      - "loader-audit::elf-hygiene.build-id::bin/runvx"
+      - "loader-audit::elf-hygiene.build-id::lib/lib*.so.*"
+      - "loader-audit::elf-hygiene.build-id::lib/*.cpython-312-x86_64-linux-gnu.so"
+      - "packaging::tarball::so-mode"
+      - "packaging::tarball::elf.build-id"
+      - "packaging::rpm::amdrocm-mivisionx::so-mode"
+      - "packaging::rpm::amdrocm-pydecode::so-mode"
+      - "packaging::rpm::amdrocm-rocal::so-mode"
+      - "packaging::rpm::amdrocm-roccv::so-mode"
+      - "packaging::rpm::amdrocm-vision-sysdeps::so-mode"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-packaging-extras
+    title: Stray *-asan license folders, no pkg-config files, stale protobuf-lite packaging rule
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "loader-audit::license::no-asan-doc-dirs"
+      - "loader-audit::inventory::pkg-config-files"
+      - "loader-audit::inventory::protobuf-lite"
+      - "packaging::tarball::asan-doc-dirs"
+      - "packaging::tarball::pkgconfig"
+      - "packaging::tarball::sysdeps::libprotobuf-lite-rocm-vision"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-findrocal-include
+    title: Findrocal requires <rocal/rocal_api.h> rather than the documented "rocal_api.h"
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "sdk-consumer::consumer.rocal::include-unprefixed"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-headers
+    title: Public headers that are not self-contained (Khronos VX headers, rocal_api_*, internal rocCV headers; vx_ext_amd.h not valid C)
+    severity: low
+    owner: vision-pack
+    kind: xfail
+    match:
+      - "sdk-consumer::headers.c99::mivisionx/vx_ext_amd.h"
+      - "sdk-consumer::headers.c99::mivisionx/VX/vx_api.h"
+      - "sdk-consumer::headers.c99::mivisionx/VX/vx_compatibility.h"
+      - "sdk-consumer::headers.c99::mivisionx/VX/vx_kernels.h"
+      - "sdk-consumer::headers.c99::mivisionx/VX/vx_nodes.h"
+      - "sdk-consumer::headers.c99::mivisionx/VX/vx_types.h"
+      - "sdk-consumer::headers.c99::mivisionx/VX/vxu.h"
+      - "sdk-consumer::headers.cxx17::mivisionx/VX/vx_api.h"
+      - "sdk-consumer::headers.cxx17::mivisionx/VX/vx_compatibility.h"
+      - "sdk-consumer::headers.cxx17::mivisionx/VX/vx_kernels.h"
+      - "sdk-consumer::headers.cxx17::mivisionx/VX/vx_nodes.h"
+      - "sdk-consumer::headers.cxx17::mivisionx/VX/vx_types.h"
+      - "sdk-consumer::headers.cxx17::mivisionx/VX/vxu.h"
+      - "sdk-consumer::headers.cxx17::rocal/rocal_api_augmentation.h"
+      - "sdk-consumer::headers.cxx17::rocal/rocal_api_data_loaders.h"
+      - "sdk-consumer::headers.cxx17::rocal/rocal_api_data_transfer.h"
+      - "sdk-consumer::headers.cxx17::rocal/rocal_api_meta_data.h"
+      - "sdk-consumer::headers.cxx20-host::roccv/core/detail/hip_utils.hpp"
+      - "sdk-consumer::headers.cxx20-host::roccv/details/filter_2d.hpp"
+      - "sdk-consumer::headers.cxx20-host::roccv/kernels/host/bilateral_filter_host.hpp"
+      - "sdk-consumer::headers.cxx20-host::roccv/kernels/host/bnd_box_host.hpp"
+      - "sdk-consumer::headers.cxx20-host::roccv/kernels/host/histogram_host.hpp"
+      - "sdk-consumer::headers.cxx20-host::roccv/kernels/kernel_helpers.hpp"
+      - "sdk-consumer::headers.hip::roccv/core/detail/hip_utils.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/device/bilateral_filter_device.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/device/bnd_box_device.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/device/histogram_device.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/host/bilateral_filter_host.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/host/bnd_box_host.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/host/histogram_host.hpp"
+      - "sdk-consumer::headers.hip::roccv/kernels/kernel_helpers.hpp"
+      - "mivisionx::api-probe::vx_ext_amd.h-compiles-as-C"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-mvx-gaps
+    title: MIVisionX low items (vx_rpp ColorJitter/Glitch/ColorToGreyscale gaps, RGBA NO_RESOURCES, GPU 9x7 convolution, silent CPU fallback, GPU Box3x3 off by one, threshold attribute, read-gdf-sample.gdf, ctest race)
+    severity: low
+    owner: MIVisionX
+    kind: xfail
+    match:
+      - "mivisionx::vxrpp.GPU::ColorJitter"
+      - "mivisionx::vxrpp.*::Glitch"
+      - "mivisionx::vxrpp.*::ColorToGreyscale_NHWC1"
+      - "mivisionx::api-probe.*::rgba-create"
+      - "mivisionx::api-probe.GPU::convolution-9x7"
+      - "mivisionx::api-probe.*::threshold-readonly-attribute"
+      - "mivisionx::cts.*.optional::Threshold.DISABLED_testvxSetThresholdAttribute_negative"
+      - "mivisionx::gpu-fallback::*"
+      - "mivisionx::samples.gdf::read-gdf-sample.gdf"
+      - "mivisionx::ctest-race::*"
+      - "sdk-consumer::consumer.mivisionx::GPU.box3x3"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-gdf-hidden
+    title: GDFs upstream keeps in cpu/hidden because they fail (incl. the GPU odd-size Convolve cases)
+    severity: low
+    owner: MIVisionX
+    kind: xfail
+    match_file: lists/L-gdf-hidden.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-vision-small-sizes
+    title: Vision nodes that reject 5x3 and 10x10 images (runVisionTests' small sizes hit validation branches)
+    severity: low
+    owner: MIVisionX
+    kind: xfail
+    match_file: lists/L-vision-small-sizes.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-openvx-mark
+    title: openvx-mark reports no timing for MinMaxLoc on GPU
+    severity: low
+    owner: vision-pack-test
+    kind: xfail
+    match:
+      - "mivisionx::perf.openvx-mark.GPU::MinMaxLoc"
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: L-rocal-gaps
+    title: rocAL low items (rocalNop uninitialized memory, color_jitter without GPU path, WebDataset cases registered while disabled, CHECK_LMDB_RETURN_STATUS double evaluation)
+    severity: low
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::probe::nop-uninitialized.*"
+      - "rocal::golden-cpp-strict.*::Nop_*"
+      - "rocal::probe::color-jitter.gpu"
+      - "rocal::golden-py.gpu.rgb::ColorJitter_rgb_hip"
+      - "rocal::readers.*::webdataset"
+      - "rocal::lmdb::error-message"
+    match_file: lists/L-webdataset-golden.txt
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-rocal-harness
+    title: rocAL harness gaps (image comparator always exits 0, TF tests print "Install tensorflow" and exit 0, audio test always exits 0)
+    severity: low
+    owner: rocAL
+    kind: xfail
+    match:
+      - "robustness::exit-code::rocal-image-comparison-exit0"
+      - "robustness::exit-code::rocal-unit-test-missing-tensorflow-exit0"
+      - "robustness::exit-code::rocal-audio-unit-test-exit0"
+      - "rocal::audio.*::qa-run"
+      # The upstream comparators' totals (they always exit 0); each failing case is baselined on its own.
+      - "rocal::golden-cpp::upstream-comparator"
+      - "rocal::golden-py::upstream-comparator"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-rocal-drift
+    title: rocAL golden drift - Hue/Saturation off by 1 LSB; WarpPerspective, Remap and ColorTemp differ on a few border pixels
+    severity: low
+    owner: rocAL
+    kind: xfail
+    match:
+      - "rocal::golden-*::Hue_rgb_*"
+      - "rocal::golden-*::Saturation_rgb_hip"
+      - "rocal::golden-*::ColorTemp_rgb_host"
+      - "rocal::golden-*::WarpPerspective_*_hip"
+      - "rocal::golden-*::Remap_gray_hip"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-rocal-crashes
+    title: rocAL crashes instead of reporting errors (grey raw TFRecord, BlendRandom numpy on host, the crash probes)
+    severity: low
+    owner: rocAL
+    # The grey tf_raw cases flip between "Not a valid option" (skip) and SIGSEGV.
+    kind: xfail
+    match:
+      - "rocal::golden-cpp*.*.gray::*_tfraw"
+      - "rocal::golden-cpp*.host.*::BlendRandom_*"
+      - "rocal::probe::crash.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-roccv-accuracy
+    title: rocCV WarpAffine NEAREST differs between GPU and CPU (FMA rounding); GammaContrast loses precision on U32; Threshold header documents the wrong layout
+    severity: low
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::gpu-vs-cpu.warp_affine::U8_NEAREST_*"
+      - "roccv::gpu-vs-cpu.warp_affine::F32_NEAREST_*"
+      - "roccv::repro::warp_affine_nearest_source_pixels"
+      - "roccv::precision.gamma_contrast::*"
+      - "roccv::api-doc::threshold_NW_layout.*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-roccv-validation
+    title: rocCV accepts negative padding, singular warp matrices and a NaN rotation angle; copy_to needs a GPU even for CPU tensors
+    severity: low
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::negative.*::warp_affine_singular_matrix"
+      - "roccv::negative.*::warp_perspective_singular_matrix"
+      - "roccv::negative.*::copymakeborder_negative_top"
+      - "roccv::negative.*::rotate_NaN_angle"
+      - "robustness-nogpu::roccv::cpu-flip-copy-to"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-roccv-samples
+    title: rocCV samples - broken -h option, normalize ignores bad options, SIGABRT on bad input
+    severity: low
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::samples.help::bilateral_filter"
+      - "roccv::samples.help::bnd_box"
+      - "roccv::samples.help::center_crop"
+      - "roccv::samples.help::custom_crop"
+      - "roccv::samples.help::roccv_cropandresize_app"
+      - "roccv::samples.badinput::normalize_unknown_option"
+      - "roccv::samples.badinput::center_crop_missing_input"
+      - "roccv::samples.badinput::center_crop_crop_too_big"
+      - "roccv::samples.badinput::custom_crop_out_of_bounds"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-roccv-perf
+    title: rocCV Gaussian and AverageBlur about 3x slower than comparable operators; Rotate 2.3x slower than WarpAffine
+    severity: low
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::perf-audit::*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-roccv-tests
+    title: rocCV Python tests check tensor metadata only, and 6 of 25 files are not registered in the installed ctest
+    severity: low
+    owner: rocCV
+    kind: xfail
+    match:
+      - "roccv::audit::*"
+    added: 2026-09-25
+    review_by: 2026-12-31
+
+  # ------------------------------------------------ expected to be blocked
+  - id: L-extended-only
+    title: Checks that need ROCm torch, tensorflow or jax run only in the extended image
+    severity: low
+    owner: vision-pack-test
+    kind: skip
+    match:
+      - "roccv::dlpack.torch::*"
+      - "roccv::samples.torch::*"
+      - "rocpydecode::jpeg::jpeg_tensor_test"
+      - "rocal::golden-py*::*jax*"
+      - "rocal::readers.*::tfrecord"
+      - "rocal::extended::*"
+    # The TFRecord-reader Python golden cases have plain augmentation names.
+    match_file: lists/L-tf-golden.txt
+    added: 2026-09-27
+    review_by: 2026-12-31
+  - id: L-media-optional
+    title: rocPyDecode samples that need hip-python, mpi4py or PyAV (not in the media image)
+    severity: low
+    owner: vision-pack-test
+    kind: skip
+    match:
+      - "rocpydecode::samples::videodecodeperf"
+      - "rocpydecode::samples::videodecode_mpi"
+      - "rocpydecode::video::decoder_api_test"
+    added: 2026-09-27
+    review_by: 2026-12-31

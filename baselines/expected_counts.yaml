@@ -1,0 +1,119 @@
+# Floors on the number of result IDs per suite and group, so silently dropped
+# tests turn the night red (report/triage.py). `group` is a glob over the second
+# ID component (<suite>::<group>::<name>); `tiers` default to every tier the
+# suite runs in. Values come from the validation run of 27 Sep 2026 on
+# nightly-20260926. When upstream legitimately adds or removes tests, update the
+# floor in the same PR. Hardware-dependent groups (unsupported-GPU probes) and
+# environment-dependent ones (build.*, harness) are deliberately not guarded.
+schema: 1
+counts:
+  # ------------------------------------------------------------- packaging
+  - {suite: packaging, group: deb, min: 46, note: "upstream validate_packages.sh: 13 packages + 3 metas, plus extra checks"}
+  - {suite: packaging, group: rpm, min: 221}
+  - {suite: packaging, group: tarball, min: 45}
+  - {suite: packaging, group: install-deb, min: 6}
+  - {suite: packaging, group: install-rpm, min: 7}
+  - {suite: install-test, group: "*", min: 1, tiers: [full]}
+
+  # ------------------------------------------------------------- mivisionx
+  - {suite: mivisionx, group: ctest, min: 6, tiers: [quick]}
+  - {suite: mivisionx, group: ctest, min: 32, tiers: [standard, comprehensive, full]}
+  - {suite: mivisionx, group: api.CPU, min: 16, tiers: [standard, comprehensive, full]}
+  - {suite: mivisionx, group: api.GPU, min: 16, tiers: [standard, comprehensive, full]}
+  - {suite: mivisionx, group: samples.gdf, min: 5, tiers: [standard, comprehensive, full]}
+  - {suite: mivisionx, group: api-probe.exports, min: 369, tiers: [standard, comprehensive, full]}
+  - {suite: mivisionx, group: cts.CPU.*, min: 5957, tiers: [comprehensive, full],
+     note: "5,824 required + pipelining 109 + streaming 24"}
+  - {suite: mivisionx, group: cts.GPU.*, min: 5957, tiers: [comprehensive, full]}
+  - {suite: mivisionx, group: cts.CPU.optional, min: 7439, tiers: [full]}
+  - {suite: mivisionx, group: cts.GPU.optional, min: 7439, tiers: [full]}
+  - {suite: mivisionx, group: gdf.CPU.*, min: 441, tiers: [comprehensive, full], note: "416 GDFs + 25 hidden"}
+  - {suite: mivisionx, group: gdf.GPU.*, min: 441, tiers: [comprehensive, full]}
+  - {suite: mivisionx, group: vision.CPU.*, min: 351, tiers: [comprehensive, full], note: "116 nodes x 3 sizes + honesty"}
+  - {suite: mivisionx, group: vision.GPU.*, min: 351, tiers: [comprehensive, full]}
+  - {suite: mivisionx, group: parity.*, min: 572, tiers: [comprehensive, full]}
+  - {suite: mivisionx, group: vxrpp.*, min: 224, tiers: [comprehensive, full]}
+  - {suite: mivisionx, group: crash.*, min: 138, tiers: [comprehensive, full]}
+  - {suite: mivisionx, group: perf.openvx-mark.GPU, min: 40, tiers: [full]}
+
+  # ----------------------------------------------------------------- rocal
+  - {suite: rocal, group: ctest, min: 3, tiers: [quick]}
+  - {suite: rocal, group: ctest, min: 21, tiers: [standard, comprehensive, full]}
+  - {suite: rocal, group: pybind, min: 6, tiers: [standard, comprehensive, full]}
+  - {suite: rocal, group: audio-cpp.*, min: 24, tiers: [standard, comprehensive, full], note: "12 cases per backend"}
+  - {suite: rocal, group: audio.*, min: 26, tiers: [standard, comprehensive, full]}
+  - {suite: rocal, group: probe, min: 40, tiers: [comprehensive, full],
+     note: "box-encoder-release expands to 4 IDs once unit_tests is built"}
+  - {suite: rocal, group: golden-cpp.*, min: 612, tiers: [comprehensive, full], note: "153 unit_tests runs per backend/colour pair"}
+  - {suite: rocal, group: golden-cpp-strict.*, min: 612, tiers: [comprehensive, full]}
+  - {suite: rocal, group: golden-py.*, min: 358, tiers: [comprehensive, full], note: "91 per rgb pair, 88 per gray pair"}
+  - {suite: rocal, group: readers.*, min: 22, tiers: [comprehensive, full]}
+  - {suite: rocal, group: lmdb, min: 25, tiers: [comprehensive, full]}
+  - {suite: rocal, group: perf, min: 23, tiers: [full]}
+
+  # ---------------------------------------------------------- loader-audit
+  - {suite: loader-audit, group: verify-install, min: 47}
+  - {suite: loader-audit, group: ldd.customer, min: 15, note: "all 15 vision-pack ELF objects"}
+  - {suite: loader-audit, group: ldd.undefined, min: 15}
+  - {suite: loader-audit, group: dlopen, min: 10}
+  - {suite: loader-audit, group: link, min: 5}
+  - {suite: loader-audit, group: py-import.py312, min: 11}
+  - {suite: loader-audit, group: inventory, min: 15}
+  - {suite: loader-audit, group: fatbin.has-gfx, min: 5}
+  - {suite: loader-audit, group: license, min: 8}
+  - {suite: loader-audit, group: license.bundled, min: 8}
+  - {suite: loader-audit, group: cwd-hijack, min: 15, tiers: [standard, comprehensive, full]}
+  - {suite: loader-audit, group: cwd-hijack.control, min: 3, tiers: [standard, comprehensive, full]}
+  - {suite: loader-audit, group: interpose, min: 5, tiers: [standard, comprehensive, full]}
+  - {suite: loader-audit, group: elf-hardening, min: 15, tiers: [standard, comprehensive, full]}
+  - {suite: loader-audit, group: elf-hygiene.*, min: 30, tiers: [standard, comprehensive, full]}
+  - {suite: loader-audit, group: symbols.*, min: 17, tiers: [standard, comprehensive, full]}
+  - {suite: loader-audit, group: hardcoded-paths.*, min: 19, tiers: [standard, comprehensive, full]}
+
+  # ---------------------------------------------------------- sdk-consumer
+  - {suite: sdk-consumer, group: headers.cxx17, min: 33}
+  - {suite: sdk-consumer, group: headers.hip, min: 119}
+  - {suite: sdk-consumer, group: headers.c99, min: 24, tiers: [comprehensive, full]}
+  - {suite: sdk-consumer, group: headers.cxx20-host, min: 97, tiers: [comprehensive, full]}
+  - {suite: sdk-consumer, group: consumer.mivisionx, min: 15}
+  - {suite: sdk-consumer, group: consumer.rocal, min: 12}
+  - {suite: sdk-consumer, group: consumer.roccv, min: 10}
+  - {suite: sdk-consumer, group: contamination.*, min: 16}
+  - {suite: sdk-consumer, group: standalone.ldd, min: 15}
+
+  # ----------------------------------------------------------------- roccv
+  - {suite: roccv, group: ctest, min: 5, tiers: [quick]}
+  - {suite: roccv, group: pytest, min: 1152, tiers: [quick]}
+  - {suite: roccv, group: ctest, min: 40, tiers: [standard, comprehensive, full]}
+  - {suite: roccv, group: case.*, min: 1704, tiers: [standard, comprehensive, full], note: "1,656 TEST_CASE sites"}
+  - {suite: roccv, group: pybind-ctest, min: 20, tiers: [standard, comprehensive, full]}
+  - {suite: roccv, group: pytest, min: 12038, tiers: [standard, comprehensive, full], note: "all 25 files"}
+  - {suite: roccv, group: gpu-vs-cpu.*, min: 441, tiers: [comprehensive, full]}
+  - {suite: roccv, group: numpy-ref.*, min: 217, tiers: [comprehensive, full]}
+  - {suite: roccv, group: hwc.*, min: 100, tiers: [comprehensive, full]}
+  - {suite: roccv, group: strided-copy.*, min: 45, tiers: [comprehensive, full]}
+  - {suite: roccv, group: dlpack, min: 45, tiers: [comprehensive, full]}
+  - {suite: roccv, group: negative.*, min: 54, tiers: [comprehensive, full]}
+  - {suite: roccv, group: stub, min: 10, tiers: [comprehensive, full]}
+  - {suite: roccv, group: cpp-probe.*, min: 25, tiers: [comprehensive, full]}
+  - {suite: roccv, group: samples.cpp, min: 41, tiers: [comprehensive, full]}
+  - {suite: roccv, group: samples.compare, min: 18, tiers: [comprehensive, full]}
+  - {suite: roccv, group: perf, min: 54, tiers: [comprehensive, full]}
+
+  # ----------------------------------------------------------- rocpydecode
+  - {suite: rocpydecode, group: layout, min: 2}
+  - {suite: rocpydecode, group: import, min: 8}
+  - {suite: rocpydecode, group: api, min: 2}
+  - {suite: rocpydecode, group: video, min: 9}
+  - {suite: rocpydecode, group: samples, min: 10}
+  - {suite: rocpydecode, group: jpeg, min: 5}
+
+  # ------------------------------------------------------------ robustness
+  - {suite: robustness, group: exit-code, min: 7}
+  - {suite: robustness, group: hang, min: 2}
+  - {suite: robustness-nogpu, group: env, min: 1}
+  - {suite: robustness-nogpu, group: import, min: 18}
+  - {suite: robustness-nogpu, group: mivisionx, min: 2}
+  - {suite: robustness-nogpu, group: roccv, min: 3}
+  - {suite: robustness-nogpu, group: rocal, min: 3}
+  - {suite: robustness-nogpu, group: rocpydecode, min: 2}
