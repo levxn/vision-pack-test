@@ -1,0 +1,3 @@
+# Suites source build_tools/lib/vp.sh through a computed path.
+disable=SC1091
+external-sources=true

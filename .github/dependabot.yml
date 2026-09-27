@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # Keep the SHA-pinned actions current (Dependabot updates the pins and the
+  # version comments together).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "ci"
+
+  # Base images of the test containers.
+  - package-ecosystem: docker
+    directory: /docker
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+
+  # The vision-pack submodule is pinned by the nightly pipeline at run time,
+  # so it is intentionally not managed by Dependabot.

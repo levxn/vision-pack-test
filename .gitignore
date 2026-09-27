@@ -1,0 +1,15 @@
+# Local runs (build_tools/local_run.sh) and report previews
+/out/
+/_local/
+/site/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# Editors
+.vscode/
+.idea/

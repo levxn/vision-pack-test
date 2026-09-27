@@ -1,0 +1,9 @@
+# Changes to CI definitions, runner hooks and the QA baselines need owner review:
+# they decide what runs on the self-hosted GPU runner and what counts as a pass.
+/.github/        @levxn
+/runner/         @levxn
+/baselines/      @levxn
+/build_tools/    @levxn
+/docker/         @levxn
+/report/         @levxn
+/suites/         @levxn

@@ -1,0 +1,4 @@
+[submodule "vision-pack"]
+	path = vision-pack
+	url = https://github.com/kiritigowda/vision-pack.git
+	branch = main

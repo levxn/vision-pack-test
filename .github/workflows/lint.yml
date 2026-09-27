@@ -1,0 +1,71 @@
+# Checks for changes to this repository itself. This is the only workflow that
+# runs on pull requests, and it only ever uses GitHub-hosted runners: nothing
+# here can reach the self-hosted GPU runner.
+name: lint
+
+# TEMPORARILY DISABLED: trigger commented out so this workflow cannot run yet.
+# Uncomment to re-enable.
+# on:
+#   pull_request:
+#   push:
+#     branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflows:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: actionlint
+        run: |
+          set -euo pipefail
+          # 1.7.12 is the first release that knows on.schedule[].timezone.
+          bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
+          ./actionlint -color
+      - name: zizmor (workflow security audit)
+        run: |
+          set -euo pipefail
+          # zizmor's self-hosted-runner audit only runs in its pedantic persona.
+          # The self-hosted runner is intentional and gated by the host-side
+          # pre-job hook (runner/hooks/job-started.sh).
+          pipx run zizmor --min-severity medium --no-online-audits .github/workflows
+
+  scripts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: shellcheck
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(git ls-files '*.sh' 'runner/cron/*')
+          shellcheck -x -S warning "${files[@]}"
+      - name: ruff, yamllint, pytest
+        run: |
+          set -euo pipefail
+          # A venv: Ubuntu 24.04's system pip refuses installs (PEP 668).
+          python3 -m venv "${RUNNER_TEMP}/lint-venv"
+          "${RUNNER_TEMP}/lint-venv/bin/pip" install --quiet ruff yamllint pytest pyyaml
+          export PATH="${RUNNER_TEMP}/lint-venv/bin:${PATH}"
+          ruff check .
+          yamllint -c .yamllint.yml .
+          pytest -q tests
+      - name: Known-issue manifest (schema and review_by expiry)
+        run: |
+          set -euo pipefail
+          "${RUNNER_TEMP}/lint-venv/bin/python" build_tools/lint_known_issues.py \
+            baselines/known_issues.yaml --expected baselines/expected_counts.yaml

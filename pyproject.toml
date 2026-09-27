@@ -1,0 +1,18 @@
+[project]
+name = "vision-pack-test"
+version = "0.1.0"
+description = "Nightly functional QA of the vision-pack nightly releases"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = ["vision-pack"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"
