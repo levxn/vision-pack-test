@@ -1,0 +1,8 @@
+# Top-level pip requirements of the test image. Everything else comes from
+# Ubuntu 24.04 apt packages (numpy, pytest, Pillow, pandas, matplotlib,
+# OpenCV), which keeps numpy at 1.26 so apt's python3-opencv keeps working.
+# Regenerate the hash-pinned lock with: docker/lock_requirements.sh test
+--index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://pypi.org/simple
+# rocAL audio QA (audio_unit_test.py imports torch); CPU build is enough.
+torch==2.14.0+cpu

@@ -1,0 +1,7 @@
+# Digest-pinned test images used by the nightly, one "kind=ref@sha256:..."
+# per line. .github/workflows/image.yml publishes new images to GHCR and opens
+# a PR that updates this file. An empty value makes build_tools/ensure_image.sh
+# build the image on the runner from docker/ instead (tagged by content hash).
+# The extended image is always built on the runner.
+test=
+media=

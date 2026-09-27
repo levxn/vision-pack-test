@@ -1,0 +1,55 @@
+# syntax=docker/dockerfile:1
+# Test image for the vision-pack nightly QA suites (see suites/suites.yaml).
+#
+# It carries no ROCm: the per-run prefix (TheRock SDK + vision-pack overlay)
+# is mounted read-only at /opt/vp/rocm by build_tools/run_in_container.sh.
+# Published by .github/workflows/image.yml and consumed pinned by digest
+# (docker/images.lock); build_tools/ensure_image.sh builds it on the runner
+# when no pinned image is available.
+#
+# Python packages come from Ubuntu's apt archive (numpy 1.26, pytest, Pillow,
+# pandas, matplotlib, OpenCV 4.6) so python3-opencv keeps its numpy ABI; only
+# the CPU torch wheel comes from pip, hash-pinned.
+ARG BASE=ghcr.io/rocm/no_rocm_image_ubuntu24_04@sha256:405945a40deaff9db90b9839c0f41d4cba4a383c1a7459b28627047bf6302a26
+FROM ${BASE}
+
+LABEL org.opencontainers.image.source="https://github.com/levxn/vision-pack-test" \
+      org.opencontainers.image.description="vision-pack nightly QA: test image"
+
+USER root
+WORKDIR /
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Build tools for the shipped test trees and consumer projects; python3-dev
+# provides libpython, which the rocAL tests link because of finding H1.
+# libjpeg-turbo8, libturbojpeg, liblmdb0, libprotobuf32t64 and libsndfile1 are
+# the host copies the loader-audit interposition checks load first (finding M1).
+# dpkg-dev and equivs build the local repo / stub packages for install-test.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      build-essential cmake ninja-build pkg-config git git-lfs curl ca-certificates jq \
+      file binutils patchelf elfutils time procps psmisc util-linux xz-utils zstd pigz \
+      python3 python3-dev python3-pip python3-venv \
+      python3-numpy python3-pytest python3-pil python3-pandas python3-matplotlib python3-yaml \
+      python3-opencv libopencv-dev \
+      libjpeg-turbo8 libturbojpeg liblmdb0 libprotobuf32t64 libsndfile1 \
+      dpkg-dev equivs gh \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-test.txt /tmp/requirements-test.txt
+RUN python3 -m pip install --break-system-packages --require-hashes --no-deps \
+      -r /tmp/requirements-test.txt \
+ && rm /tmp/requirements-test.txt \
+ && python3 -c 'import cv2, numpy, torch; print("cv2", cv2.__version__, "numpy", numpy.__version__, "torch", torch.__version__)'
+
+# The repository is bind-mounted read-only and owned by the runner user, while
+# suites run as root: let git (e.g. reading the vision-pack submodule) accept it.
+RUN git config --system --add safe.directory '*' \
+ && mkdir -p /opt/vp
+
+WORKDIR /opt/vp/out

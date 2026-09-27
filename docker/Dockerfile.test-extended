@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+# Extended image (full tier with extended_deps): ROCm torch/torchvision from
+# TheRock's nightly wheel index for the runner's GPU family, plus tensorflow
+# and jax, for the checks that need a real framework (rocAL TF/JAX readers,
+# rocCV DLPack interop, rocPyDecode tensor tests, the rocCV classification
+# sample).
+#
+# This is the plan's "spike": the wheels are nightly builds and are not
+# hash-pinned. They live in their own virtual environment, because they need
+# numpy 2, which would break the apt-built python3-opencv in the base image;
+# the venv therefore carries its own numpy/OpenCV/pytest stack. Suites run the
+# venv's python first on PATH. build_tools/ensure_image.sh builds this image
+# on the runner (it is too large for hosted runners).
+ARG BASE_TEST=vp-test:local
+FROM ${BASE_TEST}
+
+ARG AMDGPU_FAMILY=gfx120X-all
+ARG TORCH_INDEX=https://rocm.nightlies.amd.com/v2/${AMDGPU_FAMILY}/
+# Empty = newest release that supports Python 3.12; set to pin (e.g. 2.20.0).
+ARG TENSORFLOW_VERSION=
+ARG JAX_VERSION=
+
+LABEL org.opencontainers.image.description="vision-pack nightly QA: extended image (${AMDGPU_FAMILY})"
+
+ENV VIRTUAL_ENV=/opt/vp-venv
+RUN python3 -m venv "${VIRTUAL_ENV}" \
+ && "${VIRTUAL_ENV}/bin/pip" install --retries 5 --timeout 120 \
+      numpy pytest pillow pandas matplotlib pyyaml opencv-python-headless \
+ && "${VIRTUAL_ENV}/bin/pip" install --retries 5 --timeout 120 \
+      --index-url "${TORCH_INDEX}" torch torchvision \
+ && "${VIRTUAL_ENV}/bin/pip" install --retries 5 --timeout 120 \
+      "tensorflow-cpu${TENSORFLOW_VERSION:+==${TENSORFLOW_VERSION}}" "jax[cpu]${JAX_VERSION:+==${JAX_VERSION}}" \
+ && "${VIRTUAL_ENV}/bin/python" -c 'import numpy, torch, tensorflow, jax; print("numpy", numpy.__version__, "torch", torch.__version__, "tf", tensorflow.__version__, "jax", jax.__version__)'
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}" \
+    VP_EXTENDED=1

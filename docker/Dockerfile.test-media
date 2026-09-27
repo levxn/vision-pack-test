@@ -1,0 +1,15 @@
+# syntax=docker/dockerfile:1
+# Media image for the rocpydecode suite: the test image plus FFmpeg. Today's
+# vision-pack is built without FFmpeg (finding H2), so the suite decodes the
+# shipped Annex-B streams and needs nothing extra; ffmpeg brings the libav*
+# runtime (libavcodec60, libavformat60, libavutil58) an FFmpeg-enabled build
+# would need, plus the CLI for making new raw streams. The VA-API driver comes
+# from the SDK's rocm_sysdeps, not from Mesa.
+ARG BASE_TEST=vp-test:local
+FROM ${BASE_TEST}
+
+LABEL org.opencontainers.image.description="vision-pack nightly QA: media image"
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ffmpeg \
+ && rm -rf /var/lib/apt/lists/*

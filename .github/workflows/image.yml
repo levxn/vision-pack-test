@@ -1,0 +1,152 @@
+# Publish the test and media images to GHCR and propose the new digests in
+# docker/images.lock via a pull request. The nightly consumes images only by
+# digest; until a lock entry exists, build_tools/ensure_image.sh builds the
+# image on the runner instead. The extended image is always built on the
+# runner (per GPU family, and too large for hosted runners).
+name: image
+
+# TEMPORARILY DISABLED: trigger commented out so this workflow cannot run yet.
+# Uncomment to re-enable.
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - "docker/**"
+#       - ".github/workflows/image.yml"
+#   schedule:
+#     # Weekly rebuild to pick up Ubuntu security updates.
+#     - cron: "17 3 * * 1"
+#   workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: image
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: build and push
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      test: ${{ steps.refs.outputs.test }}
+      media: ${{ steps.refs.outputs.media }}
+      hash: ${{ steps.hash.outputs.hash }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Content hash of docker/
+        id: hash
+        run: |
+          set -euo pipefail
+          hash="$(cd docker && find . -type f ! -name images.lock -print0 | sort -z \
+            | xargs -0 sha256sum | sha256sum | cut -c1-16)"
+          echo "hash=${hash}" >> "$GITHUB_OUTPUT"
+          echo "image base name: ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push test image
+        id: test
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: docker
+          file: docker/Dockerfile.test
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.hash.outputs.name }}/test:${{ steps.hash.outputs.hash }}
+            ${{ steps.hash.outputs.name }}/test:latest
+          labels: |
+            vp-ci.kind=test
+            vp-ci.content-hash=${{ steps.hash.outputs.hash }}
+
+      - name: Build and push media image
+        id: media
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: docker
+          file: docker/Dockerfile.test-media
+          push: true
+          provenance: false
+          build-args: |
+            BASE_TEST=${{ steps.hash.outputs.name }}/test@${{ steps.test.outputs.digest }}
+          tags: |
+            ${{ steps.hash.outputs.name }}/media:${{ steps.hash.outputs.hash }}
+            ${{ steps.hash.outputs.name }}/media:latest
+          labels: |
+            vp-ci.kind=media
+            vp-ci.content-hash=${{ steps.hash.outputs.hash }}
+
+      - name: Digest-pinned references
+        id: refs
+        env:
+          NAME: ${{ steps.hash.outputs.name }}
+          TEST_DIGEST: ${{ steps.test.outputs.digest }}
+          MEDIA_DIGEST: ${{ steps.media.outputs.digest }}
+        run: |
+          set -euo pipefail
+          echo "test=${NAME}/test@${TEST_DIGEST}" >> "$GITHUB_OUTPUT"
+          echo "media=${NAME}/media@${MEDIA_DIGEST}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Published images"
+            echo "- test: \`${NAME}/test@${TEST_DIGEST}\`"
+            echo "- media: \`${NAME}/media@${MEDIA_DIGEST}\`"
+            echo
+            echo "Make the GHCR packages public (or give the runner pull access) before merging the lock PR."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  lock:
+    name: propose docker/images.lock update
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Open or update the lock PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TEST_REF: ${{ needs.build.outputs.test }}
+          MEDIA_REF: ${{ needs.build.outputs.media }}
+          HASH: ${{ needs.build.outputs.hash }}
+        run: |
+          set -euo pipefail
+          lock=docker/images.lock
+          sed -i -E "s|^test=.*|test=${TEST_REF}|; s|^media=.*|media=${MEDIA_REF}|" "${lock}"
+          if git diff --quiet -- "${lock}"; then
+            echo "images.lock already pins these digests"
+            exit 0
+          fi
+          branch="images/lock-${HASH}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "${branch}"
+          git commit -m "Pin test images ${HASH}" -- "${lock}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "${branch}"
+          if ! gh pr view "${branch}" --json number >/dev/null 2>&1; then
+            gh pr create --base main --head "${branch}" --title "Pin test images ${HASH}" \
+              --body "Published by the image workflow run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. Merging makes the nightly pull these digests instead of building on the runner."
+          fi
