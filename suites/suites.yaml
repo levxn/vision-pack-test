@@ -1,0 +1,103 @@
+# Test matrix: which suite runs in which tier, where, and for how long.
+#
+#   runner:  hosted  GitHub-hosted ubuntu runner, no GPU
+#            gpu     self-hosted runner labelled vp-gpu
+#            cpu     self-hosted vp-cpu instance when the repo variable
+#                    VP_HAS_CPU_RUNNER is true, otherwise vp-gpu. It is on the
+#                    same host, so these suites may still use the GPU; they are
+#                    simply the ones that can overlap with the GPU queue.
+#   tiers:   the tiers that include the suite. Inside a suite, run.sh scales the
+#            work further with vp_tier_ge (quick < standard < comprehensive < full).
+#   image:   test (docker/Dockerfile.test), media (Dockerfile.test-media) or
+#            extended (Dockerfile.test-extended; used for every suite when the
+#            extended_deps dispatch input is true and the tier is full).
+#   entrypoint: script run inside the container (default suites/<name>/run.sh).
+#   gpu_access: chosen (default: /dev/kfd + the detected GPU's render node),
+#               all    (also the render nodes of GPUs the build does not target,
+#                       for unsupported-GPU negatives), or
+#               none   (no GPU device at all: CPU paths must still work).
+#
+# The hosted packaging jobs (validate-packages, verify-tarball, install-smoke)
+# are separate jobs in test.yml; the "packaging" entry here only records their
+# tiers and budget for plan_matrix.py and the report.
+#
+# Timeouts are about three times the comprehensive wall time measured on
+# 27 Sep 2026 (nightly-20260926, RX 9070 XT), with room for the full tier's
+# extras and first-night downloads. The whole comprehensive tier ran in 35 min
+# serially. A timeout is an infrastructure error, so keep them tight enough to
+# catch hangs.
+
+suites:
+  packaging:
+    runner: hosted
+    tiers: [quick, standard, comprehensive, full]
+    timeout_minutes: 45
+    description: DEB/RPM validation, tarball checks and clean-container installs
+
+  loader-audit:
+    runner: cpu
+    tiers: [quick, standard, comprehensive, full]
+    timeout_minutes: 15  # measured 6 s
+    image: test
+    description: RUNPATH/NEEDED, dlopen and link probes, CWD hijack, symbol isolation, licenses
+
+  sdk-consumer:
+    runner: cpu
+    tiers: [standard, comprehensive, full]
+    timeout_minutes: 20  # measured 20 s
+    image: test
+    description: header self-containment, find_package consumer builds, install contamination
+
+  mivisionx:
+    runner: gpu
+    tiers: [quick, standard, comprehensive, full]
+    # Measured: comprehensive 11 min, full 14 min (plus the first-night CTS clone and build).
+    timeout_minutes: 60
+    image: test
+    description: ctest, API tests on both targets, Khronos CTS shards, GDF sweep, parity, vx_rpp
+
+  rocal:
+    runner: gpu
+    tiers: [quick, standard, comprehensive, full]
+    timeout_minutes: 60  # measured 19.5 min (C++ golden sweep 11 min)
+    image: test
+    description: ctest, C++ and Python golden sweeps, audio, readers, API probes
+
+  roccv:
+    runner: gpu
+    tiers: [quick, standard, comprehensive, full]
+    timeout_minutes: 40  # measured 2.7 min; the full tier also builds roccv_bench from source
+    image: test
+    description: ctest with per-case results, pytest, GPU-vs-CPU harness, DLPack, samples
+
+  rocpydecode:
+    runner: gpu
+    tiers: [standard, comprehensive, full]
+    timeout_minutes: 15  # measured 9 s; each script has its own 300 s limit
+    image: media
+    description: raw video decode, rocPyJpegDecode, expected demuxer failures
+
+  robustness:
+    runner: gpu
+    tiers: [comprehensive, full]
+    timeout_minutes: 15  # measured 66 s, of which 60 s is the M12 hang guard
+    image: test
+    gpu_access: all
+    description: unsupported-GPU negatives, exit-code honesty, hang guards
+
+  robustness-nogpu:
+    runner: gpu
+    tiers: [comprehensive, full]
+    timeout_minutes: 10  # measured 3 s
+    image: test
+    gpu_access: none
+    entrypoint: suites/robustness/nogpu.sh
+    description: CPU pipelines in a container with no GPU device
+
+  install-test:
+    runner: gpu
+    tiers: [full]
+    timeout_minutes: 90
+    image: test
+    entrypoint: suites/packaging/install_test.sh
+    description: install only the -test packages like a customer and run the shipped tests
