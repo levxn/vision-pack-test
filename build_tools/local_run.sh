@@ -6,17 +6,21 @@
 #   build_tools/local_run.sh --suite roccv --prefix /opt/rocm-nightly \
 #       [--data /path/to/MIVisionX-data] [--tier standard] [--out ./out] \
 #       [--manifest file.json] [--dist-tarball vision-pack-dist-*.tar.gz] \
-#       [--extended] [--ci-parity]
+#       [--extended] [--ci-parity] [--no-gpu]
 #
 # Output goes to <out>/<suite>/ (results.jsonl, junit/, logs/, perf/); the
 # download cache (e.g. the OpenVX CTS clone) goes to $VP_CACHE, by default
 # /tmp/vp-ci-cache-<uid>. The GPU is pinned with ROCR_VISIBLE_DEVICES because
 # bare metal cannot hide the other render nodes the way the container
 # launcher does.
+#
+# --no-gpu emulates a runner without a usable GPU (test.yml's test-nogpu job):
+# empty VP_GFX, gpu_access none and ROCR_VISIBLE_DEVICES=-1. Only the suites
+# with needs_gpu: false in suites/suites.yaml can run that way.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-suite="" prefix="" data="" tier="standard" out="${REPO}/out" manifest="" extended=0 parity=0
+suite="" prefix="" data="" tier="standard" out="${REPO}/out" manifest="" extended=0 parity=0 no_gpu=0
 dist="${VP_DIST_TARBALL:-}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -29,7 +33,8 @@ while [[ $# -gt 0 ]]; do
     --dist-tarball) dist="$(readlink -f "$2")"; shift 2 ;;
     --extended) extended=1; shift ;;
     --ci-parity) parity=1; shift ;;
-    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
+    --no-gpu) no_gpu=1; shift ;;
+    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
     *) echo "unknown argument $1" >&2; exit 2 ;;
   esac
 done
@@ -51,8 +56,21 @@ grep -qE "^  ${suite}:[[:space:]]*$" suites/suites.yaml || { echo "unknown suite
 entry="$(suite_field entrypoint "suites/${suite}/run.sh")"
 access="$(suite_field gpu_access chosen)"
 
-gpu_env="$("${REPO}/build_tools/detect_gpu.sh" --manifest "${manifest}" 2>/dev/null || true)"
-eval "$(printf '%s\n' "${gpu_env}" | grep -E '^VP_[A-Z_]+=' | sed 's/^/export /')"
+if [[ "${no_gpu}" == 1 ]]; then
+  if [[ "$(suite_field needs_gpu true)" != false ]]; then
+    echo "local_run: ${suite} needs a GPU (no needs_gpu: false in suites/suites.yaml); without one CI reports it as ${suite}::infra::no-gpu" >&2
+    exit 2
+  fi
+  access=none
+  gpu_env="$(printf '%s\n' VP_GPU_PRESENT=0 "VP_NO_GPU_REASON=local_run.sh --no-gpu" VP_GFX= VP_RENDER_MINOR= \
+    VP_GPU_INDEX= VP_SDK_FAMILY= VP_GPU_LIST= VP_UNSUPPORTED_GPUS=)"
+else
+  gpu_env="$("${REPO}/build_tools/detect_gpu.sh" --manifest "${manifest}" 2>/dev/null || true)"
+fi
+# Values may contain spaces (VP_NO_GPU_REASON), so no eval.
+while IFS= read -r kv; do
+  [[ "${kv}" =~ ^VP_[A-Z_]+= ]] && export "${kv}"
+done <<<"${gpu_env}"
 
 mkdir -p "${out}/${suite}"
 export ROCM_PATH="${prefix}"
