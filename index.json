@@ -1,0 +1,25 @@
+{
+ "nights": [
+  {
+   "night": "2026-09-28",
+   "dir": "runs/36429359918",
+   "event": "workflow_dispatch",
+   "run_id": "36429359918",
+   "tier": "comprehensive",
+   "gfx": "",
+   "verdict": "red",
+   "tag": "nightly-20260926",
+   "version": "0.2.0+gd440925",
+   "sha": "d440925b1b06417460ce48bd15a5c5d4ee239cba",
+   "fingerprint": "56dab0926d14bddf",
+   "counts": {
+    "pass": 283,
+    "known_fail": 70,
+    "new_failure": 30,
+    "blocked": 5,
+    "infra_error": 8
+   },
+   "records": 396
+  }
+ ]
+}
