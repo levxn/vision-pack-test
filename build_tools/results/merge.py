@@ -18,6 +18,12 @@ It adds synthetic ``error`` records so infrastructure problems always show:
 (runner-status.json: container failure, time budget), and
 ``preflight::infra::gpu-preflight`` when the GPU pre-flight failed.
 
+When the runner had no usable GPU (environment.json ``gpu_present: false`` or
+prepared.json ``mode: no-gpu``) only the ``needs_gpu: false`` suites ran:
+``preflight::infra::no-gpu`` carries the reason, and every expected suite
+that needs a GPU (suites/suites.yaml) is ``<suite>::infra::no-gpu`` instead
+of ``no-results``.
+
     merge.py --results downloaded/ --out merged/ [--expect packaging,rocal,...]
 """
 from __future__ import annotations
@@ -32,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from emit import make_record, read_records  # noqa: E402
 
 ENV_FILES = ("environment.json", "prepared.json", "manifest.json", "preflight.json")
+SUITES_YAML = Path(__file__).resolve().parents[2] / "suites" / "suites.yaml"
 
 
 def _load(p: Path) -> dict:
@@ -39,6 +46,28 @@ def _load(p: Path) -> dict:
         return json.loads(p.read_text())
     except (OSError, ValueError):
         return {}
+
+
+def no_gpu_reason(environment: dict) -> str | None:
+    """Why the runner had no usable GPU, or None if it had one (or nobody recorded it)."""
+    env, prepared = environment.get("environment") or {}, environment.get("prepared") or {}
+    if env.get("gpu_present") is False or prepared.get("mode") == "no-gpu":
+        return env.get("no_gpu_reason") or "no usable GPU detected"
+    return None
+
+
+def gpu_suites(config: Path = SUITES_YAML) -> set[str] | None:
+    """Self-hosted suites without ``needs_gpu: false``; None if suites.yaml is unreadable."""
+    try:
+        import yaml
+    except ImportError:
+        return None
+    try:
+        cfg = yaml.safe_load(config.read_text()) or {}
+    except (OSError, yaml.YAMLError):
+        return None
+    return {name for name, s in (cfg.get("suites") or {}).items()
+            if s.get("runner", "gpu") != "hosted" and s.get("needs_gpu", True) is not False}
 
 
 def _combine(old: dict, new: dict) -> dict:
@@ -54,7 +83,8 @@ def _combine(old: dict, new: dict) -> dict:
     return out
 
 
-def merge(root: Path, out: Path, expect: list[str]) -> dict:
+def merge(root: Path, out: Path, expect: list[str], need_gpu: set[str] | None = None) -> dict:
+    """``need_gpu``: suites that cannot run without a GPU (default: from suites.yaml)."""
     (out / "perf").mkdir(parents=True, exist_ok=True)
     records: dict[str, dict] = {}
     suites: dict[str, dict] = {}
@@ -98,13 +128,26 @@ def merge(root: Path, out: Path, expect: list[str]) -> dict:
         rec = make_record("preflight", "preflight::infra::gpu-preflight", "error",
                           message=f"GPU pre-flight failed: {pre.get('reason', 'unknown')}")
         records[rec["id"]] = rec
+    why = no_gpu_reason(environment)
+    if why is not None:
+        rec = make_record("preflight", "preflight::infra::no-gpu", "error",
+                          message=f"the runner had no usable GPU ({why}); only the needs_gpu: false suites ran")
+        records[rec["id"]] = rec
+        if need_gpu is None:
+            need_gpu = gpu_suites()
 
     for suite in expect:
-        if suite not in suites:
+        if suite in suites:
+            continue
+        if why is not None and (need_gpu is None or suite in need_gpu):
+            rec = make_record(suite, f"{suite}::infra::no-gpu", "error",
+                              message=f"not run: the runner had no usable GPU ({why})")
+            suites[suite] = {"suite": suite, "missing": True, "no_gpu": True, "result_dirs": []}
+        else:
             rec = make_record(suite, f"{suite}::infra::no-results", "error",
                               message="the suite job produced no results (job failed, timed out or was cancelled)")
-            records[rec["id"]] = rec
             suites[suite] = {"suite": suite, "missing": True, "result_dirs": []}
+        records[rec["id"]] = rec
 
     with open(out / "results.jsonl", "w", encoding="utf-8") as f:
         for r in records.values():

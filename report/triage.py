@@ -23,6 +23,11 @@ branch. Expected-count floors, zero-result suites and hard performance
 regressions also turn the night red; removed tests and soft performance drops
 make it yellow. Suites never apply baselines themselves: this is the only place
 a failure becomes "known".
+
+A night on a runner without a usable GPU (merge.py's ``*::infra::no-gpu``
+records) is red with one "runner had no usable GPU" reason and one issue
+(``runner::no-gpu``); the degraded suites' "no GPU" blocked checks are
+known_blocked.
 """
 from __future__ import annotations
 
@@ -43,11 +48,13 @@ import yaml
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "build_tools" / "results"))
+from merge import no_gpu_reason  # noqa: E402
 
 FAILING = {"fail", "error"}
 RED = {"new_failure", "still_failing", "infra_error"}
 YELLOW = {"known_fail", "known_flaky", "flaky", "fixed", "blocked"}
 TIERS = ["quick", "standard", "comprehensive", "full"]
+NO_GPU_KEY = "runner::no-gpu"  # every <suite>::infra::no-gpu of a night: one issue, not one per suite
 
 
 # --------------------------------------------------------------------------- inputs
@@ -150,7 +157,7 @@ def load_history(hist: Path | None, tier: str, gfx: str, night: str) -> dict:
 
 # --------------------------------------------------------------------------- classification
 
-def classify(rec: dict, known: dict | None, prev: dict | None, have_prev: bool) -> str:
+def classify(rec: dict, known: dict | None, prev: dict | None, have_prev: bool, no_gpu: bool = False) -> str:
     rid, s = rec["id"], rec["status"]
     ps = prev[0] if prev else None
     if known and known.get("kind") == "quarantine":
@@ -170,6 +177,10 @@ def classify(rec: dict, known: dict | None, prev: dict | None, have_prev: bool) 
             return "still_failing"
         return "new_failure"
     if s == "blocked":
+        # Without a GPU the GPU checks of the needs_gpu: false suites are blocked by
+        # design; infra::no-gpu already makes the night red.
+        if no_gpu and "no gpu" in (rec.get("message") or "").lower():
+            return "known_blocked"
         # A known finding already explains the test; being blocked tonight adds nothing.
         return "known_blocked" if known and known.get("kind") in ("skip", "xfail", "flaky") else "blocked"
     return "skip"
@@ -258,17 +269,40 @@ def perf_eval(merged: Path, policy: dict, history: list[dict], night: str) -> di
                        "geomean_floor": geo_floor, "cv_cap": cv_cap, "min_abs_ms": min_ms}}
 
 
-def regression_issues(items: list[dict], state: dict, suites_ran: set[str], report_url: str) -> tuple[list, dict]:
-    """One issue per (suite, group) with red results; close after 3 green nights."""
+def no_gpu_issue_body(its: list[dict], why: str | None, nights: int, report_url: str) -> str:
+    suites = sorted({it["suite"] for it in its} - {"preflight"})
+    return "\n".join([
+        f"The self-hosted runner had no usable GPU: {why or 'see the environment in the report'}.",
+        f"{len(suites)} GPU suite(s) did not run: {', '.join(suites) or '(none planned)'}. "
+        "Only the suites with `needs_gpu: false` ran, and the night was not recorded as tested, "
+        "so the next poll tests the release again.",
+        f"No GPU for {nights} night(s). Report: {report_url or '(see the nightly run)'}", "",
+        "Check the runner host: is the amdgpu driver loaded (`/dev/kfd`, `/dev/dri/renderD*`, "
+        "`/sys/class/kfd/kfd/topology/nodes`)? Does the build target its GPU (`build_tools/detect_gpu.sh "
+        "--manifest <manifest>`)? See `infra::no-gpu` in docs/triage.md."])
+
+
+def regression_issues(items: list[dict], state: dict, suites_ran: set[str], report_url: str,
+                      no_gpu: str | None = None) -> tuple[list, dict]:
+    """One issue per (suite, group) with red results; close after 3 green nights.
+
+    The ``<suite>::infra::no-gpu`` items share one issue (NO_GPU_KEY); it counts
+    a green night whenever ``suites_ran`` contains "runner" (a night with a GPU)."""
     groups: dict[str, list[dict]] = defaultdict(list)
     for it in items:
         if it["class"] in RED:
             s, g, _ = split_id(it["id"])
-            groups[f"{s}::{g}"].append(it)
+            groups[NO_GPU_KEY if it["id"].endswith("::infra::no-gpu") else f"{s}::{g}"].append(it)
     actions, new_state = [], {}
     for key, its in sorted(groups.items()):
         fp = hashlib.sha1(key.encode()).hexdigest()[:10]
         nights = max(it.get("nights_failing", 1) for it in its)
+        if key == NO_GPU_KEY:
+            actions.append({"action": "open_or_comment", "fingerprint": fp, "key": key, "nights": nights,
+                            "title": f"Nightly infrastructure: runner had no usable GPU [{fp}]",
+                            "body": no_gpu_issue_body(its, no_gpu, nights, report_url)})
+            new_state[fp] = {"key": key, "green_streak": 0, "last_red": dt.date.today().isoformat()}
+            continue
         lines = [f"- `{it['id']}` ({it['status']}): {it.get('message', '')[:200]}" for it in its[:50]]
         if len(its) > 50:
             lines.append(f"- ... and {len(its) - 50} more")
@@ -304,7 +338,9 @@ def triage(merged: Path, known_doc: dict, expected_cfg: dict, perf_policy: dict,
     records = load_records(merged)
     suites = json.loads((merged / "suites.json").read_text()) if (merged / "suites.json").exists() else {}
     env = json.loads((merged / "environment.json").read_text()) if (merged / "environment.json").exists() else {}
-    known = Known(known_doc, gfx, tier)
+    no_gpu = no_gpu_reason(env)
+    # A night without a usable GPU matches baseline entries scoped to gfx: [none].
+    known = Known(known_doc, gfx or ("none" if no_gpu is not None else ""), tier)
     prev = hist["prev"]
     have_prev = bool(prev)
 
@@ -318,7 +354,7 @@ def triage(merged: Path, known_doc: dict, expected_cfg: dict, perf_policy: dict,
         rid = r["id"]
         k = known.match(rid)
         p = prev.get(rid)
-        cls = classify(r, k, p, have_prev)
+        cls = classify(r, k, p, have_prev, no_gpu is not None)
         failing_now = r["status"] in FAILING
         nights = (p[1] + 1 if p and p[0] in FAILING else 1) if failing_now else 0
         status_out[rid] = [r["status"], nights]
@@ -365,6 +401,13 @@ def triage(merged: Path, known_doc: dict, expected_cfg: dict, perf_policy: dict,
 
     reasons, verdict = [], "green"
     red_counts = {c: classes[c] for c in RED if classes[c]}
+    no_gpu_items = [i for i in items if i["class"] == "infra_error" and i["id"].endswith("::infra::no-gpu")]
+    if no_gpu_items:
+        skipped = len({i["suite"] for i in no_gpu_items} - {"preflight"})
+        reasons.append(f"runner had no usable GPU ({no_gpu or 'see the environment'})"
+                       + (f": {skipped} GPU suite{'' if skipped == 1 else 's'} did not run" if skipped else ""))
+        red_counts["infra_error"] -= len(no_gpu_items)
+        red_counts = {c: n for c, n in red_counts.items() if n}
     if red_counts:
         reasons += [f"{n} {c.replace('_', ' ')}" for c, n in sorted(red_counts.items())]
     if count_fail:
@@ -386,13 +429,15 @@ def triage(merged: Path, known_doc: dict, expected_cfg: dict, perf_policy: dict,
     if fixed_strict:
         reasons.append("fixed known issues to remove from the baseline: " + ", ".join(k["id"] for k in fixed_strict))
 
-    actions, issues_state = regression_issues(items, hist["issues_state"], ran, report_url)
+    # A night with a GPU counts towards closing the runner::no-gpu issue.
+    had_gpu = {"runner"} if gfx and no_gpu is None else set()
+    actions, issues_state = regression_issues(items, hist["issues_state"], ran | had_gpu, report_url, no_gpu)
 
     suite_rows = []
     for s in sorted(set(per_suite) | set(suites)):
         meta = suites.get(s, {})
         c = per_suite.get(s, Counter())
-        suite_rows.append({"suite": s, "missing": bool(meta.get("missing")),
+        suite_rows.append({"suite": s, "missing": bool(meta.get("missing")), "no_gpu": bool(meta.get("no_gpu")),
                            "wall_seconds": meta.get("wall_seconds"), "total": sum(c.values()),
                            "classes": dict(c), "status_counts": meta.get("counts", {})})
     group_rows = [{"suite": s, "group": g, "total": sum(c.values()), "counts": dict(c)}
@@ -407,6 +452,7 @@ def triage(merged: Path, known_doc: dict, expected_cfg: dict, perf_policy: dict,
                 "run_url": run_url, "report_url": report_url, "upstream": plan.get("upstream_nightly", {}),
                 "release_url": plan.get("release_url", ""), "problems": plan.get("problems", [])},
         "environment": env,
+        "no_gpu": no_gpu,
         "verdict": verdict,
         "reasons": reasons,
         "totals": {"records": len(records), "by_status": dict(Counter(r["status"] for r in records)),
@@ -433,11 +479,13 @@ def summary_md(t: dict, top: int = 20) -> str:
     run = t["run"]
     env = t.get("environment", {})
     sdk = env.get("prepared", {}).get("sdk", {})
+    no_gpu = t.get("no_gpu")
+    gpu = f"`{run['gfx']}`" if run["gfx"] else "no GPU" if no_gpu else "`?`"
     lines = [
         f"## Nightly QA: {t['verdict'].upper()}",
         "",
         f"vision-pack `{run['version'] or '?'}` ({run['tag'] or run['mode']}, `{(run['sha'] or '')[:12]}`) "
-        f"on `{run['gfx'] or '?'}`, tier **{run['tier']}**, {t['night']}.",
+        f"on {gpu}, tier **{run['tier']}**, {t['night']}.",
     ]
     if t["reasons"]:
         lines += ["", "**Why:** " + "; ".join(t["reasons"]) + "."]
@@ -448,7 +496,7 @@ def summary_md(t: dict, top: int = 20) -> str:
     for s in t["suites"]:
         c = s["classes"]
         if s["missing"]:
-            lines.append(f"| {s['suite']} | no results | | | | | | | |")
+            lines.append(f"| {s['suite']} | {'not run: no GPU' if s.get('no_gpu') else 'no results'} | | | | | | | |")
             continue
         lines.append(f"| {s['suite']} | {s['total']} | {c.get('new_failure', 0)} | {c.get('still_failing', 0)} | "
                      f"{c.get('known_fail', 0) + c.get('known_flaky', 0)} | {c.get('flaky', 0)} | {c.get('fixed', 0)} | "
@@ -473,6 +521,7 @@ def summary_md(t: dict, top: int = 20) -> str:
         lines += [f"- {k['id']}: {k['title']}" for k in fixed]
     up = run.get("upstream") or {}
     lines += ["", "### Environment", "",
+              f"- GPU: none ({no_gpu})" if no_gpu else f"- GPU: {gpu}",
               f"- SDK: `{sdk.get('name', '?')}` (fallback: {sdk.get('fallback', '?')})",
               f"- Runner: {env.get('environment', {}).get('runner', '?')}, driver "
               f"{env.get('environment', {}).get('amdgpu_driver', '?')}, kernel {env.get('environment', {}).get('kernel', '?')}",

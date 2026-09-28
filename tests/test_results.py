@@ -111,3 +111,45 @@ def test_merge_combines_suites_and_records_infra(tmp_path):
     assert recs["preflight::infra::gpu-preflight"]["status"] == "error"
     env = json.loads((out / "environment.json").read_text())
     assert env["preflight"]["ok"] is False
+
+
+def _environment(root, environment, prepared=None):
+    d = root / "results-environment" / "environment"
+    d.mkdir(parents=True)
+    (d / "environment.json").write_text(json.dumps(environment))
+    if prepared is not None:
+        (d / "prepared.json").write_text(json.dumps(prepared))
+
+
+def test_merge_without_gpu_records_no_gpu_instead_of_no_results(tmp_path):
+    root, out = tmp_path / "in", tmp_path / "out"
+    why = "no KFD topology at /sys/class/kfd/kfd/topology/nodes (amdgpu driver not loaded?)"
+    _suite_dir(root, "results-loader-audit/loader-audit", "loader-audit", [("elf::a", "pass")])
+    _environment(root, {"runner": "r", "gpu_present": False, "no_gpu_reason": why}, {"gfx": "", "mode": "no-gpu"})
+    merge.merge(root, out, ["packaging", "loader-audit", "sdk-consumer", "rocal", "roccv"])
+    recs = {r["id"]: r for r in emit.read_records(out / "results.jsonl")}
+    suites = json.loads((out / "suites.json").read_text())
+    assert recs["preflight::infra::no-gpu"]["status"] == "error" and why in recs["preflight::infra::no-gpu"]["message"]
+    for s in ("rocal", "roccv"):
+        assert recs[f"{s}::infra::no-gpu"]["status"] == "error" and f"{s}::infra::no-results" not in recs
+        assert suites[s]["missing"] and suites[s]["no_gpu"]
+    # Suites that need no GPU (and the hosted jobs) should have run: still no-results.
+    assert "sdk-consumer::infra::no-results" in recs and "packaging::infra::no-results" in recs
+    assert "loader-audit::infra::no-gpu" not in recs and not suites["loader-audit"].get("missing")
+
+
+def test_merge_prepared_mode_alone_marks_a_no_gpu_night(tmp_path):
+    root, out = tmp_path / "in", tmp_path / "out"
+    _environment(root, {"runner": "r"}, {"gfx": "", "mode": "no-gpu"})
+    merge.merge(root, out, ["rocal"], need_gpu={"rocal"})
+    recs = {r["id"]: r for r in emit.read_records(out / "results.jsonl")}
+    assert "rocal::infra::no-gpu" in recs and "no usable GPU detected" in recs["preflight::infra::no-gpu"]["message"]
+
+
+def test_merge_unknown_gpu_state_is_not_a_no_gpu_night(tmp_path):
+    # gpu_present is null when the detection itself failed (e.g. an EXPECTED_GFX mismatch).
+    root, out = tmp_path / "in", tmp_path / "out"
+    _environment(root, {"runner": "r", "gpu_present": None, "no_gpu_reason": ""})
+    merge.merge(root, out, ["rocal"])
+    recs = {r["id"]: r for r in emit.read_records(out / "results.jsonl")}
+    assert "rocal::infra::no-results" in recs and "preflight::infra::no-gpu" not in recs

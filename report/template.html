@@ -206,7 +206,7 @@ function header() {
   const parts = [`vision-pack <code>${esc(r.version || "?")}</code>`];
   if (r.tag) parts.push(r.release_url ? `<a href="${esc(r.release_url)}">${esc(r.tag)}</a>` : esc(r.tag));
   if (r.sha) parts.push(`<code>${esc(r.sha.slice(0, 12))}</code>`);
-  parts.push(`${esc(r.gfx || "?")}`, `tier ${esc(r.tier)}`);
+  parts.push(`${esc(r.gfx || (R.no_gpu ? "no GPU" : "?"))}`, `tier ${esc(r.tier)}`);
   if (sdk.name) parts.push(`SDK <code>${esc(sdk.name)}</code>`);
   if (r.run_url) parts.push(`<a href="${esc(r.run_url)}">workflow run</a>`);
   document.getElementById("subtitle").innerHTML = parts.join(" · ");
@@ -240,7 +240,7 @@ function suites() {
     const red = (c.new_failure || 0) + (c.still_failing || 0) + (c.infra_error || 0);
     const tone = s.missing || red ? "danger" : ((c.known_fail || c.flaky || c.blocked) ? "warning" : "success");
     tb.appendChild(el(`<tr>
-      <td>${dot(tone)}${esc(s.suite)}${s.missing ? " " + badge("no results", "danger") : ""}</td>
+      <td>${dot(tone)}${esc(s.suite)}${s.missing ? " " + badge(s.no_gpu ? "not run: no GPU" : "no results", "danger") : ""}</td>
       <td class="right">${num(s.total)}</td><td class="right">${num((c.pass || 0) + (c.new_test || 0))}</td>
       <td class="right">${red ? `<span class="tone-danger">${num(red)}</span>` : "0"}</td>
       <td class="right">${num((c.known_fail || 0) + (c.known_flaky || 0))}</td><td class="right">${num(c.flaky)}</td>
@@ -372,7 +372,8 @@ function env() {
     ["Upstream nightly", up.url ? `<a href="${esc(up.url)}">${esc(up.conclusion || up.status)}</a>` : esc(up.status || "unknown")],
     ["Runtime SDK", `<code>${esc(sdk.name || "?")}</code> (fallback: ${esc(sdk.fallback || "?")})`],
     ["Build SDK", `<code>${esc((pr.vision_pack || {}).build_sdk || "?")}</code>`],
-    ["GPU", `${esc(r.gfx)} <span class="text-tertiary">${esc(en.gpus || "")}</span>`],
+    ["GPU", R.no_gpu ? `none <span class="text-tertiary">(${esc(R.no_gpu)})</span>`
+                     : `${esc(r.gfx)} <span class="text-tertiary">${esc(en.gpus || "")}</span>`],
     ["Runner", `${esc(en.runner || "?")}, kernel ${esc(en.kernel || "?")}, amdgpu ${esc(en.amdgpu_driver || "?")}, docker ${esc(en.docker || "?")}`],
     ["Test image", `<code>${esc(((en.images || {}).test) || "?")}</code>`],
     ["Fingerprint", `<code>${esc(r.fingerprint)}</code>`],

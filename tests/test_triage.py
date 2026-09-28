@@ -1,9 +1,12 @@
 """report/triage.py: classification, verdict, counts, perf, issues."""
 import datetime as dt
 import gzip
+import hashlib
 import json
 
+import emit
 import generate_report
+import merge
 import publish_history
 import triage
 
@@ -169,6 +172,92 @@ def test_regression_issues_grouped_and_closed_after_three_green_nights(tmp_path)
     assert opens[0]["fingerprint"] in opens[0]["title"]
     assert any(a["action"] == "close" and a["fingerprint"] == "deadbeef00" for a in actions)
     assert "deadbeef00" not in new_state
+
+
+NO_GPU_WHY = "no KFD topology at /sys/class/kfd/kfd/topology/nodes (amdgpu driver not loaded?)"
+NO_GPU_MSG = "no GPU detected (VP_GFX empty)"  # what the needs_gpu: false suites record for their GPU checks
+
+
+def _no_gpu_night(tmp_path, extra=()):
+    """merge.py output of a night on a runner without a GPU: two degraded suites ran, three GPU suites could not."""
+    root, out = tmp_path / "in", tmp_path / "merged"
+    raw = {"loader-audit": [("elf::librocal.so", "pass", ""), ("verify::gfx-in-manifest", "blocked", NO_GPU_MSG)],
+           "sdk-consumer": [("consumer.cmake::rocal.GPU", "blocked", NO_GPU_MSG),
+                            ("consumer.py::numpy", "blocked", "numpy not installed for VP_PY"), *extra]}
+    for suite, recs in raw.items():
+        d = root / f"results-{suite}" / suite
+        d.mkdir(parents=True)
+        with open(d / "results.jsonl", "w") as f:
+            for rid, status, msg in recs:
+                f.write(json.dumps(emit.make_record(suite, rid, status, message=msg)) + "\n")
+    env = root / "results-environment" / "environment"
+    env.mkdir(parents=True)
+    (env / "environment.json").write_text(json.dumps({"runner": "vp-gpu-1", "gpu_present": False,
+                                                     "no_gpu_reason": NO_GPU_WHY}))
+    (env / "prepared.json").write_text(json.dumps({"gfx": "", "mode": "no-gpu"}))
+    merge.merge(root, out, ["loader-audit", "sdk-consumer", "mivisionx", "rocal", "roccv"])
+    return out
+
+
+def _hist(issues_state=None):
+    return {"prev_night": None, "prev": {}, "trend": [], "perf": [], "issues_state": issues_state or {}}
+
+
+def test_no_gpu_night_is_red_with_one_reason_and_one_issue(tmp_path):
+    t = triage.triage(_no_gpu_night(tmp_path), KNOWN, {}, {}, _hist(), {}, "comprehensive", "", "2026-09-27", "",
+                      "url")
+    c = _cls(t)
+    assert t["verdict"] == "red" and t["no_gpu"] == NO_GPU_WHY
+    assert t["reasons"][0] == f"runner had no usable GPU ({NO_GPU_WHY}): 3 GPU suites did not run"
+    assert not any("infra error" in r for r in t["reasons"])  # the no-GPU records are not counted twice
+    assert {i for i, k in c.items() if k == "infra_error"} == {
+        "preflight::infra::no-gpu", "mivisionx::infra::no-gpu", "rocal::infra::no-gpu", "roccv::infra::no-gpu"}
+    opens = [a for a in t["issue_actions"] if a["action"] == "open_or_comment"]
+    assert len(opens) == 1 and opens[0]["key"] == "runner::no-gpu"
+    assert opens[0]["fingerprint"] in opens[0]["title"] and "mivisionx, rocal, roccv" in opens[0]["body"]
+    md = triage.summary_md(t)
+    assert f"- GPU: none ({NO_GPU_WHY})" in md and "| rocal | not run: no GPU |" in md and "on no GPU," in md
+
+
+def test_no_gpu_blocked_checks_are_known_blocked_only_without_a_gpu(tmp_path):
+    t = triage.triage(_no_gpu_night(tmp_path), KNOWN, {}, {}, _hist(), {}, "comprehensive", "", "2026-09-27", "", "")
+    c = _cls(t)
+    assert c["loader-audit::verify::gfx-in-manifest"] == "known_blocked"
+    assert c["sdk-consumer::consumer.cmake::rocal.GPU"] == "known_blocked"
+    assert c["sdk-consumer::consumer.py::numpy"] == "blocked"  # not a GPU reason
+    rec = {"id": "loader-audit::verify::gfx-in-manifest", "status": "blocked", "message": NO_GPU_MSG}
+    assert triage.classify(rec, None, None, False) == "blocked"  # a GPU night: the missing GPU is news
+
+
+def test_gfx_none_scope_applies_only_without_a_gpu(tmp_path):
+    known = {"schema": 1, "issues": [
+        {"id": "M13-nogpu", "title": "t", "severity": "medium", "owner": "rocAL", "kind": "xfail", "gfx": ["none"],
+         "match": ["sdk-consumer::consumer.rocal::CPU.pipeline"], "added": "2026-09-28", "review_by": "2026-12-31"}]}
+    night = _no_gpu_night(tmp_path, [("consumer.rocal::CPU.pipeline", "fail", "vxVerifyGraph failed -1")])
+    t = triage.triage(night, known, {}, {}, _hist(), {}, "comprehensive", "", "2026-09-27", "", "")
+    assert _cls(t)["sdk-consumer::consumer.rocal::CPU.pipeline"] == "known_fail"
+    # With a GPU the check passes, and the entry is out of scope: no "fixed" noise every night.
+    t = triage.triage(_merged(tmp_path / "gpu", [("sdk-consumer::consumer.rocal::CPU.pipeline", "pass")]), known, {},
+                      {}, _hist(), {}, "comprehensive", "gfx1201", "2026-09-28", "", "")
+    assert t["totals"]["by_class"] == {"pass": 1} and t["known"][0]["state"] == "out-of-scope"
+
+
+def test_no_gpu_issue_closes_after_three_nights_with_a_gpu(tmp_path):
+    fp = hashlib.sha1(triage.NO_GPU_KEY.encode()).hexdigest()[:10]
+    state = {fp: {"key": triage.NO_GPU_KEY, "green_streak": 2}}
+    # Still no GPU: the issue gets a comment and its streak restarts.
+    t = triage.triage(_no_gpu_night(tmp_path), KNOWN, {}, {}, _hist(state), {}, "comprehensive", "", "2026-09-27",
+                      "", "")
+    assert [a["action"] for a in t["issue_actions"]] == ["open_or_comment"]
+    assert t["_issues_state"][fp]["green_streak"] == 0
+    # A night without the GPU suites (e.g. packaging only) does not count; a night with a GPU does.
+    actions, new_state = triage.regression_issues([], state, {"packaging"}, "url")
+    assert actions == [] and new_state[fp]["green_streak"] == 2
+    t = _run(tmp_path / "gpu", [("rocal::ctest::a", "pass")])
+    assert t["no_gpu"] is None
+    t = triage.triage(_merged(tmp_path / "gpu2", [("rocal::ctest::a", "pass")]), KNOWN, {}, {}, _hist(state), {},
+                      "comprehensive", "gfx1201", "2026-09-28", "", "")
+    assert any(a["action"] == "close" and a["fingerprint"] == fp for a in t["issue_actions"])
 
 
 def test_history_render_and_publish(tmp_path):
