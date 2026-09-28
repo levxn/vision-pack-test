@@ -117,6 +117,9 @@ VP_ALLOWED_EVENTS="schedule workflow_dispatch"
 VP_MIN_FREE_GB=100
 VP_ROOT="${VP_ROOT}"
 VP_KEEP_RUNS=5
+# 1: without /dev/kfd or render nodes, jobs still run (only the suites that
+# need no GPU; the rest are reported as infra errors). 0: reject such jobs.
+VP_ALLOW_NO_GPU=1
 EOF
 chmod 0644 /etc/vp-ci/hooks.conf
 

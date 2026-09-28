@@ -18,6 +18,10 @@ VP_ALLOWED_REF="refs/heads/main"
 VP_ALLOWED_EVENTS="schedule workflow_dispatch"
 VP_MIN_FREE_GB=100
 VP_ROOT="/srv/vp-ci"
+# 1: a gpu-role runner without /dev/kfd or render nodes still takes jobs (with
+# a warning); the workflow then runs only the suites that need no GPU and
+# reports the rest as infrastructure errors. 0: reject every job instead.
+VP_ALLOW_NO_GPU=1
 # gpu | cpu. Set per runner instance in its .env (VP_RUNNER_ROLE=cpu for vp-cpu).
 VP_RUNNER_ROLE="${VP_RUNNER_ROLE:-gpu}"
 
@@ -50,9 +54,19 @@ for wf in ${VP_ALLOWED_WORKFLOWS}; do
 done
 [[ "${allowed_wf}" == 1 ]] || fail "workflow '${wf_ref}' is not allow-listed (need ${VP_ALLOWED_WORKFLOWS} on ${VP_ALLOWED_REF})"
 
+gpu_state="n/a"
 if [[ "${VP_RUNNER_ROLE}" == "gpu" ]]; then
-  [[ -e /dev/kfd ]] || fail "/dev/kfd is missing (amdgpu driver not loaded?)"
-  ls /dev/dri/renderD* >/dev/null 2>&1 || fail "no /dev/dri/renderD* nodes"
+  gpu_state="ok"
+  if [[ ! -e /dev/kfd ]]; then
+    gpu_state="/dev/kfd is missing (amdgpu driver not loaded?)"
+  elif ! ls /dev/dri/renderD* >/dev/null 2>&1; then
+    gpu_state="no /dev/dri/renderD* nodes"
+  fi
+  if [[ "${gpu_state}" != ok ]]; then
+    [[ "${VP_ALLOW_NO_GPU}" == 1 ]] || fail "${gpu_state}"
+    echo "::warning title=vp-ci pre-job hook::${gpu_state}; continuing without a GPU (VP_ALLOW_NO_GPU=1)"
+    gpu_state="none"
+  fi
 fi
 
 command -v docker >/dev/null 2>&1 || fail "docker is not installed"
@@ -72,4 +86,4 @@ if [[ -n "${GITHUB_WORKSPACE:-}" ]]; then
   fi
 fi
 
-echo "vp-ci pre-job hook: ok (event=${event}, role=${VP_RUNNER_ROLE}, free=${avail_gb}G)"
+echo "vp-ci pre-job hook: ok (event=${event}, role=${VP_RUNNER_ROLE}, gpu=${gpu_state}, free=${avail_gb}G)"
