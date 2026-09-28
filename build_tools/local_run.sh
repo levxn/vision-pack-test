@@ -67,14 +67,16 @@ if [[ "${no_gpu}" == 1 ]]; then
 else
   gpu_env="$("${REPO}/build_tools/detect_gpu.sh" --manifest "${manifest}" 2>/dev/null || true)"
 fi
-# Values may contain spaces (VP_NO_GPU_REASON), so no eval.
-while IFS= read -r kv; do
-  [[ "${kv}" =~ ^VP_[A-Z_]+= ]] && export "${kv}"
+# Split on the first '=' rather than eval: VP_NO_GPU_REASON's value may
+# contain spaces (and, in principle, '=').
+while IFS='=' read -r key val; do
+  [[ "${key}" =~ ^VP_[A-Z_]+$ ]] && export "${key}=${val}"
 done <<<"${gpu_env}"
 
 mkdir -p "${out}/${suite}"
 export ROCM_PATH="${prefix}"
-export VP_OUT="$(cd "${out}/${suite}" && pwd)"
+VP_OUT="$(cd "${out}/${suite}" && pwd)"
+export VP_OUT
 export VP_REPO="${REPO}"
 export VP_DATA="${data}"
 export VP_TIER="${tier}"

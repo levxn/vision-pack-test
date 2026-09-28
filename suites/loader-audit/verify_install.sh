@@ -245,14 +245,14 @@ fi
 if [[ -z "${VP_GFX}" ]]; then
   check gfx-in-manifest blocked "no GPU detected (VP_GFX empty)"
 else
-  missing="$(jq -r --arg g "${VP_GFX}" '(.gpu_targets // {}) | to_entries[] | select((.value | index($g)) | not) | .key' \
+  missing_gfx="$(jq -r --arg g "${VP_GFX}" '(.gpu_targets // {}) | to_entries[] | select((.value | index($g)) | not) | .key' \
     "${VP_MANIFEST}" 2>/dev/null | tr '\n' ' ')"
   if ! jq -e '.gpu_targets | length > 0' "${VP_MANIFEST}" >/dev/null 2>&1; then
     check gfx-in-manifest fail "manifest has no gpu_targets"
-  elif [[ -z "${missing}" ]]; then
+  elif [[ -z "${missing_gfx}" ]]; then
     check gfx-in-manifest pass "${VP_GFX} listed for every library in gpu_targets"
   else
-    check gfx-in-manifest fail "${VP_GFX} missing from gpu_targets of: ${missing}"
+    check gfx-in-manifest fail "${VP_GFX} missing from gpu_targets of: ${missing_gfx}"
   fi
 fi
 exit 0

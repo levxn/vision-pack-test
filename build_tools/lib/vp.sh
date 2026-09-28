@@ -161,7 +161,8 @@ vp_run() {
       *) break ;;
     esac
   done
-  local log="${VP_OUT}/logs/$(vp__slug "${id}").log"
+  local log
+  log="${VP_OUT}/logs/$(vp__slug "${id}").log"
   local t
   t="$(vp__scale_timeout "${timeout}")"
   local attempt=1 rc status msg t0 t1 dur
@@ -177,7 +178,7 @@ vp_run() {
     } >>"${log}"
     t0="$(date +%s.%N)"
     (
-      [[ -n "${cwd}" ]] && cd "${cwd}"
+      [[ -n "${cwd}" ]] && { cd "${cwd}" || exit; }
       if [[ ${#envs[@]} -gt 0 ]]; then
         exec env "${envs[@]}" timeout -k 30 "${t}" "$@"
       else
@@ -228,7 +229,8 @@ vp_ingest_junit() {
 # Runs ctest serially with JUnit output, re-runs failures once, ingests both.
 vp_ctest() {
   local group="$1" build="$2"; shift 2
-  local junit="${VP_OUT}/raw/$(vp__slug "${group}")"
+  local junit
+  junit="${VP_OUT}/raw/$(vp__slug "${group}")"
   "${VP_REPO}/build_tools/ctest_junit.sh" "${build}" "${junit}" "$@" \
     >"${VP_OUT}/logs/$(vp__slug "${group}").ctest.log" 2>&1
   if [[ -f "${junit}.xml" ]]; then
@@ -245,9 +247,10 @@ vp_ctest() {
 # session is bounded by VP_PYTEST_TIMEOUT seconds (default 5400).
 vp_pytest() {
   local group="$1"; shift
-  local junit="${VP_OUT}/raw/$(vp__slug "${group}")"
-  local cache="${VP_WORK}/pytest-cache-$(vp__slug "${group}")"
-  local log="${VP_OUT}/logs/$(vp__slug "${group}").pytest.log"
+  local junit cache log
+  junit="${VP_OUT}/raw/$(vp__slug "${group}")"
+  cache="${VP_WORK}/pytest-cache-$(vp__slug "${group}")"
+  log="${VP_OUT}/logs/$(vp__slug "${group}").pytest.log"
   local t
   t="$(vp__scale_timeout "${VP_PYTEST_TIMEOUT:-5400}")"
   timeout -k 60 "${t}" "${VP_PY}" -m pytest "$@" -o cache_dir="${cache}" -p no:randomly \

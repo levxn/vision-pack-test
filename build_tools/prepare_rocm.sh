@@ -112,19 +112,19 @@ resolve() { # family [date] -> URL on stdout
   printf '%s\n' "${out}"
 }
 
-fallback=none
+fallback="none"
 sdk_family="${requested_family}"
 if [[ -n "${url}" ]]; then
-  fallback=pinned-url
+  fallback="pinned-url"
   sdk_family="$(family_of_sdk "${url}")"
 elif url="$(resolve "${requested_family}" "${date}")"; then
   :
 elif url="$(resolve "${requested_family}")"; then
-  fallback=family-latest
+  fallback="family-latest"
 elif url="$(resolve multiarch-tests "${date}")"; then
-  fallback=multiarch-date; sdk_family=multiarch-tests
+  fallback="multiarch-date"; sdk_family="multiarch-tests"
 elif url="$(resolve multiarch-tests)"; then
-  fallback=multiarch-latest; sdk_family=multiarch-tests
+  fallback="multiarch-latest"; sdk_family="multiarch-tests"
 else
   die "could not resolve any TheRock SDK for ${requested_family} (date ${date:-latest}) or multiarch-tests"
 fi
