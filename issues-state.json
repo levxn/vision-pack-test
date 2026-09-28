@@ -14,6 +14,11 @@
   "green_streak": 0,
   "last_red": "2026-09-28"
  },
+ "a98bcd24a6": {
+  "key": "robustness::infra",
+  "green_streak": 0,
+  "last_red": "2026-09-28"
+ },
  "f0ed1b2245": {
   "key": "rocal::infra",
   "green_streak": 0,
@@ -24,29 +29,44 @@
   "green_streak": 0,
   "last_red": "2026-09-28"
  },
- "e87e7c0c50": {
-  "key": "loader-audit::infra",
-  "green_streak": 1,
-  "last_red": "2026-09-28"
- },
- "f13910f62a": {
-  "key": "robustness-nogpu::infra",
-  "green_streak": 0,
-  "last_red": "2026-09-28"
- },
- "a98bcd24a6": {
-  "key": "robustness::infra",
-  "green_streak": 0,
-  "last_red": "2026-09-28"
- },
  "9d1c369709": {
   "key": "rocpydecode::infra",
   "green_streak": 0,
   "last_red": "2026-09-28"
  },
+ "442e663e5e": {
+  "key": "sdk-consumer::consumer.rocal",
+  "green_streak": 0,
+  "last_red": "2026-09-28"
+ },
+ "bea857f92d": {
+  "key": "sdk-consumer::consumer.roccv",
+  "green_streak": 0,
+  "last_red": "2026-09-28"
+ },
+ "fa1ddc6992": {
+  "key": "sdk-consumer::contamination.unset.explicit",
+  "green_streak": 0,
+  "last_red": "2026-09-28"
+ },
+ "0f525b6809": {
+  "key": "sdk-consumer::contamination.unset.implicit",
+  "green_streak": 0,
+  "last_red": "2026-09-28"
+ },
+ "e87e7c0c50": {
+  "key": "loader-audit::infra",
+  "green_streak": 2,
+  "last_red": "2026-09-28"
+ },
+ "f13910f62a": {
+  "key": "robustness-nogpu::infra",
+  "green_streak": 1,
+  "last_red": "2026-09-28"
+ },
  "f2232a9046": {
   "key": "sdk-consumer::infra",
-  "green_streak": 0,
+  "green_streak": 1,
   "last_red": "2026-09-28"
  }
 }
