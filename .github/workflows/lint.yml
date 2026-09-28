@@ -3,12 +3,10 @@
 # here can reach the self-hosted GPU runner.
 name: lint
 
-# TEMPORARILY DISABLED: trigger commented out so this workflow cannot run yet.
-# Uncomment to re-enable.
-# on:
-#   pull_request:
-#   push:
-#     branches: [main]
+on:
+  pull_request:
+  push:
+    branches: [main]
 
 permissions: {}
 
