@@ -117,6 +117,8 @@ def rocal_numeric(rec: Recorder, g: str, dumps: str, ok_runs: dict[str, bool], d
         pct, mad = float((d > 2).mean() * 100), float(d.mean())
         rec(f"{g}::cpu-vs-gpu", "pass" if pct < 0.5 and mad < 1.0 else "fail",
             f"MAD={mad:.3f} max={int(d.max())} bytes differing >2: {pct:.3f}%", log=log.name)
+    elif not GPU:
+        rec(f"{g}::cpu-vs-gpu", "blocked", NO_GPU, log=log.name)
     else:
         rec(f"{g}::cpu-vs-gpu", "error", "CPU or GPU output missing", log=log.name)
 
@@ -136,6 +138,9 @@ def rocal_numeric(rec: Recorder, g: str, dumps: str, ok_runs: dict[str, bool], d
             continue
     for tag, name, be in (("cpu_t1", "CPU.vs-reference", "CPU"), ("gpu", "GPU.vs-reference", "GPU")):
         a = cpu1 if tag == "cpu_t1" else gpu
+        if be == "GPU" and not GPU:
+            rec(f"{g}::{name}", "blocked", NO_GPU, log=log.name, backend=be)
+            continue
         if a is None or not refs:
             rec(f"{g}::{name}", "error", "no output or no reference images", log=log.name, backend=be)
             continue

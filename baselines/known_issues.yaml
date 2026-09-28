@@ -11,7 +11,9 @@
 #   match:  shell-style globs over result IDs <suite>::<group>::<name>. Match
 #           only the failing tests: a glob that also covers passing tests turns
 #           them into "fixed" every night. "[" must be written "[[]".
-#   gfx:    optional globs over the tested GPU (default: every GPU)
+#   gfx:    optional globs over the tested GPU (default: every GPU, and nights
+#           without one); [none] scopes an entry to nights on a runner without
+#           a usable GPU, when only the needs_gpu: false suites run
 #   tiers:  optional; issue: upstream URL; added / review_by: YYYY-MM-DD
 #   strict: report the entry in the verdict reasons once all its tests pass
 # See docs/triage.md for the workflow. lint.yml fails once review_by passes.
@@ -465,6 +467,18 @@ issues:
     match:
       - "robustness-nogpu::rocal::cpu-decode-only"
     added: 2026-09-25
+    review_by: 2026-12-31
+  - id: M13-nogpu
+    title: M13 on a runner without a GPU - the customer-style rocAL CPU pipeline fails (vx_rpp Resize hipHostMalloc returns hipErrorNoDevice)
+    severity: medium
+    owner: rocAL
+    kind: xfail
+    gfx: [none]  # with a GPU these CPU checks pass; cpu-threads-2/4 are H7 either way
+    match:
+      - "sdk-consumer::consumer.rocal::CPU.pipeline"
+      - "sdk-consumer::consumer.rocal::CPU.vs-reference"
+      - "sdk-consumer::consumer.rocal::cpu-threads-1"
+    added: 2026-09-28
     review_by: 2026-12-31
   - id: M14
     title: LMDB readers write to the dataset (read-write open, no MDB_NOLOCK)
@@ -1009,6 +1023,16 @@ issues:
       - "roccv::negative.*::rotate_NaN_angle"
       - "robustness-nogpu::roccv::cpu-flip-copy-to"
     added: 2026-09-25
+    review_by: 2026-12-31
+  - id: L-roccv-cpu-nogpu
+    title: rocCV has no GPU-free CPU path - without a GPU the customer-style CPU flip fails at hipStreamCreate (copy_to too, L-roccv-validation)
+    severity: low
+    owner: rocCV
+    kind: xfail
+    gfx: [none]  # with a GPU these CPU checks pass
+    match:
+      - "sdk-consumer::consumer.roccv::CPU.flip*"
+    added: 2026-09-28
     review_by: 2026-12-31
   - id: L-roccv-samples
     title: rocCV samples - broken -h option, normalize ignores bad options, SIGABRT on bad input
