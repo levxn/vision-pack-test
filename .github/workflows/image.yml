@@ -5,18 +5,16 @@
 # runner (per GPU family, and too large for hosted runners).
 name: image
 
-# TEMPORARILY DISABLED: trigger commented out so this workflow cannot run yet.
-# Uncomment to re-enable.
-# on:
-#   push:
-#     branches: [main]
-#     paths:
-#       - "docker/**"
-#       - ".github/workflows/image.yml"
-#   schedule:
-#     # Weekly rebuild to pick up Ubuntu security updates.
-#     - cron: "17 3 * * 1"
-#   workflow_dispatch:
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker/**"
+      - ".github/workflows/image.yml"
+  schedule:
+    # Weekly rebuild to pick up Ubuntu security updates.
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
 
 permissions: {}
 

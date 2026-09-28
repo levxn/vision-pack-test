@@ -6,60 +6,57 @@
 # reached from here. It never runs on pull requests.
 name: nightly
 
-# TEMPORARILY DISABLED: every trigger below is commented out so this workflow
-# cannot run (automatically or via manual dispatch) while it's still under
-# review. Uncomment the whole `on:` block to re-enable.
-# on:
-#   schedule:
-#     # Poll three times a day after upstream publishes (~07:50 UTC): 09:07,
-#     # 13:07 and 17:07 UTC. A poll whose release was already tested exits in
-#     # resolve-release.
-#     - cron: "37 14,18,22 * * *"
-#       timezone: "Asia/Kolkata"
-#   workflow_dispatch:
-#     inputs:
-#       mode:
-#         description: "release: test a published nightly; build: build vision_pack_ref from source"
-#         type: choice
-#         options: [release, build]
-#         default: release
-#       release_tag:
-#         description: "nightly-YYYYMMDD tag (default: newest)"
-#         type: string
-#         default: ""
-#       vision_pack_ref:
-#         description: "vision-pack branch or SHA for mode=build"
-#         type: string
-#         default: main
-#       tier:
-#         description: "quick, standard, comprehensive or full"
-#         type: choice
-#         options: [quick, standard, comprehensive, full]
-#         default: comprehensive
-#       suites:
-#         description: "Comma-separated subset of suites (default: all in the tier)"
-#         type: string
-#         default: ""
-#       extended_deps:
-#         description: "Use the extended image (ROCm torch, tensorflow, jax); full tier only"
-#         type: boolean
-#         default: false
-#       rocm_sdk_family:
-#         description: "Override the runtime TheRock SDK family (e.g. gfx120X-all-tests)"
-#         type: string
-#         default: ""
-#       rocm_sdk_date:
-#         description: "Override the runtime SDK date (YYYYMMDD)"
-#         type: string
-#         default: ""
-#       rocm_sdk_url:
-#         description: "Pin the runtime SDK tarball URL (overrides family and date)"
-#         type: string
-#         default: ""
-#       force:
-#         description: "Test even if this release/tier was already tested"
-#         type: boolean
-#         default: false
+on:
+  schedule:
+    # Poll three times a day after upstream publishes (~07:50 UTC): 09:07,
+    # 13:07 and 17:07 UTC. A poll whose release was already tested exits in
+    # resolve-release.
+    - cron: "37 14,18,22 * * *"
+      timezone: "Asia/Kolkata"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "release: test a published nightly; build: build vision_pack_ref from source"
+        type: choice
+        options: [release, build]
+        default: release
+      release_tag:
+        description: "nightly-YYYYMMDD tag (default: newest)"
+        type: string
+        default: ""
+      vision_pack_ref:
+        description: "vision-pack branch or SHA for mode=build"
+        type: string
+        default: main
+      tier:
+        description: "quick, standard, comprehensive or full"
+        type: choice
+        options: [quick, standard, comprehensive, full]
+        default: comprehensive
+      suites:
+        description: "Comma-separated subset of suites (default: all in the tier)"
+        type: string
+        default: ""
+      extended_deps:
+        description: "Use the extended image (ROCm torch, tensorflow, jax); full tier only"
+        type: boolean
+        default: false
+      rocm_sdk_family:
+        description: "Override the runtime TheRock SDK family (e.g. gfx120X-all-tests)"
+        type: string
+        default: ""
+      rocm_sdk_date:
+        description: "Override the runtime SDK date (YYYYMMDD)"
+        type: string
+        default: ""
+      rocm_sdk_url:
+        description: "Pin the runtime SDK tarball URL (overrides family and date)"
+        type: string
+        default: ""
+      force:
+        description: "Test even if this release/tier was already tested"
+        type: boolean
+        default: false
 
 permissions: {}
 
