@@ -20,6 +20,7 @@ All notable changes to vision-pack-test are recorded here.
   - Every GPU suite is recorded as `<suite>::infra::no-gpu`. The night is red with one "runner had no usable GPU" reason and one `runner::no-gpu` issue, and it is not recorded as tested.
   - `local_run.sh --no-gpu` emulates it locally.
   - An `EXPECTED_GFX` mismatch still fails.
+- A GitHub-hosted fallback (`prepare-nogpu-hosted`/`test-nogpu-hosted`) for when no self-hosted runner is registered at all, gated by the `VP_HAS_SELF_HOSTED` repository variable so `prepare-rocm` and the self-hosted `test-*` jobs are skipped outright instead of queuing forever. Runs the same `needs_gpu: false` suites, with no persistent SDK cache.
 
 ### Baseline
 - Validation run on `nightly-20260926` (vision-pack 0.2.0+gd440925, TheRock 20260926 gfx120X SDK, RX 9070 XT): every suite reproduces the manual QA metrics. M4 is fixed in this nightly (the hip_cu_mask test script now ships) and was removed from the baseline. New provisional findings N5–N14 were added while porting the suites.

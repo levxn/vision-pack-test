@@ -36,6 +36,7 @@ flowchart LR
    - It detects the GPU and fetches the matching TheRock `-tests` SDK for the manifest's SDK date (cached, sha256-checked).
    - It overlays the vision-pack tarball into one prefix under `/srv/vp-ci/runs/<run>/rocm`.
    - If the runner comes up without a usable GPU, the prefix uses vision-pack's own build SDK instead, and only the suites that need no GPU run (loader-audit, sdk-consumer, robustness-nogpu). Every GPU suite is reported as `<suite>::infra::no-gpu`, so the night is red with a single "runner had no usable GPU" reason and issue. It is not recorded as tested, so the next poll tries again.
+   - If no self-hosted runner is registered at all (no `VP_HAS_SELF_HOSTED` repository variable), those same needs_gpu: false suites run on a GitHub-hosted runner instead, with the rest reported as `infra::no-gpu` exactly as above.
 5. **GPU suites** run in Docker containers that see only the chosen GPU, with the prefix, dataset and repo mounted read-only.
 6. **`report`** does the following:
    - classifies every result against `baselines/known_issues.yaml` and last night's results;
@@ -69,6 +70,7 @@ The tier names follow AMD TheRock's convention:
 3. **Test images:** by default the runner builds them from `docker/` (tagged by content hash, reused until `docker/` changes). To use published images, run `image.yml`, make its GHCR packages public (or grant the repository read access), and merge the PR that pins their digests in `docker/images.lock`.
 4. **Optional repository variables:**
    - `EXPECTED_GFX` (e.g. `gfx1201`): fail if the runner's GPU changes.
+   - `VP_HAS_SELF_HOSTED=true`: a self-hosted runner (`vp-gpu` and/or `vp-cpu`) is registered. Until you set this, `loader-audit`/`sdk-consumer`/`robustness-nogpu` run on a GitHub-hosted runner instead (no persistent SDK cache), and every GPU suite is `infra::no-gpu`; set it once `runner/setup.sh` has registered a runner, GPU or not.
    - `VP_HAS_CPU_RUNNER=true`: a `vp-cpu` runner instance exists, so run the CPU-only suites on it in parallel.
    - `VP_COMMIT_PIN=true`: commit the tested submodule pin back to `main` after each night. This is off by default, because it conflicts with a protected `main`.
    - `VP_IMAGE_TEST` / `VP_IMAGE_MEDIA`: a digest-pinned image reference that overrides `docker/images.lock`.

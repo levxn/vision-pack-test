@@ -53,7 +53,7 @@ Options:
 - `--runner-version <x.y.z>`: pin the runner version (2.329.0 or newer is required to register).
 - `--skip-register`: install everything except the GitHub registration.
 
-Afterwards, the runner should show as **Idle** under Settings → Actions → Runners. Optionally set the repository variable `EXPECTED_GFX` (e.g. `gfx1201`): the pipeline then fails loudly if the detected GPU ever changes, instead of silently testing a different one.
+Afterwards, the runner should show as **Idle** under Settings → Actions → Runners. Then set the repository variable `VP_HAS_SELF_HOSTED=true` (Settings → Secrets and variables → Actions → Variables): until this is set, `test.yml` assumes no self-hosted runner exists at all and runs the `needs_gpu: false` suites on a GitHub-hosted runner instead (see [README.md](../README.md#setup)); with it set, `prepare-rocm` runs here as usual, and detects whether this specific machine's GPU is usable. Optionally also set `EXPECTED_GFX` (e.g. `gfx1201`): the pipeline then fails loudly if the detected GPU ever changes, instead of silently testing a different one.
 
 ## Security model
 
@@ -80,12 +80,13 @@ Making the repository private removes most of this exposure. Runner groups (rest
 - **Disk:** the pre-job hook refuses jobs below 100 GB free. `cron.daily/vp-ci-prune` removes old images and keeps the newest 6 SDK tarballs (touch `<tarball>.keep` to pin a known-good one).
 - **Logs:** `journalctl -u 'actions.runner.*'`, plus `_diag/` inside `/srv/actions-runner/<name>/`.
 - **Hook rejections** appear as a failed job with an error annotation `vp-ci pre-job hook: ...`. If you rename `nightly.yml` or dispatch from a branch other than `main`, that is expected.
-- **No usable GPU** (the driver did not load after a kernel update, the GPU fell off the bus, or it was swapped for one the build does not target):
+- **No usable GPU on this machine** (the driver did not load after a kernel update, the GPU fell off the bus, or it was swapped for one the build does not target):
   - With `VP_ALLOW_NO_GPU=1` in `/etc/vp-ci/hooks.conf` (the default), the jobs still run and the pre-job hook only warns.
   - `prepare-rocm` then builds the prefix from vision-pack's build SDK, and only loader-audit, sdk-consumer and robustness-nogpu run.
   - The report is red with one "runner had no usable GPU" reason and one issue, and the release is not recorded as tested, so the next poll re-tests it once the GPU is back.
   - `VP_ALLOW_NO_GPU=0` restores the old behaviour of rejecting every job on the GPU instance.
 
   A GPU that differs from `EXPECTED_GFX` still fails `prepare-rocm`.
+- **No self-hosted runner registered at all** (a different case from the one above: nothing here even has the `vp-gpu`/`vp-cpu` label yet, e.g. before `setup.sh` has ever run, or `VP_HAS_SELF_HOSTED` isn't set): `prepare-rocm` and the self-hosted `test-*` jobs are skipped outright, so they never queue and hang. `test.yml` instead runs `prepare-nogpu-hosted`/`test-nogpu-hosted` on a plain GitHub-hosted runner, with the same "no usable GPU" red-night behaviour. Set `VP_HAS_SELF_HOSTED=true` once this machine is registered, GPU or not, to switch back to running here.
 - **Changing the hooks:** edit them in this repository, then re-run `sudo ./runner/setup.sh --repo levxn/vision-pack-test --skip-register` on the host. The hooks in `/opt/vp-hooks` are root-owned copies, so a `git pull` alone does not update them (this applies to the `VP_ALLOW_NO_GPU` change as well). `setup.sh` also rewrites `/etc/vp-ci/hooks.conf` with its defaults, so re-apply any local edits afterwards.
 - **Removing the runner:** `cd /srv/actions-runner/<name> && sudo ./svc.sh uninstall && sudo -u ci-runner ./config.sh remove --token <REMOVAL_TOKEN>`.

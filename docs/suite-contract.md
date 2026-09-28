@@ -36,7 +36,7 @@ The launcher sets these; `build_tools/lib/vp.sh` (`vp_init`) validates them and 
 
 ### Runs without a GPU (`needs_gpu`)
 
-`needs_gpu` in `suites/suites.yaml` defaults to `true`. Set it to `false` only for a suite that still produces meaningful results with no GPU device at all (today: loader-audit, sdk-consumer, robustness-nogpu). When the self-hosted runner comes up without a usable GPU, the nightly runs only these suites, in the `test-nogpu` job:
+`needs_gpu` in `suites/suites.yaml` defaults to `true`. Set it to `false` only for a suite that still produces meaningful results with no GPU device at all (today: loader-audit, sdk-consumer, robustness-nogpu). When the self-hosted runner comes up without a usable GPU, the nightly runs only these suites, in the `test-nogpu` job (or `test-nogpu-hosted`, on a plain GitHub-hosted runner, if no self-hosted runner is registered at all — see [README.md](../README.md#setup)):
 - with `gpu_access: none` and an empty `VP_GFX`;
 - against a prefix built from vision-pack's own build SDK (the manifest's `rocm_sdk`, e.g. `gfx94X-dcgpu-tests`) instead of the GPU's family.
 

@@ -6,10 +6,14 @@
 # uploads results-<name> (results.jsonl, JUnit, summary, logs) even when it
 # fails, and report.yml turns them into the verdict.
 #
-# If the runner comes up without a usable GPU, prepare-rocm builds the prefix
-# from the build SDK (--no-gpu) and only test-nogpu runs: the needs_gpu: false
-# suites. The report records every other planned suite as
-# <suite>::infra::no-gpu, so such a night is red and not recorded as tested.
+# If the self-hosted runner comes up without a usable GPU, prepare-rocm builds
+# the prefix from the build SDK (--no-gpu) and only test-nogpu runs: the
+# needs_gpu: false suites. If no self-hosted runner is registered at all
+# (has_self_hosted, from the VP_HAS_SELF_HOSTED repo variable) those same
+# suites instead run on a GitHub-hosted runner via prepare-nogpu-hosted /
+# test-nogpu-hosted, with no persistent SDK cache. Either way the report
+# records every other planned suite as <suite>::infra::no-gpu, so such a
+# night is red and not recorded as tested.
 name: test
 
 on:
@@ -54,6 +58,9 @@ on:
       has_cpu_runner:
         type: boolean
         default: false
+      has_self_hosted:
+        type: boolean
+        default: false
       expected_gfx:
         type: string
         default: ""
@@ -65,8 +72,8 @@ on:
         description: GPU architecture tested
         value: ${{ jobs.prepare-rocm.outputs.gfx }}
       gpu_present:
-        description: Whether the self-hosted runner had a usable GPU (true or false)
-        value: ${{ jobs.prepare-rocm.outputs.gpu_present }}
+        description: Whether a usable GPU was available (true or false)
+        value: ${{ jobs.prepare-rocm.outputs.gpu_present || jobs.prepare-nogpu-hosted.outputs.gpu_present }}
 
 permissions: {}
 
@@ -256,7 +263,7 @@ jobs:
   prepare-rocm:
     name: prepare-rocm
     needs: plan
-    if: needs.plan.outputs.has_gpu == 'true' || needs.plan.outputs.has_cpu == 'true'
+    if: (needs.plan.outputs.has_gpu == 'true' || needs.plan.outputs.has_cpu == 'true') && inputs.has_self_hosted
     runs-on: [self-hosted, vp-gpu]
     timeout-minutes: 75
     permissions:
@@ -555,6 +562,172 @@ jobs:
           IMAGE_TEST: ${{ needs.prepare-rocm.outputs.image_test }}
           IMAGE_MEDIA: ${{ needs.prepare-rocm.outputs.image_media }}
           IMAGE_EXTENDED: ${{ needs.prepare-rocm.outputs.image_extended }}
+        run: build_tools/ci_run_suite.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-${{ matrix.suite }}
+          path: |
+            ${{ env.RUN_DIR }}/results/${{ matrix.suite }}
+            !${{ env.RUN_DIR }}/results/${{ matrix.suite }}/work/**
+          retention-days: 30
+          if-no-files-found: warn
+
+  # --- GitHub-hosted fallback: no self-hosted runner is registered at all ----
+  #
+  # Distinct from prepare-rocm's own --no-gpu path (a self-hosted runner
+  # exists but its GPU is unusable): here there is no runner carrying
+  # vp-gpu/vp-cpu to even attempt scheduling prepare-rocm on (inputs.has_self_hosted
+  # is false, from the VP_HAS_SELF_HOSTED repo variable). The needs_gpu: false
+  # suites still run, entirely on ubuntu-24.04, with no persistent SDK cache.
+
+  prepare-nogpu-hosted:
+    name: prepare-nogpu-hosted
+    needs: plan
+    if: needs.plan.outputs.has_nogpu == 'true' && !inputs.has_self_hosted
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      prefix: ${{ steps.prepare.outputs.prefix }}
+      tarball: ${{ steps.dist.outputs.tarball }}
+      sdk_family: ${{ steps.prepare.outputs.sdk_family }}
+      image_test: ${{ steps.img-test.outputs.image }}
+      image_media: ${{ steps.img-media.outputs.image }}
+      image_extended: ${{ steps.img-extended.outputs.image }}
+      gpu_present: 'false'
+    steps:
+      # The "runner" context isn't available in a job-level env: block, and
+      # there is no persistent /srv/vp-ci here, so these are set from the
+      # shell's own $RUNNER_TEMP instead, once, for every later step.
+      - name: Set up scratch paths (no persistent cache on a hosted runner)
+        run: |
+          echo "VP_ROOT=${RUNNER_TEMP}/vp-ci" >> "$GITHUB_ENV"
+          echo "RUN_DIR=${RUNNER_TEMP}/vp-ci/runs/${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.tarball_artifact }}
+          path: ${{ env.RUN_DIR }}/in
+      - name: Unpack the dist tarball
+        id: dist
+        run: |
+          mkdir -p "${RUN_DIR}"
+          tar -xf "${RUN_DIR}"/in/*.tar -C "${RUN_DIR}/in"
+          tarball="$(find "${RUN_DIR}/in/tarball" -name 'vision-pack-dist-linux-multiarch-*.tar.gz' | head -n 1)"
+          tar -xzOf "${tarball}" ./share/vision-pack/vision-pack-manifest.json > "${RUN_DIR}/manifest.json"
+          echo "tarball=${tarball}" >> "$GITHUB_OUTPUT"
+      - name: Prepare the ROCm prefix (--no-gpu)
+        id: prepare
+        env:
+          TARBALL: ${{ steps.dist.outputs.tarball }}
+          SDK_FAMILY: ${{ inputs.rocm_sdk_family }}
+          SDK_DATE: ${{ inputs.rocm_sdk_date }}
+          SDK_URL: ${{ inputs.rocm_sdk_url }}
+        run: |
+          args=(--tarball "${TARBALL}" --run-dir "${RUN_DIR}" --no-gpu --cache "${VP_ROOT}/cache/sdk" --github)
+          [[ -n "${SDK_FAMILY}" ]] && args+=(--family "${SDK_FAMILY}")
+          [[ -n "${SDK_DATE}" ]] && args+=(--date "${SDK_DATE}")
+          [[ -n "${SDK_URL}" ]] && args+=(--url "${SDK_URL}")
+          timeout -k 60 3600 build_tools/prepare_rocm.sh "${args[@]}"
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test image
+        id: img-test
+        run: build_tools/ensure_image.sh --kind test --github
+      - name: Media image
+        id: img-media
+        if: contains(needs.plan.outputs.nogpu_matrix, '"media"')
+        run: build_tools/ensure_image.sh --kind media --github
+      - name: Extended image
+        id: img-extended
+        if: contains(needs.plan.outputs.nogpu_matrix, '"extended"')
+        env:
+          FAMILY: ${{ steps.prepare.outputs.sdk_family }}
+        run: build_tools/ensure_image.sh --kind extended --family "${FAMILY}" --github
+      - name: Record the environment
+        if: ${{ !cancelled() }}
+        env:
+          IMAGE_TEST: ${{ steps.img-test.outputs.image }}
+          IMAGE_MEDIA: ${{ steps.img-media.outputs.image }}
+          IMAGE_EXTENDED: ${{ steps.img-extended.outputs.image }}
+        run: |
+          mkdir -p "${RUN_DIR}/results/environment"
+          cp "${RUN_DIR}/prepared.json" "${RUN_DIR}/results/environment/" 2>/dev/null || true
+          cp "${RUN_DIR}/manifest.json" "${RUN_DIR}/results/environment/" 2>/dev/null || true
+          jq -n --arg runner "github-hosted (no self-hosted runner registered)" \
+            --arg test "${IMAGE_TEST}" --arg media "${IMAGE_MEDIA}" --arg extended "${IMAGE_EXTENDED}" \
+            '{runner:$runner, kernel:"", amdgpu_driver:"", docker:"", gpus:"", gpu_present:false,
+              no_gpu_reason:"no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is",
+              images:{test:$test, media:$media, extended:$extended}}' \
+            > "${RUN_DIR}/results/environment/environment.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-environment
+          path: ${{ env.RUN_DIR }}/results/environment
+          retention-days: 90
+          if-no-files-found: warn
+
+  test-nogpu-hosted:
+    name: ${{ matrix.suite }} (hosted, no self-hosted runner)
+    needs: [plan, prepare-nogpu-hosted]
+    if: needs.plan.outputs.has_nogpu == 'true' && needs.prepare-nogpu-hosted.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: ${{ matrix.timeout }}
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.nogpu_matrix) }}
+    steps:
+      # Must match prepare-nogpu-hosted's RUN_DIR (same github.run_id/run_attempt),
+      # even though this is a different, fresh VM with its own $RUNNER_TEMP.
+      - name: Set up scratch paths (no persistent cache on a hosted runner)
+        run: |
+          echo "VP_ROOT=${RUNNER_TEMP}/vp-ci" >> "$GITHUB_ENV"
+          echo "RUN_DIR=${RUNNER_TEMP}/vp-ci/runs/${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ inputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run ${{ matrix.suite }}
+        id: run
+        env:
+          SUITE: ${{ matrix.suite }}
+          ENTRY: ${{ matrix.entrypoint }}
+          KIND: ${{ matrix.image }}
+          ACCESS: ${{ matrix.gpu_access }}
+          TIMEOUT_MIN: ${{ matrix.timeout }}
+          TIER: ${{ inputs.tier }}
+          PREFIX: ${{ needs.prepare-nogpu-hosted.outputs.prefix }}
+          DIST_TARBALL: ${{ needs.prepare-nogpu-hosted.outputs.tarball }}
+          GFX: ""
+          MINOR: ""
+          VP_SDK_FAMILY: ${{ needs.prepare-nogpu-hosted.outputs.sdk_family }}
+          IMAGE_TEST: ${{ needs.prepare-nogpu-hosted.outputs.image_test }}
+          IMAGE_MEDIA: ${{ needs.prepare-nogpu-hosted.outputs.image_media }}
+          IMAGE_EXTENDED: ${{ needs.prepare-nogpu-hosted.outputs.image_extended }}
         run: build_tools/ci_run_suite.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ !cancelled() }}

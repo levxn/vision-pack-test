@@ -270,6 +270,7 @@ jobs:
       rocm_sdk_date: ${{ inputs.rocm_sdk_date }}
       rocm_sdk_url: ${{ inputs.rocm_sdk_url }}
       has_cpu_runner: ${{ vars.VP_HAS_CPU_RUNNER == 'true' }}
+      has_self_hosted: ${{ vars.VP_HAS_SELF_HOSTED == 'true' }}
       expected_gfx: ${{ vars.EXPECTED_GFX }}
 
   report:
