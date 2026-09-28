@@ -63,7 +63,9 @@ vision-pack-test is a public repository, and GitHub warns that self-hosted runne
    - the event is `schedule` or `workflow_dispatch`;
    - the repository is `levxn/vision-pack-test`;
    - `GITHUB_WORKFLOW_REF` is `.github/workflows/nightly.yml@refs/heads/main` (jobs of reusable workflows report their caller, so `test.yml` and `report.yml` jobs pass);
-   - `/dev/kfd` exists (GPU instance), Docker works, and at least 100 GB is free.
+   - Docker works, and at least 100 GB is free.
+
+   A missing `/dev/kfd` or `/dev/dri/renderD*` on the GPU instance is only a warning while `VP_ALLOW_NO_GPU=1` (see "Operating notes"). It does not relax any of the checks above.
 
    The hook lives outside the repository and is root-owned, so no pull request can change it.
 2. **Repository settings** (see "Before you start"): approval for all external contributors, read-only default token, SHA-pinned actions, protected `main`.
@@ -78,5 +80,12 @@ Making the repository private removes most of this exposure. Runner groups (rest
 - **Disk:** the pre-job hook refuses jobs below 100 GB free. `cron.daily/vp-ci-prune` removes old images and keeps the newest 6 SDK tarballs (touch `<tarball>.keep` to pin a known-good one).
 - **Logs:** `journalctl -u 'actions.runner.*'`, plus `_diag/` inside `/srv/actions-runner/<name>/`.
 - **Hook rejections** appear as a failed job with an error annotation `vp-ci pre-job hook: ...`. If you rename `nightly.yml` or dispatch from a branch other than `main`, that is expected.
-- **Changing the hooks:** edit them in this repository, then re-run `sudo ./runner/setup.sh --repo levxn/vision-pack-test --skip-register` on the host.
+- **No usable GPU** (the driver did not load after a kernel update, the GPU fell off the bus, or it was swapped for one the build does not target):
+  - With `VP_ALLOW_NO_GPU=1` in `/etc/vp-ci/hooks.conf` (the default), the jobs still run and the pre-job hook only warns.
+  - `prepare-rocm` then builds the prefix from vision-pack's build SDK, and only loader-audit, sdk-consumer and robustness-nogpu run.
+  - The report is red with one "runner had no usable GPU" reason and one issue, and the release is not recorded as tested, so the next poll re-tests it once the GPU is back.
+  - `VP_ALLOW_NO_GPU=0` restores the old behaviour of rejecting every job on the GPU instance.
+
+  A GPU that differs from `EXPECTED_GFX` still fails `prepare-rocm`.
+- **Changing the hooks:** edit them in this repository, then re-run `sudo ./runner/setup.sh --repo levxn/vision-pack-test --skip-register` on the host. The hooks in `/opt/vp-hooks` are root-owned copies, so a `git pull` alone does not update them (this applies to the `VP_ALLOW_NO_GPU` change as well). `setup.sh` also rewrites `/etc/vp-ci/hooks.conf` with its defaults, so re-apply any local edits afterwards.
 - **Removing the runner:** `cd /srv/actions-runner/<name> && sudo ./svc.sh uninstall && sudo -u ci-runner ./config.sh remove --token <REMOVAL_TOKEN>`.

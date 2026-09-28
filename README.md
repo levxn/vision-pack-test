@@ -35,6 +35,7 @@ flowchart LR
 4. **`prepare-rocm`** runs on the self-hosted runner:
    - It detects the GPU and fetches the matching TheRock `-tests` SDK for the manifest's SDK date (cached, sha256-checked).
    - It overlays the vision-pack tarball into one prefix under `/srv/vp-ci/runs/<run>/rocm`.
+   - If the runner comes up without a usable GPU, the prefix uses vision-pack's own build SDK instead, and only the suites that need no GPU run (loader-audit, sdk-consumer, robustness-nogpu). Every GPU suite is reported as `<suite>::infra::no-gpu`, so the night is red with a single "runner had no usable GPU" reason and issue. It is not recorded as tested, so the next poll tries again.
 5. **GPU suites** run in Docker containers that see only the chosen GPU, with the prefix, dataset and repo mounted read-only.
 6. **`report`** does the following:
    - classifies every result against `baselines/known_issues.yaml` and last night's results;

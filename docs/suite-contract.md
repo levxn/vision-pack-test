@@ -17,7 +17,7 @@ The launcher sets these; `build_tools/lib/vp.sh` (`vp_init`) validates them and 
 | `VP_REPO` | Repository root (read-only). |
 | `VP_DATA` | Dataset root that **contains** `rocal_data/` (read-only; may be empty → record `blocked`). |
 | `VP_TIER` | `quick`, `standard`, `comprehensive` or `full`. |
-| `VP_GFX` | Chosen GPU architecture, e.g. `gfx1201` (empty on CPU-only runs). |
+| `VP_GFX` | Chosen GPU architecture, e.g. `gfx1201`. **Can be empty:** with `gpu_access: none`, on a runner without a usable GPU (`needs_gpu: false` suites only, see below) and with `local_run.sh --no-gpu`. |
 | `VP_MANIFEST` | vision-pack manifest JSON (`sha`, `rocm_sdk`, `submodules`, `gpu_targets`). |
 | `VP_VISION_PACK_SRC` | vision-pack submodule at the tested commit (top level only; nested library submodules are not initialised in release mode). |
 | `VP_EXTENDED` | `1` when the extended image (ROCm torch, tensorflow, jax) is in use. |
@@ -33,6 +33,16 @@ The launcher sets these; `build_tools/lib/vp.sh` (`vp_init`) validates them and 
 - puts `$ROCM_PATH/bin` first on `PATH`;
 - sets `PYTHONPATH=$ROCM_PATH/lib`, `PYTHONDONTWRITEBYTECODE=1`, `MPLBACKEND=Agg`, a private `HOME` under `$VP_OUT/work`, and `ROCAL_DATA_PATH=$VP_DATA`;
 - **unsets** `LD_LIBRARY_PATH` (customer mode: libraries must resolve through RUNPATH; `VP_CI_PARITY=1` restores upstream CI's value), `AGO_DEFAULT_TARGET` (set it per test), `HIP_VISIBLE_DEVICES` and `HSA_OVERRIDE_GFX_VERSION`.
+
+### Runs without a GPU (`needs_gpu`)
+
+`needs_gpu` in `suites/suites.yaml` defaults to `true`. Set it to `false` only for a suite that still produces meaningful results with no GPU device at all (today: loader-audit, sdk-consumer, robustness-nogpu). When the self-hosted runner comes up without a usable GPU, the nightly runs only these suites, in the `test-nogpu` job:
+- with `gpu_access: none` and an empty `VP_GFX`;
+- against a prefix built from vision-pack's own build SDK (the manifest's `rocm_sdk`, e.g. `gfx94X-dcgpu-tests`) instead of the GPU's family.
+
+Every other planned suite is recorded as `<suite>::infra::no-gpu`, and the night is red.
+
+Such a suite must check `VP_GFX` before any GPU-specific check, and record that check as `blocked` with a message containing "no GPU", e.g. `no GPU detected (VP_GFX empty)`. On a no-GPU night triage classifies these as `known_blocked`. On a night with a GPU they stay `blocked`, so a detection problem is still visible.
 
 ## Writing results
 
@@ -95,3 +105,5 @@ build_tools/local_run.sh --suite roccv --prefix /opt/rocm-nightly --data /path/t
     --tier standard --out /tmp/vpt
 jq -c '{id,status}' /tmp/vpt/roccv/results.jsonl | head
 ```
+
+`--no-gpu` emulates a runner without a usable GPU: empty `VP_GFX`, `gpu_access none` and `ROCR_VISIBLE_DEVICES=-1`. It refuses suites that do not have `needs_gpu: false`.
