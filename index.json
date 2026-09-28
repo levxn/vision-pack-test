@@ -20,6 +20,27 @@
     "infra_error": 8
    },
    "records": 396
+  },
+  {
+   "night": "2026-09-28",
+   "dir": "runs/36435459547",
+   "event": "workflow_dispatch",
+   "run_id": "36435459547",
+   "tier": "quick",
+   "gfx": "",
+   "verdict": "red",
+   "tag": "nightly-20260926",
+   "version": "0.2.0+gd440925",
+   "sha": "d440925b1b06417460ce48bd15a5c5d4ee239cba",
+   "fingerprint": "95b1f3af9ce82417",
+   "counts": {
+    "pass": 405,
+    "known_fail": 90,
+    "blocked": 11,
+    "new_failure": 31,
+    "infra_error": 3
+   },
+   "records": 540
   }
  ]
 }
