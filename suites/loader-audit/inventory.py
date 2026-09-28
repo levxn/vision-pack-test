@@ -113,7 +113,7 @@ def main() -> int:
     rec("inventory::manifest-schema", "fail" if schema else "pass",
         f"missing/invalid: {', '.join(schema)}" if schema else f"version {m.get('version')}", log=log_file)
 
-    for base in sorted((m.get("gpu_targets") or {})):
+    for base in sorted(m.get("gpu_targets") or {}):
         ok = f"lib/{base}.so" in entries and exists(f"lib/{base}.so")
         rec(f"inventory::gpu-target-lib.{base}", "pass" if ok else "fail",
             f"lib/{base}.so {'installed' if ok else 'missing'}", log=log_file)

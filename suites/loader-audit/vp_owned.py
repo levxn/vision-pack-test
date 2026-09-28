@@ -49,7 +49,7 @@ OWNED_GLOBS = (
     "lib/rocm_sysdeps/lib/*-rocm-vision.so*",
 )
 # share/doc/<lib> and share/doc/<lib>-<variant> (e.g. -asan) for each vision library.
-OWNED_DOC_RE = re.compile(r"^share/doc/(%s)(-[^/]+)?(/|$)" % "|".join(VISION_LIBS))
+OWNED_DOC_RE = re.compile(r"^share/doc/({})(-[^/]+)?(/|$)".format("|".join(VISION_LIBS)))
 
 BASE_LIB_RE = re.compile(
     r"^(linux-vdso|ld-linux-x86-64|libc|libm|libdl|libpthread|librt|libstdc\+\+|libgcc_s|libmvec|libutil|libresolv)\.so")

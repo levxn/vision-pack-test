@@ -29,8 +29,20 @@ import os
 import shutil
 import sys
 
-from sdkutil import (HERE, ROCM, Recorder, cmake_build, cmake_configure, customer_env, first_error, ingest_checks,
-                     log_path, run, tier_ge, work_dir)
+from sdkutil import (
+    HERE,
+    ROCM,
+    Recorder,
+    cmake_build,
+    cmake_configure,
+    customer_env,
+    first_error,
+    ingest_checks,
+    log_path,
+    run,
+    tier_ge,
+    work_dir,
+)
 
 GPU = bool(os.environ.get("VP_GFX"))
 NO_GPU = "no GPU detected (VP_GFX empty)"

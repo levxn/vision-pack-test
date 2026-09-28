@@ -81,7 +81,7 @@ def main() -> int:
 
     workers = max(1, min(8, (os.cpu_count() or 2) // 2))
     with ThreadPoolExecutor(max_workers=workers) as ex, open(log_file, "w", encoding="utf-8") as log:
-        for (mode, lib, h), rc, out in ex.map(one, jobs):
+        for (mode, _lib, h), rc, out in ex.map(one, jobs):
             tid = f"headers.{mode}::{h}"
             if rc is None:
                 rec(tid, "blocked", f"{mode} compiler not available")

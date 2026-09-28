@@ -27,8 +27,7 @@ import os
 import re
 import stat
 
-from vp_owned import (ROCM, Recorder, customer_env, fatbin_info, load_manifest, load_owned, log_path, run,
-                      tier_ge)
+from vp_owned import ROCM, Recorder, customer_env, fatbin_info, load_manifest, load_owned, log_path, run, tier_ge
 
 
 def nm_dyn(path: str) -> list[tuple[str, str]]:

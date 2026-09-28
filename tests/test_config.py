@@ -1,5 +1,6 @@
 """suites.yaml tier matrix and the baseline linter."""
 import datetime as dt
+from itertools import pairwise
 from pathlib import Path
 
 import lint_known_issues
@@ -16,7 +17,7 @@ def test_tiers_are_cumulative():
     names = []
     for tier in plan_matrix.TIERS:
         names.append(set(plan_matrix.plan(CFG, tier, set(), False, False)["expected"]))
-    for smaller, larger in zip(names, names[1:]):
+    for smaller, larger in pairwise(names):
         assert smaller <= larger
 
 
