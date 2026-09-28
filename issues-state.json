@@ -54,19 +54,14 @@
   "green_streak": 0,
   "last_red": "2026-09-28"
  },
- "e87e7c0c50": {
-  "key": "loader-audit::infra",
-  "green_streak": 2,
-  "last_red": "2026-09-28"
- },
  "f13910f62a": {
   "key": "robustness-nogpu::infra",
-  "green_streak": 1,
+  "green_streak": 2,
   "last_red": "2026-09-28"
  },
  "f2232a9046": {
   "key": "sdk-consumer::infra",
-  "green_streak": 1,
+  "green_streak": 2,
   "last_red": "2026-09-28"
  }
 }
