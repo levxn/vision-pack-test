@@ -6,8 +6,12 @@
 
 Outputs JSON objects ``{"include": [...]}`` for the self-hosted jobs, split by
 runner label, plus the list of hosted suites and every expected suite (for the
-report's missing-suite check). With --github they are written to
-$GITHUB_OUTPUT as gpu_matrix, cpu_matrix, hosted, expected, has_gpu, has_cpu.
+report's missing-suite check). ``nogpu_matrix`` holds the planned suites with
+``needs_gpu: false`` (with ``gpu_access: none``), which test.yml runs instead
+of both self-hosted matrices when the runner has no usable GPU;
+``gpu_required`` lists the planned suites that cannot. With --github they are
+written to $GITHUB_OUTPUT as gpu_matrix, cpu_matrix, nogpu_matrix, hosted,
+expected, gpu_required, has_gpu, has_cpu and has_nogpu.
 """
 from __future__ import annotations
 
@@ -25,7 +29,7 @@ TIERS = ["quick", "standard", "comprehensive", "full"]
 def plan(cfg: dict, tier: str, only: set[str], has_cpu_runner: bool, extended: bool) -> dict:
     if tier not in TIERS:
         raise SystemExit(f"unknown tier {tier!r}; expected one of {TIERS}")
-    gpu, cpu, hosted, expected = [], [], [], []
+    gpu, cpu, nogpu, hosted, expected, gpu_required = [], [], [], [], [], []
     for name, s in cfg["suites"].items():
         if only and name not in only:
             continue
@@ -42,6 +46,9 @@ def plan(cfg: dict, tier: str, only: set[str], has_cpu_runner: bool, extended: b
         access = s.get("gpu_access", "chosen")
         if access not in ("chosen", "all", "none"):
             raise SystemExit(f"suite {name}: gpu_access must be chosen, all or none (got {access!r})")
+        needs_gpu = s.get("needs_gpu", True)
+        if not isinstance(needs_gpu, bool):
+            raise SystemExit(f"suite {name}: needs_gpu must be true or false (got {needs_gpu!r})")
         entry = {
             "suite": name,
             "timeout": int(s.get("timeout_minutes", 60)),
@@ -53,9 +60,14 @@ def plan(cfg: dict, tier: str, only: set[str], has_cpu_runner: bool, extended: b
             cpu.append(entry)
         else:
             gpu.append(entry)
+        if needs_gpu:
+            gpu_required.append(name)
+        else:
+            nogpu.append({**entry, "gpu_access": "none"})
     return {"gpu_matrix": {"include": gpu}, "cpu_matrix": {"include": cpu},
-            "hosted": hosted, "expected": expected,
-            "has_gpu": bool(gpu), "has_cpu": bool(cpu)}
+            "nogpu_matrix": {"include": nogpu},
+            "hosted": hosted, "expected": expected, "gpu_required": gpu_required,
+            "has_gpu": bool(gpu), "has_cpu": bool(cpu), "has_nogpu": bool(nogpu)}
 
 
 def main() -> int:
@@ -79,10 +91,13 @@ def main() -> int:
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
             f.write(f"gpu_matrix={json.dumps(p['gpu_matrix'])}\n")
             f.write(f"cpu_matrix={json.dumps(p['cpu_matrix'])}\n")
+            f.write(f"nogpu_matrix={json.dumps(p['nogpu_matrix'])}\n")
             f.write(f"hosted={','.join(p['hosted'])}\n")
             f.write(f"expected={','.join(p['expected'])}\n")
+            f.write(f"gpu_required={','.join(p['gpu_required'])}\n")
             f.write(f"has_gpu={'true' if p['has_gpu'] else 'false'}\n")
             f.write(f"has_cpu={'true' if p['has_cpu'] else 'false'}\n")
+            f.write(f"has_nogpu={'true' if p['has_nogpu'] else 'false'}\n")
     return 0
 
 

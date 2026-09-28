@@ -16,6 +16,11 @@
 #               all    (also the render nodes of GPUs the build does not target,
 #                       for unsupported-GPU negatives), or
 #               none   (no GPU device at all: CPU paths must still work).
+#   needs_gpu:  true (default) or false. When the runner comes up without a
+#               usable GPU, only the needs_gpu: false suites run (test-nogpu,
+#               with gpu_access none and an empty VP_GFX; their GPU-specific
+#               checks record "blocked"). The others are reported as
+#               <suite>::infra::no-gpu and the night is red.
 #
 # The hosted packaging jobs (validate-packages, verify-tarball, install-smoke)
 # are separate jobs in test.yml; the "packaging" entry here only records their
@@ -39,6 +44,7 @@ suites:
     tiers: [quick, standard, comprehensive, full]
     timeout_minutes: 15  # measured 6 s
     image: test
+    needs_gpu: false
     description: RUNPATH/NEEDED, dlopen and link probes, CWD hijack, symbol isolation, licenses
 
   sdk-consumer:
@@ -46,6 +52,7 @@ suites:
     tiers: [standard, comprehensive, full]
     timeout_minutes: 20  # measured 20 s
     image: test
+    needs_gpu: false
     description: header self-containment, find_package consumer builds, install contamination
 
   mivisionx:
@@ -91,6 +98,7 @@ suites:
     timeout_minutes: 10  # measured 3 s
     image: test
     gpu_access: none
+    needs_gpu: false
     entrypoint: suites/robustness/nogpu.sh
     description: CPU pipelines in a container with no GPU device
 

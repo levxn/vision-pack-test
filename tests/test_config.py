@@ -4,6 +4,7 @@ from pathlib import Path
 
 import lint_known_issues
 import plan_matrix
+import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent
@@ -28,6 +29,36 @@ def test_matrix_entries_and_runner_split():
     assert gpu["robustness-nogpu"]["gpu_access"] == "none"
     assert gpu["install-test"]["entrypoint"] == "suites/packaging/install_test.sh"
     assert all(e["image"] == "extended" for e in gpu.values())  # extended deps + full tier
+
+
+NOGPU_BY_TIER = {"quick": {"loader-audit"},
+                 "standard": {"loader-audit", "sdk-consumer"},
+                 "comprehensive": {"loader-audit", "sdk-consumer", "robustness-nogpu"},
+                 "full": {"loader-audit", "sdk-consumer", "robustness-nogpu"}}
+
+
+@pytest.mark.parametrize("has_cpu", [False, True])
+@pytest.mark.parametrize("tier", plan_matrix.TIERS)
+def test_nogpu_matrix_per_tier(tier, has_cpu):
+    p = plan_matrix.plan(CFG, tier, set(), has_cpu, False)
+    nogpu = {e["suite"]: e for e in p["nogpu_matrix"]["include"]}
+    assert set(nogpu) == NOGPU_BY_TIER[tier] and p["has_nogpu"] is True
+    assert all(e["gpu_access"] == "none" for e in nogpu.values())
+    # Every planned self-hosted suite either runs without a GPU or is reported as needing one.
+    assert set(p["gpu_required"]) == set(p["expected"]) - set(p["hosted"]) - set(nogpu)
+    if "robustness-nogpu" in nogpu:
+        assert nogpu["robustness-nogpu"]["entrypoint"] == "suites/robustness/nogpu.sh"
+
+
+def test_nogpu_matrix_follows_the_suite_filter():
+    p = plan_matrix.plan(CFG, "full", {"rocal"}, False, False)
+    assert p["nogpu_matrix"]["include"] == [] and p["has_nogpu"] is False and p["gpu_required"] == ["rocal"]
+
+
+def test_needs_gpu_must_be_a_bool():
+    cfg = {"suites": {"x": {"runner": "gpu", "tiers": ["quick"], "needs_gpu": "no"}}}
+    with pytest.raises(SystemExit, match="needs_gpu"):
+        plan_matrix.plan(cfg, "quick", set(), False, False)
 
 
 def test_suite_entrypoints_exist():
