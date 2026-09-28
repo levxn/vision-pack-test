@@ -3,7 +3,7 @@
 # the detected GPU family, with the vision-pack dist tarball overlaid on top.
 #
 #   prepare_rocm.sh --tarball <vision-pack-dist-linux-multiarch-*.tar.gz> \
-#       --run-dir /srv/vp-ci/runs/<run_id> --gfx gfx1201 \
+#       --run-dir /srv/vp-ci/runs/<run_id> (--gfx gfx1201 | --no-gpu) \
 #       [--cache /srv/vp-ci/cache/sdk] [--family gfx120X-all-tests] \
 #       [--date YYYYMMDD] [--url <sdk tarball url>] [--resolve-only] [--github]
 #
@@ -16,24 +16,30 @@
 # SDK recorded in the manifest (rocm_sdk). Fallbacks, in order: the latest SDK
 # of the family, multiarch-tests from that date, the latest multiarch-tests.
 # Both trees must share one prefix because every RUNPATH is $ORIGIN-relative.
+#
+# --no-gpu is for a runner without a usable GPU: the family is the build SDK's
+# own (from rocm_sdk, same fallbacks), the dist_amdgpu_targets check is
+# skipped, and prepared.json records "mode": "no-gpu" with an empty gfx. Only
+# the needs_gpu: false suites run against such a prefix.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FETCH="${REPO}/vision-pack/build_tools/fetch_rocm_sdk.py"
 tarball="" run_dir="" gfx="${VP_GFX:-}" cache="${VP_SDK_CACHE:-/srv/vp-ci/cache/sdk}"
-family="" date="" url="" resolve_only=0 github=0
+family="" date="" url="" resolve_only=0 github=0 no_gpu=0 gfx_arg=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tarball) tarball="$2"; shift 2 ;;
     --run-dir) run_dir="$2"; shift 2 ;;
-    --gfx) gfx="$2"; shift 2 ;;
+    --gfx) gfx="$2"; gfx_arg=1; shift 2 ;;
+    --no-gpu) no_gpu=1; shift ;;
     --cache) cache="$2"; shift 2 ;;
     --family) family="$2"; shift 2 ;;
     --date) date="$2"; shift 2 ;;
     --url) url="$2"; shift 2 ;;
     --resolve-only) resolve_only=1; shift ;;
     --github) github=1; shift ;;
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,23p' "$0"; exit 0 ;;
     *) echo "unknown argument $1" >&2; exit 2 ;;
   esac
 done
@@ -42,7 +48,13 @@ log() { printf '[prepare-rocm] %s\n' "$*" >&2; }
 die() { printf '::error::prepare-rocm: %s\n' "$*" >&2; exit 1; }
 
 [[ -n "${tarball}" && -f "${tarball}" ]] || die "--tarball must name the vision-pack dist tarball"
-[[ -n "${gfx}" ]] || die "--gfx (or VP_GFX) is required; run detect_gpu.sh first"
+mode=gpu
+if [[ "${no_gpu}" == 1 ]]; then
+  [[ "${gfx_arg}" == 0 ]] || die "--no-gpu and --gfx are mutually exclusive"
+  mode=no-gpu gfx=""
+else
+  [[ -n "${gfx}" ]] || die "--gfx (or VP_GFX) is required; run detect_gpu.sh first, or pass --no-gpu"
+fi
 [[ "${resolve_only}" == 1 || -n "${run_dir}" ]] || die "--run-dir is required"
 [[ -f "${FETCH}" ]] || die "${FETCH} missing: is the vision-pack submodule checked out?"
 command -v jq >/dev/null || die "jq is required"
@@ -64,6 +76,11 @@ family_for_gfx() {
   esac
 }
 
+# therock-dist-linux-<family>-<version>.tar.gz (URL or name) -> family
+family_of_sdk() {
+  sed -nE 's/.*therock-dist-linux-(.+)-[0-9]+\.[0-9]+\.[0-9]+[a-z0-9.]*\.tar\.gz$/\1/p' <<<"${1##*/}"
+}
+
 # The manifest travels inside the dist tarball.
 manifest_json="$(tar -xzOf "${tarball}" ./share/vision-pack/vision-pack-manifest.json 2>/dev/null \
   || tar -xzOf "${tarball}" share/vision-pack/vision-pack-manifest.json 2>/dev/null)" \
@@ -74,8 +91,18 @@ build_sdk="$(jq -r '.rocm_sdk // empty' <<<"${manifest_json}")"
 if [[ -z "${date}" && "${build_sdk}" =~ a(20[0-9]{6})\.tar\.gz$ ]]; then
   date="${BASH_REMATCH[1]}"
 fi
-requested_family="${family:-$(family_for_gfx "${gfx}")}"
-log "vision-pack ${vp_version} (${vp_sha:0:12}); build SDK ${build_sdk##*/}; gfx ${gfx} -> ${requested_family}, date ${date:-latest}"
+if [[ -n "${family}" ]]; then
+  requested_family="${family}"
+elif [[ "${mode}" == no-gpu ]]; then
+  requested_family="$(family_of_sdk "${build_sdk}")"
+  if [[ -z "${requested_family}" ]]; then
+    echo "::warning::prepare-rocm: no build SDK family in the manifest's rocm_sdk '${build_sdk}'; using multiarch-tests" >&2
+    requested_family=multiarch-tests
+  fi
+else
+  requested_family="$(family_for_gfx "${gfx}")"
+fi
+log "vision-pack ${vp_version} (${vp_sha:0:12}); build SDK ${build_sdk##*/}; ${gfx:-no GPU} -> ${requested_family}, date ${date:-latest}"
 
 resolve() { # family [date] -> URL on stdout
   local args=(--gpu-family "$1" --print-url) out
@@ -89,7 +116,7 @@ fallback=none
 sdk_family="${requested_family}"
 if [[ -n "${url}" ]]; then
   fallback=pinned-url
-  sdk_family="$(sed -nE 's/.*therock-dist-linux-(.+)-[0-9]+\.[0-9]+\.[0-9]+[a-z0-9.]*\.tar\.gz$/\1/p' <<<"${url##*/}")"
+  sdk_family="$(family_of_sdk "${url}")"
 elif url="$(resolve "${requested_family}" "${date}")"; then
   :
 elif url="$(resolve "${requested_family}")"; then
@@ -108,8 +135,8 @@ log "SDK: ${sdk_name} (fallback: ${fallback})"
 if [[ "${resolve_only}" == 1 ]]; then
   jq -n --arg url "${url}" --arg name "${sdk_name}" --arg family "${sdk_family}" \
     --arg requested "${requested_family}" --arg date "${date}" --arg fallback "${fallback}" \
-    --arg gfx "${gfx}" --arg vp_sha "${vp_sha}" --arg vp_version "${vp_version}" \
-    '{gfx:$gfx, sdk:{url:$url, name:$name, family:$family, requested_family:$requested,
+    --arg gfx "${gfx}" --arg mode "${mode}" --arg vp_sha "${vp_sha}" --arg vp_version "${vp_version}" \
+    '{gfx:$gfx, mode:$mode, sdk:{url:$url, name:$name, family:$family, requested_family:$requested,
       date:$date, fallback:$fallback}, vision_pack:{sha:$vp_sha, version:$vp_version}}'
   exit 0
 fi
@@ -173,8 +200,10 @@ flock -u "${lockfd}"
 dist_info="${prefix}/share/therock/dist_info.json"
 [[ -f "${dist_info}" ]] || die "${sdk_name} has no share/therock/dist_info.json"
 targets="$(jq -r '.dist_amdgpu_targets // ""' "${dist_info}")"
-[[ ";${targets};" == *";${gfx};"* ]] \
-  || die "${sdk_name} was not built for ${gfx} (dist_amdgpu_targets: ${targets}); pass --family multiarch-tests"
+if [[ "${mode}" == gpu ]]; then
+  [[ ";${targets};" == *";${gfx};"* ]] \
+    || die "${sdk_name} was not built for ${gfx} (dist_amdgpu_targets: ${targets}); pass --family multiarch-tests"
+fi
 missing=()
 for f in include/rpp/rpp.h include/rocjpeg/rocjpeg.h share/rocdecode/utils; do
   [[ -e "${prefix}/${f}" ]] || missing+=("${f}")
@@ -188,14 +217,14 @@ installed_sha="$(jq -r '.sha // empty' "${prefix}/share/vision-pack/vision-pack-
 [[ "${installed_sha}" == "${vp_sha}" ]] || die "installed manifest sha ${installed_sha} != tarball manifest sha ${vp_sha}"
 
 dist_sha="$(sha256sum "${tarball}" | cut -d' ' -f1)"
-jq -n --arg prefix "$(cd "${prefix}" && pwd)" --arg gfx "${gfx}" \
+jq -n --arg prefix "$(cd "${prefix}" && pwd)" --arg gfx "${gfx}" --arg mode "${mode}" \
   --arg url "${url}" --arg name "${sdk_name}" --arg family "${sdk_family}" --arg requested "${requested_family}" \
   --arg date "${date}" --arg fallback "${fallback}" --arg sha256 "${sdk_sha}" --argjson size "${size}" \
   --arg etag "${etag}" --arg targets "${targets}" --arg cached "${cached}" \
   --arg dist "$(basename "${tarball}")" --arg dist_sha "${dist_sha}" \
   --arg vp_sha "${vp_sha}" --arg vp_version "${vp_version}" --arg build_sdk "${build_sdk}" \
   --arg at "$(date -u +%FT%TZ)" \
-  '{prefix:$prefix, gfx:$gfx, prepared_at:$at,
+  '{prefix:$prefix, gfx:$gfx, mode:$mode, prepared_at:$at,
     sdk:{url:$url, name:$name, family:$family, requested_family:$requested, date:$date, fallback:$fallback,
          sha256:$sha256, size:$size, etag:$etag, dist_amdgpu_targets:$targets, from_cache:($cached=="1")},
     vision_pack:{tarball:$dist, sha256:$dist_sha, sha:$vp_sha, version:$vp_version, build_sdk:$build_sdk}}' \
@@ -212,12 +241,17 @@ if [[ "${github}" == 1 && -n "${GITHUB_OUTPUT:-}" ]]; then
     echo "sdk_sha256=${sdk_sha}"
     echo "vp_sha=${vp_sha}"
     echo "vp_version=${vp_version}"
+    echo "mode=${mode}"
   } >>"${GITHUB_OUTPUT}"
   {
     echo "### ROCm prefix"
     echo "| | |"
     echo "|---|---|"
-    echo "| GPU | \`${gfx}\` |"
+    if [[ "${mode}" == no-gpu ]]; then
+      echo "| GPU | none (no-gpu mode: only the suites that need no GPU run) |"
+    else
+      echo "| GPU | \`${gfx}\` |"
+    fi
     echo "| SDK | \`${sdk_name}\` (fallback: ${fallback}, cached: ${cached}) |"
     echo "| SDK sha256 | \`${sdk_sha}\` |"
     echo "| vision-pack | \`${vp_version}\` (\`${vp_sha:0:12}\`) |"
