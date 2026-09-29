@@ -5,7 +5,8 @@ Every subcommand appends result records to ``--results`` through
 build_tools/results/emit.py (suite ``--suite``, default ``packaging``)::
 
     pkgcheck.py upstream-log --log F --rc N          # validate_packages.sh output -> deb::<pkg>
-    pkgcheck.py deb    --debs DIR                    # extra DEB checks (licenses, N1/N2 refs)
+    pkgcheck.py deb    --debs DIR --work DIR          # extra DEB checks (licenses, N1/N2 refs,
+                                                       # empty dirs, build paths -- issue #55)
     pkgcheck.py rpm    --rpms DIR [--debs DIR] --work DIR
     pkgcheck.py tarball --tarball F --root DIR [--debs DIR] [--release-json F] [--vp-src DIR]
     pkgcheck.py depends --pkg-dir DIR --format deb|rpm --index F --group G [--stubs-out F]
@@ -302,6 +303,10 @@ class Pkg:
         return [e for e in self.entries if e.kind != "d"]
 
     def depends_names(self) -> list[str]:
+        if self.fmt == "rpm":
+            # Manual (explicit Requires:) entries, same filter as requires.relations --
+            # excludes auto soname/rpmlib requires, which aren't package names.
+            return [n for n, t, _, _ in self.requires if t == "manual" or (t == "" and not n.startswith("rpmlib("))]
         return [n for n, _, _ in parse_deb_depends(self.fields.get("Depends", ""))]
 
 
@@ -569,6 +574,38 @@ def cmd_deb(a) -> int:
     all_paths: set[str] = set()
     for p in pkgs.values():
         all_paths.update(e.path for e in p.files)
+    # empty directories and build-machine paths (issue #55: amdrocm-roccv shipped
+    # an empty lib/amd/rocal/plugin/, so `import amd.rocal.plugin` wrongly
+    # succeeded; confirmed on DEBs specifically, so this must not be RPM-only
+    # the way it used to be -- see L-build-paths/N8 for the RPM/tarball side).
+    for name in sorted(pkgs):
+        p = pkgs[name]
+        g = f"{name}::"
+        ed = empty_dirs(p.entries)
+        rec(g + "payload.empty-dirs", "fail" if ed else "pass",
+            ("owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): "
+             + short_list(ed)) if ed else "")
+        if not p.files or is_meta(name):
+            continue
+        dest = Path(a.work) / name
+        rc, err = extract_deb(p.file, dest)
+        if rc != 0:
+            rec(g + "payload.build-paths", "error", f"dpkg-deb -x failed: {err[:300]}")
+            continue
+        hits = []
+        for e in p.files:
+            fp = dest / e.path.lstrip("/")
+            if e.kind != "f" or not fp.is_file():
+                continue
+            if is_elf(fp):
+                dyn = elf_dynamic(fp)
+                for rp in dyn.get("RUNPATH", []) + dyn.get("RPATH", []):
+                    if bad_runpath_tokens(rp):
+                        hits.append(f"{e.path} RUNPATH [{rp}]")
+            elif e.size < 4_000_000 and file_has(fp, BUILD_PATH_RE):
+                hits.append(e.path)
+        rec(g + "payload.build-paths", "fail" if hits else "pass",
+            ("build-machine paths in RUNPATHs or text files: " + short_list(hits, 6)) if hits else "")
     for name, needs in LICENSES_REQUIRED.items():
         if name in pkgs:
             record_licenses(rec, f"{name}::", [e.path for e in pkgs[name].files], needs)
@@ -692,6 +729,12 @@ def resolve_link(entries: dict[str, Entry], path: str, limit: int = 40) -> str |
     return None
 
 
+def extract_deb(f: Path, dest: Path) -> tuple[int, str]:
+    dest.mkdir(parents=True, exist_ok=True)
+    r = subprocess.run(["dpkg-deb", "-x", str(f), str(dest)], capture_output=True, text=True)
+    return r.returncode, r.stderr.strip()
+
+
 # ---------------------------------------------------------------------------
 # rpm
 # ---------------------------------------------------------------------------
@@ -751,8 +794,10 @@ def cmd_rpm(a) -> int:
     rec("set::version", "pass" if len(vers) == 1 and len(rels) == 1 else "fail",
         f"versions {short_list(sorted(vers))}; releases {short_list(sorted(rels))}")
     set_provides: set[str] = set()
+    all_paths: set[str] = set()
     for p in pkgs.values():
         set_provides.update(n for n, _, _ in p.provides)
+        all_paths.update(e.path for e in p.files)
     counts = {}
     for name in sorted(pkgs):
         p = pkgs[name]
@@ -927,6 +972,45 @@ def cmd_rpm(a) -> int:
                     content = pth.read_text(errors="replace").strip() if pth.is_file() else None
                     rec(g + "pth.content", "pass" if content == PTH_CONTENT else "fail",
                         f"{PTH_PATH}: {content!r}" if content is not None else f"{PTH_PATH} not in payload")
+                # -test packages: every samples/ path their shipped tests
+                # reference must live inside the package's own Depends
+                # closure (N1/N2 on the DEB side; RPMs share the install
+                # rules, so the same defect class can occur here too).
+                if name.endswith("-test"):
+                    for e in files:
+                        fp = dest / e.path.lstrip("/")
+                        if e.kind == "f" and want_text(e.path, e.size) and fp.is_file():
+                            p.texts[e.path] = fp.read_bytes()
+                    refs = sample_refs(p)
+                    if not refs:
+                        rec(g + "refs.closure", "pass", "no samples/ references in the shipped tests")
+                        rec(g + "refs.any-package", "pass", "no samples/ references in the shipped tests")
+                    else:
+                        cl = closure(pkgs, name)
+                        cl_paths: set[str] = set()
+                        for n in cl:
+                            cl_paths.update(e2.path for e2 in pkgs[n].files)
+                        not_cl = {t: f for t, f in refs.items() if t not in cl_paths}
+                        nowhere = {t: f for t, f in refs.items() if t not in all_paths}
+                        describe = lambda d: "; ".join(  # noqa: E731
+                            f"{t} (used by {short_list(sorted(f), 2)})" for t, f in sorted(d.items()))
+                        if not_cl:
+                            owners = defaultdict(list)
+                            for t in not_cl:
+                                for n2, p2 in pkgs.items():
+                                    if any(e2.path == t for e2 in p2.files):
+                                        owners[t].append(n2)
+                            where = "; ".join(f"{t} -> {','.join(o)}" for t, o in owners.items())
+                            rec(g + "refs.closure", "fail",
+                                f"files the tests read are outside {name} and its declared Requires "
+                                f"({short_list(sorted(cl))}): {describe(not_cl)}" + (f"; shipped by: {where}"
+                                                                                     if where else ""))
+                        else:
+                            rec(g + "refs.closure", "pass", f"{len(refs)} referenced file(s) inside the Requires closure")
+                        if nowhere:
+                            rec(g + "refs.any-package", "fail", f"referenced files ship in no package: {describe(nowhere)}")
+                        else:
+                            rec(g + "refs.any-package", "pass", f"{len(refs)} referenced file(s) all shipped")
             if name == "amdrocm-vision-pythonpath":
                 rec(g + "pth.site-dir", "fail",
                     f"ships the Debian-only {PTH_PATH} (no EL interpreter reads it) and relies on an untracked "
@@ -1335,6 +1419,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--summary-md", default="")
     p = sub.add_parser("deb")
     p.add_argument("--debs", required=True)
+    p.add_argument("--work", required=True)
     p = sub.add_parser("rpm")
     p.add_argument("--rpms", required=True)
     p.add_argument("--debs", default="")

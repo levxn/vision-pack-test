@@ -616,6 +616,7 @@ issues:
     kind: xfail
     match:
       - "packaging::deb::amdrocm-pydecode-test::refs.*"
+      - "packaging::rpm::amdrocm-pydecode-test::refs.*"
       - "install-test::rocpydecode::n1.samples"
       - "install-test::rocpydecode::raw_regression_test"
       - "install-test::rocpyjpegdecode::jpeg_regression_test"
@@ -629,6 +630,7 @@ issues:
     match:
       - "packaging::deb::amdrocm-*-test::depends.devel"
       - "packaging::deb::amdrocm-mivisionx-test::refs.closure"
+      - "packaging::rpm::amdrocm-mivisionx-test::refs.closure"
       - "install-test::*::n2.*"
       - "install-test::*::shipped::*"
     added: 2026-09-27
@@ -684,7 +686,7 @@ issues:
     added: 2026-09-27
     review_by: 2026-12-31
   - id: N8
-    title: Packages and the tarball own empty foreign directories (CPack)
+    title: Packages and the tarball own empty foreign directories (CPack); vision-pack#55, e.g. amdrocm-roccv ships an empty lib/amd/rocal/plugin so `import amd.rocal.plugin` wrongly succeeds
     severity: low
     owner: vision-pack
     kind: xfail
@@ -695,6 +697,12 @@ issues:
       - "packaging::rpm::amdrocm-roccv::payload.empty-dirs"
       - "packaging::rpm::amdrocm-vision-pythonpath::payload.empty-dirs"
       - "packaging::rpm::amdrocm-vision-sysdeps::payload.empty-dirs"
+      - "packaging::deb::amdrocm-mivisionx::payload.empty-dirs"
+      - "packaging::deb::amdrocm-pydecode::payload.empty-dirs"
+      - "packaging::deb::amdrocm-rocal::payload.empty-dirs"
+      - "packaging::deb::amdrocm-roccv::payload.empty-dirs"
+      - "packaging::deb::amdrocm-vision-pythonpath::payload.empty-dirs"
+      - "packaging::deb::amdrocm-vision-sysdeps::payload.empty-dirs"
       - "packaging::tarball::empty-dirs"
     added: 2026-09-27
     review_by: 2026-12-31
@@ -781,6 +789,7 @@ issues:
       - "packaging::tarball::runpath::bin/runvx"
       - "packaging::tarball::elf.ci-paths"
       - "packaging::rpm::amdrocm-mivisionx::payload.build-paths"
+      - "packaging::deb::amdrocm-mivisionx::payload.build-paths"
     added: 2026-09-25
     review_by: 2026-12-31
   - id: L-reexports

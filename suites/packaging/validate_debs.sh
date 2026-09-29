@@ -10,6 +10,7 @@
 #   packaging::deb::summary                  the "Package validation summary"
 #   packaging::deb::set::{packages,version}
 #   packaging::deb::<package>::license.<component>
+#   packaging::deb::<package>::{payload.empty-dirs,payload.build-paths}
 #   packaging::deb::<test-package>::{depends.devel,refs.closure,refs.any-package}
 # Appends the summary table to $GITHUB_STEP_SUMMARY when set.
 set -uo pipefail
@@ -59,7 +60,9 @@ else
   fi
 fi
 
-pk_py deb --debs "${debs}" >"${VP_OUT}/logs/deb-extra.log" 2>&1 \
+work="${VP_WORK}/deb-payload"
+pk_py deb --debs "${debs}" --work "${work}" >"${VP_OUT}/logs/deb-extra.log" 2>&1 \
   || vp_result deb::extra-checks error "pkgcheck.py deb failed (see logs/deb-extra.log)" 0 "${VP_OUT}/logs/deb-extra.log"
+pk_cleanup_work "${work}"
 vp_finish
 exit 0
