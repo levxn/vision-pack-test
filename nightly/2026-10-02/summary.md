@@ -2,7 +2,7 @@
 
 vision-pack `0.2.0+g66bd96c` (nightly-20261002, `66bd96cf03b4`) on `?`, tier **comprehensive**, 2026-10-02.
 
-**Why:** 5 infra error; 8 new failure; 28 still failing; fixed known issues to remove from the baseline: H1, H3, H4, N5.
+**Why:** 5 infra error; 8 new failure; 29 still failing; fixed known issues to remove from the baseline: H1, H3, H4, N5.
 
 Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-02/
 
@@ -10,7 +10,7 @@ Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-02/
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | loader-audit | 265 | 0 | 0 | 45 | 0 | 15 | 6 | 4 |
 | mivisionx | no results | | | | | | | |
-| packaging | 425 | 8 | 20 | 25 | 0 | 53 | 9 | 0 |
+| packaging | 425 | 8 | 21 | 25 | 0 | 53 | 9 | 0 |
 | robustness | no results | | | | | | | |
 | robustness-nogpu | 29 | 0 | 0 | 3 | 0 | 1 | 0 | 0 |
 | rocal | no results | | | | | | | |
@@ -18,7 +18,7 @@ Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-02/
 | rocpydecode | no results | | | | | | | |
 | sdk-consumer | 342 | 0 | 8 | 40 | 0 | 2 | 14 | 0 |
 
-### New and unbaselined failures (41)
+### New and unbaselined failures (42)
 
 - `mivisionx::infra::no-results` (error, failing 5 nights): the suite job produced no results (job failed, timed out or was cancelled)
 - `packaging::install-deb::dpkg.verify` (fail, failing 5 nights): missing     /usr/share/doc/amdrocm-vision-sdk/README.Debian missing     /usr/share/doc/amdrocm-vision-tests/README.Debian missing     /usr/share/doc/amdrocm-vis
@@ -40,7 +40,7 @@ Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-02/
 - `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail, failing 5 nights): rc 1: Traceback (most recent call last):   File "<string>", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' 
 - `packaging::install-rpm::import::rocal_pybind` (fail, failing 5 nights): rc 1: Traceback (most recent call last):   File "<string>", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' 
 - `packaging::install-rpm::import::rocpycv` (fail, failing 5 nights): rc 1: Traceback (most recent call last):   File "<string>", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' 
-- ... and 21 more (see the report)
+- ... and 22 more (see the report)
 
 ### Known issues that passed tonight
 

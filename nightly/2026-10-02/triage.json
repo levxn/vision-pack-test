@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "night": "2026-10-02",
- "generated_at": "2026-10-02T16:12:06+00:00",
+ "generated_at": "2026-10-02T21:54:22+00:00",
  "run": {
   "tag": "nightly-20261002",
   "version": "0.2.0+g66bd96c",
@@ -10,7 +10,7 @@
   "fingerprint": "97f7ec30a8a8a484",
   "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37029077558",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37065962449",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-02/",
   "upstream": {
    "status": "not-found"
@@ -24,26 +24,26 @@
  "reasons": [
   "5 infra error",
   "8 new failure",
-  "28 still failing",
+  "29 still failing",
   "fixed known issues to remove from the baseline: H1, H3, H4, N5"
  ],
  "totals": {
   "records": 1066,
   "by_status": {
-   "pass": 879,
+   "pass": 878,
    "blocked": 29,
    "skip": 4,
-   "fail": 142,
+   "fail": 143,
    "error": 12
   },
   "by_class": {
-   "pass": 806,
+   "pass": 805,
    "fixed": 71,
    "blocked": 26,
    "skip": 4,
    "known_fail": 113,
    "new_test": 2,
-   "still_failing": 28,
+   "still_failing": 29,
    "new_failure": 8,
    "known_blocked": 3,
    "infra_error": 5
@@ -54,7 +54,7 @@
    "suite": "loader-audit",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 13,
+   "wall_seconds": 10,
    "total": 265,
    "classes": {
     "pass": 195,
@@ -87,20 +87,20 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 88,
+   "wall_seconds": 67,
    "total": 425,
    "classes": {
-    "pass": 308,
+    "pass": 307,
     "fixed": 53,
     "new_test": 2,
-    "still_failing": 20,
+    "still_failing": 21,
     "new_failure": 8,
     "known_fail": 25,
     "blocked": 9
    },
    "status_counts": {
-    "pass": 363,
-    "fail": 53,
+    "pass": 362,
+    "fail": 54,
     "error": 0,
     "skip": 0,
     "blocked": 9,
@@ -122,7 +122,7 @@
    "suite": "robustness-nogpu",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 6,
+   "wall_seconds": 8,
    "total": 29,
    "classes": {
     "pass": 25,
@@ -175,7 +175,7 @@
    "suite": "sdk-consumer",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 159,
+   "wall_seconds": 128,
    "total": 342,
    "classes": {
     "pass": 278,
@@ -452,8 +452,8 @@
    "group": "install-rpm",
    "total": 38,
    "counts": {
-    "pass": 18,
-    "fail": 11,
+    "pass": 17,
+    "fail": 12,
     "blocked": 9
    }
   },
@@ -1041,6 +1041,22 @@
    "duration_s": 0
   },
   {
+   "id": "packaging::install-rpm::isolation.jpeg_std_error",
+   "suite": "packaging",
+   "group": "install-rpm",
+   "status": "fail",
+   "class": "still_failing",
+   "known": null,
+   "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
+   "repro": "",
+   "log": "",
+   "backend": "",
+   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
+   "prev": "fail",
+   "nights_failing": 5,
+   "duration_s": 0
+  },
+  {
    "id": "packaging::install-rpm::pth.python3.12",
    "suite": "packaging",
    "group": "install-rpm",
@@ -1214,7 +1230,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.213
+   "duration_s": 0.142
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.vs-reference",
@@ -1262,7 +1278,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.047
+   "duration_s": 0.037
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip0",
@@ -1278,7 +1294,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.047
+   "duration_s": 0.037
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip1",
@@ -1294,7 +1310,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.047
+   "duration_s": 0.037
   },
   {
    "id": "sdk-consumer::contamination.unset.explicit::roccv-offload-arch",
@@ -1342,7 +1358,7 @@
    "result_dir": "results-loader-audit",
    "prev": "fail",
    "nights_failing": 0,
-   "duration_s": 0.064
+   "duration_s": 0.056
   },
   {
    "id": "loader-audit::docs::install-usage",
@@ -2222,7 +2238,7 @@
    "result_dir": "results-loader-audit",
    "prev": "fail",
    "nights_failing": 0,
-   "duration_s": 0.034
+   "duration_s": 0.029
   },
   {
    "id": "loader-audit::link::rocal-c-consumer-run",
@@ -2238,7 +2254,7 @@
    "result_dir": "results-loader-audit",
    "prev": "fail",
    "nights_failing": 0,
-   "duration_s": 0.034
+   "duration_s": 0.029
   },
   {
    "id": "loader-audit::py-import.py313-negative::rocal_pybind",
@@ -3854,7 +3870,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "error",
    "nights_failing": 5,
-   "duration_s": 0.966
+   "duration_s": 1.066
   },
   {
    "id": "robustness-nogpu::rocal::cpu-decode-resize",
@@ -3870,7 +3886,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.164
+   "duration_s": 0.215
   },
   {
    "id": "robustness-nogpu::roccv::cpu-flip-copy-to",
@@ -3886,7 +3902,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.114
+   "duration_s": 0.164
   },
   {
    "id": "robustness-nogpu::rocpydecode::jpeg-decoder-clean-error",
@@ -3902,7 +3918,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.064
+   "duration_s": 0.114
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-constant",
@@ -3918,7 +3934,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.086
+   "duration_s": 0.065
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-replicate",
@@ -3934,7 +3950,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 5,
-   "duration_s": 0.086
+   "duration_s": 0.065
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::GPU.border-constant",
@@ -6243,7 +6259,7 @@
   ],
   "removed_count": 2,
   "new_failure": 8,
-  "still_failing": 28,
+  "still_failing": 29,
   "fixed": 71,
   "new_test": 2
  },
@@ -6471,7 +6487,7 @@
    "key": "packaging::install-rpm",
    "nights": 5,
    "title": "Nightly regression: packaging::install-rpm [82323088f1]",
-   "body": "10 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 5 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-02/\n\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal-0.2.0+g66bd96c-202610\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx-0.2.0+g66bd96c-20261002.x86_64: \t(amdrocm-runtime >= 10.2.0~ or amdrocm-runtime10.2 >= 10.2.0~) is needed by (installed) amdrocm-mivisionx-0.2.0+g66bd96c\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n- `packaging::install-rpm::remove.clean` (fail): left behind: /usr/local/lib64/python3.9/site-packages/amdrocm-vision.pth (written by %post) \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "11 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 5 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-02/\n\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal-0.2.0+g66bd96c-202610\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx-0.2.0+g66bd96c-20261002.x86_64: \t(amdrocm-runtime >= 10.2.0~ or amdrocm-runtime10.2 >= 10.2.0~) is needed by (installed) amdrocm-mivisionx-0.2.0+g66bd96c\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n- `packaging::install-rpm::remove.clean` (fail): left behind: /usr/local/lib64/python3.9/site-packages/amdrocm-vision.pth (written by %post) \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
