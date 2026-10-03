@@ -2,61 +2,61 @@
  "d3cee6816a": {
   "key": "mivisionx::infra",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "80da0054c7": {
   "key": "packaging::install-deb",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "82323088f1": {
   "key": "packaging::install-rpm",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "4cb9a97540": {
   "key": "packaging::rpm",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "a98bcd24a6": {
   "key": "robustness::infra",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "f0ed1b2245": {
   "key": "rocal::infra",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "630c79d6b7": {
   "key": "roccv::infra",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "9d1c369709": {
   "key": "rocpydecode::infra",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "442e663e5e": {
   "key": "sdk-consumer::consumer.rocal",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "bea857f92d": {
   "key": "sdk-consumer::consumer.roccv",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "fa1ddc6992": {
   "key": "sdk-consumer::contamination.unset.explicit",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  },
  "0f525b6809": {
   "key": "sdk-consumer::contamination.unset.implicit",
   "green_streak": 0,
-  "last_red": "2026-10-02"
+  "last_red": "2026-10-03"
  }
 }
