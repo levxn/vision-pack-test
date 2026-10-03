@@ -215,25 +215,25 @@
    "night": "2026-10-03",
    "dir": "nightly/2026-10-03",
    "event": "schedule",
-   "run_id": "37129073044",
-   "tier": "comprehensive",
+   "run_id": "37149247213",
+   "tier": "full",
    "gfx": "",
    "verdict": "red",
    "tag": "nightly-20261003",
    "version": "0.2.0+gb34a2b0",
    "sha": "b34a2b0a3a31b0834479a19ed18d77bff8c3c6e1",
-   "fingerprint": "7c0146338b4ef318",
+   "fingerprint": "b9a8f138eecafd62",
    "counts": {
-    "pass": 808,
+    "pass": 807,
     "fixed": 71,
     "blocked": 26,
     "skip": 4,
     "known_fail": 113,
-    "still_failing": 36,
+    "new_failure": 37,
     "known_blocked": 3,
-    "infra_error": 5
+    "infra_error": 6
    },
-   "records": 1066
+   "records": 1067
   }
  ]
 }
