@@ -1,16 +1,16 @@
 {
  "schema": 1,
  "night": "2026-10-04",
- "generated_at": "2026-10-04T15:15:46+00:00",
+ "generated_at": "2026-10-04T20:31:03+00:00",
  "run": {
   "tag": "nightly-20261004",
   "version": "0.2.0+ga7f1c71",
   "sha": "a7f1c713d72bc1f2f5a538690fd534e5e2832c4d",
   "mode": "release",
-  "fingerprint": "6204c2141c0dc018",
-  "tier": "full",
+  "fingerprint": "6a532845fe9dd1b4",
+  "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37210426451",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37230848301",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-04/",
   "upstream": {
    "status": "not-found"
@@ -22,49 +22,38 @@
  "no_gpu": null,
  "verdict": "red",
  "reasons": [
-  "6 infra error",
+  "5 infra error",
   "1 new failure",
-  "37 still failing",
+  "36 still failing",
   "fixed known issues to remove from the baseline: H1, H3, H4, N5"
  ],
  "totals": {
-  "records": 1067,
+  "records": 1066,
   "by_status": {
-   "pass": 877,
+   "pass": 878,
    "blocked": 29,
    "skip": 4,
-   "fail": 145,
-   "error": 12
+   "fail": 144,
+   "error": 11
   },
   "by_class": {
-   "pass": 806,
+   "pass": 807,
    "fixed": 71,
    "blocked": 26,
    "skip": 4,
    "known_fail": 113,
-   "still_failing": 37,
+   "still_failing": 36,
    "new_failure": 1,
    "known_blocked": 3,
-   "infra_error": 6
+   "infra_error": 5
   }
  },
  "suites": [
   {
-   "suite": "install-test",
-   "missing": true,
-   "no_gpu": false,
-   "wall_seconds": null,
-   "total": 1,
-   "classes": {
-    "infra_error": 1
-   },
-   "status_counts": {}
-  },
-  {
    "suite": "loader-audit",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 14,
+   "wall_seconds": 11,
    "total": 265,
    "classes": {
     "pass": 195,
@@ -97,18 +86,18 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 63,
+   "wall_seconds": 74,
    "total": 425,
    "classes": {
-    "pass": 309,
+    "pass": 310,
     "fixed": 53,
-    "still_failing": 29,
+    "still_failing": 28,
     "known_fail": 25,
     "blocked": 9
    },
    "status_counts": {
-    "pass": 362,
-    "fail": 54,
+    "pass": 363,
+    "fail": 53,
     "error": 0,
     "skip": 0,
     "blocked": 9,
@@ -130,7 +119,7 @@
    "suite": "robustness-nogpu",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 7,
+   "wall_seconds": 6,
    "total": 29,
    "classes": {
     "pass": 25,
@@ -183,7 +172,7 @@
    "suite": "sdk-consumer",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 164,
+   "wall_seconds": 155,
    "total": 342,
    "classes": {
     "pass": 277,
@@ -205,14 +194,6 @@
   }
  ],
  "groups": [
-  {
-   "suite": "install-test",
-   "group": "infra",
-   "total": 1,
-   "counts": {
-    "error": 1
-   }
-  },
   {
    "suite": "loader-audit",
    "group": "cwd-hijack",
@@ -469,8 +450,8 @@
    "group": "install-rpm",
    "total": 38,
    "counts": {
-    "pass": 17,
-    "fail": 12,
+    "pass": 18,
+    "fail": 11,
     "blocked": 9
    }
   },
@@ -689,22 +670,6 @@
  ],
  "items": [
   {
-   "id": "install-test::infra::no-results",
-   "suite": "install-test",
-   "group": "infra",
-   "status": "error",
-   "class": "infra_error",
-   "known": null,
-   "message": "the suite job produced no results (job failed, timed out or was cancelled)",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
-   "duration_s": 0.0
-  },
-  {
    "id": "mivisionx::infra::no-results",
    "suite": "mivisionx",
    "group": "infra",
@@ -717,7 +682,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -733,7 +698,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -829,7 +794,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -845,7 +810,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -861,7 +826,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -877,7 +842,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -893,7 +858,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -909,7 +874,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -925,7 +890,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -941,7 +906,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -957,7 +922,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -973,7 +938,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -989,7 +954,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1005,7 +970,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1021,7 +986,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1037,7 +1002,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1053,7 +1018,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1069,23 +1034,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::isolation.jpeg_std_error",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1101,7 +1050,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1117,7 +1066,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1133,7 +1082,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0
   },
   {
@@ -1197,7 +1146,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1213,7 +1162,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1229,7 +1178,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1245,7 +1194,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1262,7 +1211,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "pass",
    "nights_failing": 1,
-   "duration_s": 0.075
+   "duration_s": 0.072
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.pipeline",
@@ -1277,8 +1226,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.059
+   "nights_failing": 6,
+   "duration_s": 0.055
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.vs-reference",
@@ -1293,7 +1242,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1309,7 +1258,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1325,8 +1274,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.04
+   "nights_failing": 6,
+   "duration_s": 0.041
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip0",
@@ -1341,8 +1290,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.04
+   "nights_failing": 6,
+   "duration_s": 0.041
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip1",
@@ -1357,8 +1306,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.04
+   "nights_failing": 6,
+   "duration_s": 0.041
   },
   {
    "id": "sdk-consumer::contamination.unset.explicit::roccv-offload-arch",
@@ -1373,7 +1322,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1389,7 +1338,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1406,7 +1355,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.058
+   "duration_s": 0.055
   },
   {
    "id": "loader-audit::docs::install-usage",
@@ -1421,7 +1370,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1437,7 +1386,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1453,7 +1402,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 3,
    "duration_s": 0.0
   },
   {
@@ -1469,7 +1418,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1485,7 +1434,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1501,7 +1450,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1517,7 +1466,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1533,7 +1482,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1549,7 +1498,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1565,7 +1514,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1581,7 +1530,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1597,7 +1546,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1613,7 +1562,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1629,7 +1578,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1645,7 +1594,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1661,7 +1610,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1677,7 +1626,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1693,7 +1642,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 3,
    "duration_s": 0.0
   },
   {
@@ -1709,7 +1658,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1725,7 +1674,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1741,7 +1690,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1757,7 +1706,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1773,7 +1722,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1869,7 +1818,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1885,7 +1834,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1901,7 +1850,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1917,7 +1866,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1933,7 +1882,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1949,7 +1898,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1965,7 +1914,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -1997,7 +1946,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2013,7 +1962,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2029,7 +1978,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2045,7 +1994,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2061,7 +2010,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2077,7 +2026,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2093,7 +2042,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2237,7 +2186,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2286,7 +2235,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.034
+   "duration_s": 0.03
   },
   {
    "id": "loader-audit::link::rocal-c-consumer-run",
@@ -2302,7 +2251,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.033
+   "duration_s": 0.029
   },
   {
    "id": "loader-audit::py-import.py313-negative::rocal_pybind",
@@ -2381,7 +2330,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2397,7 +2346,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2413,7 +2362,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2429,7 +2378,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2445,7 +2394,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2461,7 +2410,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2477,7 +2426,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2589,7 +2538,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2605,7 +2554,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -2829,7 +2778,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 5,
    "duration_s": 0.0
   },
   {
@@ -3021,7 +2970,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3229,7 +3178,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3245,7 +3194,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 5,
    "duration_s": 0.0
   },
   {
@@ -3261,7 +3210,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 5,
    "duration_s": 0.0
   },
   {
@@ -3341,7 +3290,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3421,7 +3370,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3437,7 +3386,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3501,7 +3450,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3517,7 +3466,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3533,7 +3482,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3549,7 +3498,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3565,7 +3514,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3661,7 +3610,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3677,7 +3626,7 @@
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3693,7 +3642,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3709,7 +3658,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3725,7 +3674,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3741,7 +3690,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3757,7 +3706,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3853,7 +3802,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3885,7 +3834,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3901,7 +3850,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -3917,8 +3866,8 @@
    "backend": "CPU",
    "result_dir": "results-robustness-nogpu",
    "prev": "error",
-   "nights_failing": 2,
-   "duration_s": 0.214
+   "nights_failing": 6,
+   "duration_s": 0.164
   },
   {
    "id": "robustness-nogpu::rocal::cpu-decode-resize",
@@ -3933,8 +3882,8 @@
    "backend": "CPU",
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.214
+   "nights_failing": 6,
+   "duration_s": 0.164
   },
   {
    "id": "robustness-nogpu::roccv::cpu-flip-copy-to",
@@ -3949,8 +3898,8 @@
    "backend": "CPU",
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.164
+   "nights_failing": 6,
+   "duration_s": 0.114
   },
   {
    "id": "robustness-nogpu::rocpydecode::jpeg-decoder-clean-error",
@@ -3981,8 +3930,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.075
+   "nights_failing": 6,
+   "duration_s": 0.072
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-replicate",
@@ -3997,8 +3946,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
-   "duration_s": 0.075
+   "nights_failing": 6,
+   "duration_s": 0.072
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::GPU.border-constant",
@@ -4189,7 +4138,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4205,7 +4154,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4237,7 +4186,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4317,7 +4266,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4333,7 +4282,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4349,7 +4298,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4365,7 +4314,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4381,7 +4330,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4397,7 +4346,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4413,7 +4362,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4429,7 +4378,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4445,7 +4394,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4461,7 +4410,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4477,7 +4426,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4493,7 +4442,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4509,7 +4458,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4525,7 +4474,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4541,7 +4490,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4557,7 +4506,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4573,7 +4522,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4589,7 +4538,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4605,7 +4554,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4621,7 +4570,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4637,7 +4586,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4653,7 +4602,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4669,7 +4618,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4685,7 +4634,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4701,7 +4650,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4717,7 +4666,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4733,7 +4682,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4749,7 +4698,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4765,7 +4714,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4781,7 +4730,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4797,7 +4746,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4813,7 +4762,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4829,7 +4778,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4845,7 +4794,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   },
   {
@@ -4861,7 +4810,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 2,
+   "nights_failing": 6,
    "duration_s": 0.0
   }
  ],
@@ -6300,11 +6249,11 @@
   }
  ],
  "delta": {
-  "previous_night": "2026-10-03",
+  "previous_night": "2026-10-02",
   "removed": [],
   "removed_count": 0,
   "new_failure": 1,
-  "still_failing": 37,
+  "still_failing": 36,
   "fixed": 71,
   "new_test": 0
  },
@@ -6562,35 +6511,27 @@
  "issue_actions": [
   {
    "action": "open_or_comment",
-   "fingerprint": "4729d3f753",
-   "key": "install-test::infra",
-   "nights": 2,
-   "title": "Nightly regression: install-test::infra [4729d3f753]",
-   "body": "1 result(s) in `install-test::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `install-test::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
-  },
-  {
-   "action": "open_or_comment",
    "fingerprint": "d3cee6816a",
    "key": "mivisionx::infra",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: mivisionx::infra [d3cee6816a]",
-   "body": "1 result(s) in `mivisionx::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `mivisionx::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `mivisionx::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `mivisionx::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "80da0054c7",
    "key": "packaging::install-deb",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: packaging::install-deb [80da0054c7]",
-   "body": "15 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk/README.Debian missing     /usr/share/doc/amdrocm-vision-tests/README.Debian missing     /usr/share/doc/amdrocm-vision/README.Debian \n- `packaging::install-deb::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libomp.so: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::pyRocVideoDecode.decoder` (fail): rc 1:   File \"/opt/rocm/lib/pyRocVideoDecode/decoder.py\", line 21, in <module>     import rocpydecode as rocpydec ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directo\n- `packaging::install-deb::ldd::libopenvx.so` (fail): not found: libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::librocal.so` (fail): not found: libhipfile.so.0 libomp.so librocdecode.so.1 librocjpeg.so.1 libamdhip64.so.7 librpp.so.3 libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install t\n- `packaging::install-deb::ldd::libroccv.so` (fail): not found: libamdhip64.so.7 libomp.so (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::libvx_rpp.so` (fail): not found: librpp.so.3 libamdhip64.so.7 libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::libvxu.so` (fail): not found: libamdhip64.so.7 libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::rocal_pybind.cpython-312-x86_64-linux-gnu.so` (fail): not found: libomp.so librocdecode.so.1 librocjpeg.so.1 libhipfile.so.0 libamdhip64.so.7 librpp.so.3 libamdhip64.so.7 libhipfile.so.0 libomp.so librocdecode.so.1 librocjpeg.so.1 (vision libs sit in /op\n- `packaging::install-deb::ldd::rocpycv.cpython-312-x86_64-linux-gnu.so` (fail): not found: libamdhip64.so.7 libamdhip64.so.7 libomp.so (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::rocpydecode.cpython-312-x86_64-linux-gnu.so` (fail): not found: libamdhip64.so.7 librocdecode.so.1 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::rocpyjpegdecode.cpython-312-x86_64-linux-gnu.so` (fail): not found: libamdhip64.so.7 librocjpeg.so.1 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "15 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk/README.Debian missing     /usr/share/doc/amdrocm-vision-tests/README.Debian missing     /usr/share/doc/amdrocm-vision/README.Debian \n- `packaging::install-deb::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libomp.so: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directory \n- `packaging::install-deb::import::pyRocVideoDecode.decoder` (fail): rc 1:   File \"/opt/rocm/lib/pyRocVideoDecode/decoder.py\", line 21, in <module>     import rocpydecode as rocpydec ImportError: libamdhip64.so.7: cannot open shared object file: No such file or directo\n- `packaging::install-deb::ldd::libopenvx.so` (fail): not found: libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::librocal.so` (fail): not found: libhipfile.so.0 libomp.so librocdecode.so.1 librocjpeg.so.1 libamdhip64.so.7 librpp.so.3 libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install t\n- `packaging::install-deb::ldd::libroccv.so` (fail): not found: libamdhip64.so.7 libomp.so (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::libvx_rpp.so` (fail): not found: librpp.so.3 libamdhip64.so.7 libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::libvxu.so` (fail): not found: libamdhip64.so.7 libamdhip64.so.7 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::rocal_pybind.cpython-312-x86_64-linux-gnu.so` (fail): not found: libomp.so librocdecode.so.1 librocjpeg.so.1 libhipfile.so.0 libamdhip64.so.7 librpp.so.3 libamdhip64.so.7 libhipfile.so.0 libomp.so librocdecode.so.1 librocjpeg.so.1 (vision libs sit in /op\n- `packaging::install-deb::ldd::rocpycv.cpython-312-x86_64-linux-gnu.so` (fail): not found: libamdhip64.so.7 libamdhip64.so.7 libomp.so (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::rocpydecode.cpython-312-x86_64-linux-gnu.so` (fail): not found: libamdhip64.so.7 librocdecode.so.1 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n- `packaging::install-deb::ldd::rocpyjpegdecode.cpython-312-x86_64-linux-gnu.so` (fail): not found: libamdhip64.so.7 librocjpeg.so.1 (vision libs sit in /opt/rocm/lib with $ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "82323088f1",
    "key": "packaging::install-rpm",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: packaging::install-rpm [82323088f1]",
-   "body": "11 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal-0.2.0+ga7f1c71-202610\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx-0.2.0+ga7f1c71-20261004.x86_64: \t(amdrocm-runtime >= 10.2.0~ or amdrocm-runtime10.2 >= 10.2.0~) is needed by (installed) amdrocm-mivisionx-0.2.0+ga7f1c71\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n- `packaging::install-rpm::remove.clean` (fail): left behind: /usr/local/lib64/python3.9/site-packages/amdrocm-vision.pth (written by %post) \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "10 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal-0.2.0+ga7f1c71-202610\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx-0.2.0+ga7f1c71-20261004.x86_64: \t(amdrocm-runtime >= 10.2.0~ or amdrocm-runtime10.2 >= 10.2.0~) is needed by (installed) amdrocm-mivisionx-0.2.0+ga7f1c71\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n- `packaging::install-rpm::remove.clean` (fail): left behind: /usr/local/lib64/python3.9/site-packages/amdrocm-vision.pth (written by %post) \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
@@ -6604,33 +6545,33 @@
    "action": "open_or_comment",
    "fingerprint": "a98bcd24a6",
    "key": "robustness::infra",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: robustness::infra [a98bcd24a6]",
-   "body": "1 result(s) in `robustness::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `robustness::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `robustness::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `robustness::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "f0ed1b2245",
    "key": "rocal::infra",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: rocal::infra [f0ed1b2245]",
-   "body": "1 result(s) in `rocal::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `rocal::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `rocal::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `rocal::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "630c79d6b7",
    "key": "roccv::infra",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: roccv::infra [630c79d6b7]",
-   "body": "1 result(s) in `roccv::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `roccv::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `roccv::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `roccv::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "9d1c369709",
    "key": "rocpydecode::infra",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: rocpydecode::infra [9d1c369709]",
-   "body": "1 result(s) in `rocpydecode::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `rocpydecode::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `rocpydecode::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `rocpydecode::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
@@ -6644,33 +6585,33 @@
    "action": "open_or_comment",
    "fingerprint": "442e663e5e",
    "key": "sdk-consumer::consumer.rocal",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: sdk-consumer::consumer.rocal [442e663e5e]",
-   "body": "3 result(s) in `sdk-consumer::consumer.rocal` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::consumer.rocal::CPU.pipeline` (fail): rocalCreate: NULL\n- `sdk-consumer::consumer.rocal::cpu-threads-1` (error): no output to compare (cpu_t1 ok=False, reference CPU 1-thread)\n- `sdk-consumer::consumer.rocal::CPU.vs-reference` (error): no output or no reference images\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "3 result(s) in `sdk-consumer::consumer.rocal` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::consumer.rocal::CPU.pipeline` (fail): rocalCreate: NULL\n- `sdk-consumer::consumer.rocal::cpu-threads-1` (error): no output to compare (cpu_t1 ok=False, reference CPU 1-thread)\n- `sdk-consumer::consumer.rocal::CPU.vs-reference` (error): no output or no reference images\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "bea857f92d",
    "key": "sdk-consumer::consumer.roccv",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: sdk-consumer::consumer.roccv [bea857f92d]",
-   "body": "3 result(s) in `sdk-consumer::consumer.roccv` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::consumer.roccv::CPU.flip1` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip0` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip-1` (fail): hipStreamCreate failed\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "3 result(s) in `sdk-consumer::consumer.roccv` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::consumer.roccv::CPU.flip1` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip0` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip-1` (fail): hipStreamCreate failed\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "fa1ddc6992",
    "key": "sdk-consumer::contamination.unset.explicit",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: sdk-consumer::contamination.unset.explicit [fa1ddc6992]",
-   "body": "1 result(s) in `sdk-consumer::contamination.unset.explicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::contamination.unset.explicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `sdk-consumer::contamination.unset.explicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::contamination.unset.explicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "0f525b6809",
    "key": "sdk-consumer::contamination.unset.implicit",
-   "nights": 2,
+   "nights": 6,
    "title": "Nightly regression: sdk-consumer::contamination.unset.implicit [0f525b6809]",
-   "body": "1 result(s) in `sdk-consumer::contamination.unset.implicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::contamination.unset.implicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `sdk-consumer::contamination.unset.implicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 6 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-04/\n\n- `sdk-consumer::contamination.unset.implicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   }
  ]
 }

@@ -1,9 +1,4 @@
 {
- "4729d3f753": {
-  "key": "install-test::infra",
-  "green_streak": 0,
-  "last_red": "2026-10-04"
- },
  "d3cee6816a": {
   "key": "mivisionx::infra",
   "green_streak": 0,
@@ -66,6 +61,11 @@
  },
  "0f525b6809": {
   "key": "sdk-consumer::contamination.unset.implicit",
+  "green_streak": 0,
+  "last_red": "2026-10-04"
+ },
+ "4729d3f753": {
+  "key": "install-test::infra",
   "green_streak": 0,
   "last_red": "2026-10-04"
  }
