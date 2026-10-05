@@ -1,0 +1,670 @@
+# Downstream checks: a vision-pack nightly release (the newest by default) as
+# a customer receives it. packaging validates the DEBs, RPMs and dist tarball
+# and installs the packages in clean containers; loader-audit and sdk-consumer
+# run against the dist tarball overlaid on TheRock's build SDK. The library
+# suites, robustness and install-test stay in nightly.yml.
+#
+# GitHub-hosted runners only: the runner's pre-job hook
+# (runner/hooks/job-started.sh) admits nightly.yml alone to the self-hosted
+# runners. Self-contained: resolve-release and fetch-release are copies of
+# nightly.yml's jobs and the test jobs of test.yml's hosted path. It calls
+# neither test.yml nor report.yml and deliberately has none of their side
+# effects: no qa-history (so no skipping of a release already tested), no
+# GitHub Pages, no issues, no notifications. downstream-report puts the
+# verdict in the job summary and the downstream-report artifact, and fails
+# the run when it is red.
+#
+# Known gaps: there is no GPU, so the GPU sub-checks record "blocked"
+# (loader-audit fatbin.has-gfx and gfx-in-manifest, sdk-consumer GPU.* and
+# cpu-vs-gpu), and install-test does not run. Running these jobs on the
+# self-hosted runner would need downstream.yml in VP_ALLOWED_WORKFLOWS of
+# runner/hooks/job-started.sh and runner/setup.sh, installed on the host;
+# that is not done here.
+name: downstream
+
+on:
+  schedule:
+    # Eight minutes after nightly.yml's polls: 09:15, 13:15 and 17:15 UTC.
+    # Nothing records what was tested, so every poll tests the release again.
+    - cron: "45 14,18,22 * * *"
+      timezone: "Asia/Kolkata"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "nightly-YYYYMMDD tag (default: newest)"
+        type: string
+        default: ""
+      tier:
+        description: "standard or comprehensive (scheduled runs: comprehensive)"
+        type: choice
+        options: [standard, comprehensive]
+        default: comprehensive
+
+permissions: {}
+
+concurrency:
+  group: downstream
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+env:
+  DOWNSTREAM_SUITES: packaging,loader-audit,sdk-consumer
+  SMOKE_IMAGE_DEB: ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3
+  SMOKE_IMAGE_RPM: rockylinux:9@sha256:d7be1c094cc5845ee815d4632fe377514ee6ebcf8efaed6892889657e5ddaaa6
+
+jobs:
+  resolve-release:
+    name: resolve-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      sha: ${{ steps.resolve.outputs.sha }}
+      stale: ${{ steps.resolve.outputs.stale }}
+      problems: ${{ steps.resolve.outputs.problems }}
+      tier: ${{ steps.params.outputs.tier }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run parameters
+        id: params
+        env:
+          EVENT: ${{ github.event_name }}
+          IN_TIER: ${{ inputs.tier }}
+        run: |
+          tier="${IN_TIER:-comprehensive}"
+          if [[ "${EVENT}" == schedule ]]; then
+            # No weekly full tier: for these suites it only adds install-test,
+            # which needs the self-hosted GPU runner.
+            tier=comprehensive
+          fi
+          echo "tier=${tier}" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.release_tag }}
+          TIER: ${{ steps.params.outputs.tier }}
+        run: |
+          # No qa-history: an empty list of tested fingerprints, so the plan never skips.
+          : > "${RUNNER_TEMP}/tested.txt"
+          args=(--mode release --tier "${TIER}" --tested-file "${RUNNER_TEMP}/tested.txt"
+                --out "${RUNNER_TEMP}/run-plan.json" --github)
+          [[ -n "${TAG}" ]] && args+=(--tag "${TAG}")
+          python3 build_tools/resolve_release.py "${args[@]}"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: run-plan
+          path: ${{ runner.temp }}/run-plan.json
+          retention-days: 90
+          if-no-files-found: error
+
+  fetch-release:
+    name: fetch-release
+    needs: resolve-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      deb_artifact: ${{ steps.fetch.outputs.deb_artifact }}
+      rpm_artifact: ${{ steps.fetch.outputs.rpm_artifact }}
+      tarball_artifact: ${{ steps.fetch.outputs.tarball_artifact }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download and verify the release
+        id: fetch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.resolve-release.outputs.tag }}
+          SHA: ${{ needs.resolve-release.outputs.sha }}
+        run: |
+          build_tools/fetch_release.sh --tag "${TAG}" --sha "${SHA}" \
+            --dest "${RUNNER_TEMP}/release" --pack "${RUNNER_TEMP}/artifacts" --github
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.fetch.outputs.deb_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.fetch.outputs.deb_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.fetch.outputs.rpm_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.fetch.outputs.rpm_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.fetch.outputs.tarball_artifact }}
+          path: ${{ runner.temp }}/artifacts/${{ steps.fetch.outputs.tarball_artifact }}.tar
+          retention-days: 14
+          compression-level: 0
+          if-no-files-found: error
+
+  plan:
+    name: plan
+    needs: resolve-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      nogpu_matrix: ${{ steps.plan.outputs.nogpu_matrix }}
+      hosted: ${{ steps.plan.outputs.hosted }}
+      expected: ${{ steps.plan.outputs.expected }}
+      has_nogpu: ${{ steps.plan.outputs.has_nogpu }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No self-hosted runner: loader-audit and sdk-consumer (needs_gpu: false)
+      # run from nogpu_matrix on hosted runners, and gpu_matrix goes unused.
+      - name: Plan the tier
+        id: plan
+        env:
+          TIER: ${{ needs.resolve-release.outputs.tier }}
+        run: |
+          python3 -c 'import yaml' 2>/dev/null \
+            || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml >/dev/null; }
+          python3 build_tools/plan_matrix.py --tier "${TIER}" --suites "${DOWNSTREAM_SUITES}" \
+            --has-cpu-runner false --extended false --github
+
+  # --- packaging -------------------------------------------------------------
+
+  validate-packages:
+    name: validate-packages
+    needs: [resolve-release, fetch-release, plan]
+    if: contains(needs.plan.outputs.hosted, 'packaging')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ needs.resolve-release.outputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.fetch-release.outputs.deb_artifact }}
+          path: ${{ runner.temp }}/in
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.fetch-release.outputs.rpm_artifact }}
+          path: ${{ runner.temp }}/in
+      - name: Unpack
+        run: |
+          mkdir -p "${RUNNER_TEMP}/assets"
+          for t in "${RUNNER_TEMP}"/in/*.tar; do tar -xf "${t}" -C "${RUNNER_TEMP}/assets"; done
+          sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends rpm cpio jq >/dev/null
+      # No ROCM_PATH: the scripts point vp_init at an empty prefix of their own.
+      - name: DEB validation (Package validation summary)
+        run: |
+          suites/packaging/validate_debs.sh --debs "${RUNNER_TEMP}/assets/deb" \
+            --out "${RUNNER_TEMP}/results/packaging-deb"
+      - name: RPM validation
+        if: ${{ !cancelled() }}
+        run: |
+          suites/packaging/validate_rpms.sh --rpms "${RUNNER_TEMP}/assets/rpm" --debs "${RUNNER_TEMP}/assets/deb" \
+            --out "${RUNNER_TEMP}/results/packaging-rpm"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-packaging-packages
+          path: ${{ runner.temp }}/results
+          retention-days: 30
+          if-no-files-found: warn
+
+  verify-tarball:
+    name: verify-tarball
+    needs: [fetch-release, plan]
+    if: contains(needs.plan.outputs.hosted, 'packaging')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.fetch-release.outputs.tarball_artifact }}
+          path: ${{ runner.temp }}/in
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.fetch-release.outputs.deb_artifact }}
+          path: ${{ runner.temp }}/in
+      - name: Unpack
+        run: |
+          mkdir -p "${RUNNER_TEMP}/assets"
+          for t in "${RUNNER_TEMP}"/in/*.tar; do tar -xf "${t}" -C "${RUNNER_TEMP}/assets"; done
+      - name: Verify the dist tarball
+        run: |
+          tarball="$(find "${RUNNER_TEMP}/assets/tarball" -name 'vision-pack-dist-linux-multiarch-*.tar.gz' | head -n 1)"
+          args=(--tarball "${tarball}" --debs "${RUNNER_TEMP}/assets/deb" --out "${RUNNER_TEMP}/results/packaging-tarball")
+          # release.json travels in the tarball artifact of fetched releases (not in build mode).
+          [[ -f "${RUNNER_TEMP}/assets/release.json" ]] && args+=(--release-json "${RUNNER_TEMP}/assets/release.json")
+          suites/packaging/verify_tarball.sh "${args[@]}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-packaging-tarball
+          path: ${{ runner.temp }}/results
+          retention-days: 30
+          if-no-files-found: warn
+
+  install-smoke:
+    name: install-smoke (${{ matrix.kind }})
+    needs: [resolve-release, fetch-release, plan]
+    if: contains(needs.plan.outputs.hosted, 'packaging')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [deb, rpm]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ matrix.kind == 'deb' && needs.fetch-release.outputs.deb_artifact || needs.fetch-release.outputs.rpm_artifact }}
+          path: ${{ runner.temp }}/in
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.fetch-release.outputs.tarball_artifact }}
+          path: ${{ runner.temp }}/in
+      - name: Install in a clean container
+        env:
+          KIND: ${{ matrix.kind }}
+          TIER: ${{ needs.resolve-release.outputs.tier }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/assets" "${RUNNER_TEMP}/results/packaging-install-${KIND}"
+          for t in "${RUNNER_TEMP}"/in/*.tar; do tar -xf "${t}" -C "${RUNNER_TEMP}/assets"; done
+          # TheRock package build of the manifest's SDK date (…10.2.0a20260926.tar.gz -> 20260926).
+          sdk_date="$(jq -r '.rocm_sdk // ""' "${RUNNER_TEMP}/assets/manifest.json" | grep -oE 'a20[0-9]{6}' | tr -d a || true)"
+          image="${SMOKE_IMAGE_DEB}" flag=--debs
+          [[ "${KIND}" == rpm ]] && image="${SMOKE_IMAGE_RPM}" flag=--rpms
+          docker run --rm --network host -e GITHUB_ACTIONS -e "VP_TIER=${TIER}" \
+            -v "${GITHUB_WORKSPACE}:/w" -v "${RUNNER_TEMP}/assets:/in:ro" \
+            -v "${RUNNER_TEMP}/results/packaging-install-${KIND}:/out" -w /w \
+            "${image}" bash "/w/suites/packaging/install_smoke_${KIND}.sh" "${flag}" "/in/${KIND}" --out /out \
+            ${sdk_date:+--therock-date "${sdk_date}"}
+          sudo chown -R "$(id -u):$(id -g)" "${RUNNER_TEMP}/results" "${GITHUB_WORKSPACE}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-packaging-install-${{ matrix.kind }}
+          path: ${{ runner.temp }}/results
+          retention-days: 30
+          if-no-files-found: warn
+
+  # --- loader-audit, sdk-consumer: the needs_gpu: false suites, no GPU ------
+  #
+  # test.yml's GitHub-hosted path: the prefix is TheRock's build SDK with the
+  # dist tarball overlaid (prepare_rocm.sh --no-gpu), with no persistent SDK
+  # cache, and each suite runs in the test container with no GPU device.
+
+  prepare-nogpu-hosted:
+    name: prepare-nogpu-hosted
+    needs: [resolve-release, fetch-release, plan]
+    if: needs.plan.outputs.has_nogpu == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      prefix: ${{ steps.prepare.outputs.prefix }}
+      sdk_family: ${{ steps.prepare.outputs.sdk_family }}
+      image_test: ${{ steps.img-test.outputs.image }}
+      image_media: ${{ steps.img-media.outputs.image }}
+      image_extended: ${{ steps.img-extended.outputs.image }}
+    steps:
+      # The "runner" context isn't available in a job-level env: block, and
+      # there is no persistent /srv/vp-ci here, so these are set from the
+      # shell's own $RUNNER_TEMP instead, once, for every later step.
+      - name: Set up scratch paths (no persistent cache on a hosted runner)
+        run: |
+          echo "VP_ROOT=${RUNNER_TEMP}/vp-ci" >> "$GITHUB_ENV"
+          echo "RUN_DIR=${RUNNER_TEMP}/vp-ci/runs/${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ needs.resolve-release.outputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ needs.fetch-release.outputs.tarball_artifact }}
+          path: ${{ env.RUN_DIR }}/in
+      - name: Unpack the dist tarball
+        id: dist
+        run: |
+          mkdir -p "${RUN_DIR}"
+          tar -xf "${RUN_DIR}"/in/*.tar -C "${RUN_DIR}/in"
+          tarball="$(find "${RUN_DIR}/in/tarball" -name 'vision-pack-dist-linux-multiarch-*.tar.gz' | head -n 1)"
+          tar -xzOf "${tarball}" ./share/vision-pack/vision-pack-manifest.json > "${RUN_DIR}/manifest.json"
+          echo "tarball=${tarball}" >> "$GITHUB_OUTPUT"
+      - name: Prepare the ROCm prefix (--no-gpu)
+        id: prepare
+        env:
+          TARBALL: ${{ steps.dist.outputs.tarball }}
+        run: |
+          args=(--tarball "${TARBALL}" --run-dir "${RUN_DIR}" --no-gpu --cache "${VP_ROOT}/cache/sdk" --github)
+          timeout -k 60 3600 build_tools/prepare_rocm.sh "${args[@]}"
+      # Every job runs on its own fresh, throwaway VM -- unlike self-hosted
+      # runners (one persistent machine reused across jobs), a GitHub-hosted
+      # "ubuntu-24.04" job never sees files another job wrote to disk. The
+      # prefix (and the dist tarball, for the checks that read it directly)
+      # must cross to test-nogpu-hosted as an uploaded artifact, not a path.
+      - name: Archive the prefix and dist tarball for test-nogpu-hosted
+        env:
+          TARBALL: ${{ steps.dist.outputs.tarball }}
+        run: |
+          tar -czf "${RUN_DIR}/rocm-prefix.tar.gz" -C "${RUN_DIR}" rocm
+          cp "${TARBALL}" "${RUN_DIR}/dist.tar.gz"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nogpu-hosted-prefix
+          path: |
+            ${{ env.RUN_DIR }}/rocm-prefix.tar.gz
+            ${{ env.RUN_DIR }}/dist.tar.gz
+          retention-days: 1
+          if-no-files-found: error
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test image
+        id: img-test
+        run: build_tools/ensure_image.sh --kind test --github
+      - name: Media image
+        id: img-media
+        if: contains(needs.plan.outputs.nogpu_matrix, '"media"')
+        run: build_tools/ensure_image.sh --kind media --github
+      - name: Extended image
+        id: img-extended
+        if: contains(needs.plan.outputs.nogpu_matrix, '"extended"')
+        env:
+          FAMILY: ${{ steps.prepare.outputs.sdk_family }}
+        run: build_tools/ensure_image.sh --kind extended --family "${FAMILY}" --github
+      # gpu_present: false and prepared.json (mode no-gpu) stay in on purpose;
+      # downstream-report explains why.
+      - name: Record the environment
+        if: ${{ !cancelled() }}
+        env:
+          IMAGE_TEST: ${{ steps.img-test.outputs.image }}
+          IMAGE_MEDIA: ${{ steps.img-media.outputs.image }}
+          IMAGE_EXTENDED: ${{ steps.img-extended.outputs.image }}
+        run: |
+          mkdir -p "${RUN_DIR}/results/environment"
+          cp "${RUN_DIR}/prepared.json" "${RUN_DIR}/results/environment/" 2>/dev/null || true
+          cp "${RUN_DIR}/manifest.json" "${RUN_DIR}/results/environment/" 2>/dev/null || true
+          jq -n --arg runner "github-hosted (downstream.yml)" \
+            --arg test "${IMAGE_TEST}" --arg media "${IMAGE_MEDIA}" --arg extended "${IMAGE_EXTENDED}" \
+            '{runner:$runner, kernel:"", amdgpu_driver:"", docker:"", gpus:"", gpu_present:false,
+              no_gpu_reason:"GitHub-hosted runner, no GPU by design (downstream.yml)",
+              images:{test:$test, media:$media, extended:$extended}}' \
+            > "${RUN_DIR}/results/environment/environment.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-environment
+          path: ${{ env.RUN_DIR }}/results/environment
+          retention-days: 90
+          if-no-files-found: warn
+
+  test-nogpu-hosted:
+    name: ${{ matrix.suite }} (hosted, no GPU)
+    needs: [resolve-release, plan, prepare-nogpu-hosted]
+    if: needs.plan.outputs.has_nogpu == 'true' && needs.prepare-nogpu-hosted.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.nogpu_matrix) }}
+    steps:
+      # Must match prepare-nogpu-hosted's RUN_DIR (same github.run_id/run_attempt),
+      # even though this is a different, fresh VM with its own $RUNNER_TEMP.
+      - name: Set up scratch paths (no persistent cache on a hosted runner)
+        run: |
+          echo "VP_ROOT=${RUNNER_TEMP}/vp-ci" >> "$GITHUB_ENV"
+          echo "RUN_DIR=${RUNNER_TEMP}/vp-ci/runs/${{ github.run_id }}-${{ github.run_attempt }}" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Pin vision-pack
+        env:
+          SHA: ${{ needs.resolve-release.outputs.sha }}
+        run: build_tools/pin_submodule.sh "${SHA}"
+      # This VM never saw prepare-nogpu-hosted's disk -- download what it
+      # archived there (the prefix and the dist tarball) and re-extract.
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: nogpu-hosted-prefix
+          path: ${{ env.RUN_DIR }}
+      - name: Extract the prefix
+        run: tar -xzf "${RUN_DIR}/rocm-prefix.tar.gz" -C "${RUN_DIR}"
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run ${{ matrix.suite }}
+        id: run
+        env:
+          SUITE: ${{ matrix.suite }}
+          ENTRY: ${{ matrix.entrypoint }}
+          KIND: ${{ matrix.image }}
+          ACCESS: ${{ matrix.gpu_access }}
+          TIMEOUT_MIN: ${{ matrix.timeout }}
+          TIER: ${{ needs.resolve-release.outputs.tier }}
+          PREFIX: ${{ needs.prepare-nogpu-hosted.outputs.prefix }}
+          DIST_TARBALL: ${{ env.RUN_DIR }}/dist.tar.gz
+          GFX: ""
+          MINOR: ""
+          VP_SDK_FAMILY: ${{ needs.prepare-nogpu-hosted.outputs.sdk_family }}
+          IMAGE_TEST: ${{ needs.prepare-nogpu-hosted.outputs.image_test }}
+          IMAGE_MEDIA: ${{ needs.prepare-nogpu-hosted.outputs.image_media }}
+          IMAGE_EXTENDED: ${{ needs.prepare-nogpu-hosted.outputs.image_extended }}
+        run: build_tools/ci_run_suite.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: results-${{ matrix.suite }}
+          path: |
+            ${{ env.RUN_DIR }}/results/${{ matrix.suite }}
+            !${{ env.RUN_DIR }}/results/${{ matrix.suite }}/work/**
+          retention-days: 30
+          if-no-files-found: warn
+
+  # --- verdict ---------------------------------------------------------------
+  #
+  # report.yml's merge and triage only: no qa-history, HTML site, Pages,
+  # issues or notifications.
+
+  downstream-report:
+    name: downstream-report
+    needs: [resolve-release, fetch-release, plan, validate-packages, verify-tarball, install-smoke, prepare-nogpu-hosted, test-nogpu-hosted]
+    if: always() && needs.resolve-release.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -c 'import yaml' 2>/dev/null \
+            || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml >/dev/null; }
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: results-*
+          path: ${{ runner.temp }}/downloaded
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: run-plan
+          path: ${{ runner.temp }}/plan
+
+      # Without these a failed plan would leave nothing expected and nothing
+      # to triage: a green verdict.
+      - name: Record orchestration failures
+        env:
+          FETCH: ${{ needs.fetch-release.result }}
+          PLAN: ${{ needs.plan.result }}
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          d="${RUNNER_TEMP}/downloaded/results-orchestrator"
+          mkdir -p "${d}"
+          : > "${d}/results.jsonl"
+          rec() { jq -cn --arg id "$1" --arg m "$2" '{suite:"orchestrator", id:$id, status:"error", message:$m,
+                  duration_s:0, log:"", backend:"", attempts:1, repro:""}' >> "${d}/results.jsonl"; }
+          [[ "${FETCH}" == failure ]] && rec "orchestrator::infra::fetch-release" "fetch-release failed: the release could not be downloaded or verified"
+          [[ "${PLAN}" == failure ]] && rec "orchestrator::infra::plan" "plan failed: no suite was scheduled"
+          [[ " ${RESULTS} " == *" cancelled "* ]] && rec "orchestrator::infra::test-cancelled" "a job of this run was cancelled"
+          [[ -s "${d}/results.jsonl" ]] || rm -rf "${d}"
+
+      - name: Release warnings (stale, problems)
+        if: needs.resolve-release.outputs.stale == 'true' || needs.resolve-release.outputs.problems != '0'
+        env:
+          TAG: ${{ needs.resolve-release.outputs.tag }}
+          STALE: ${{ needs.resolve-release.outputs.stale }}
+          PROBLEMS: ${{ needs.resolve-release.outputs.problems }}
+        run: |
+          plan="${RUNNER_TEMP}/plan/run-plan.json"
+          warn() {
+            echo "::warning title=vision-pack release::$1"
+            echo "- $1" >> "${RUNNER_TEMP}/release-warnings.md"
+          }
+          if [[ "${STALE}" == true ]]; then
+            warn "no new vision-pack nightly: ${TAG} is $(jq -r .age_days "${plan}") days old and is tested again (upstream's nightly may be failing)"
+          fi
+          if [[ "${PROBLEMS}" != 0 ]]; then
+            while IFS= read -r p; do
+              warn "resolve-release: ${p}"
+            done < <(jq -r '.problems[]' "${plan}")
+          fi
+
+      # Only the known issues of these suites: a match glob or match_file line
+      # counts when its suite field (before the first "::") matches one of them
+      # as a glob, so a generic "*::infra::*" would count too. A multi-suite
+      # entry keeps only those globs, and its match_file only if a line counts.
+      # Written next to known_issues.yaml so match_file paths resolve.
+      - name: Known issues of the downstream suites
+        run: |
+          python3 - <<'EOF'
+          import fnmatch
+          import os
+          from pathlib import Path
+
+          import yaml
+
+          suites = os.environ["DOWNSTREAM_SUITES"].split(",")
+          src = Path("baselines/known_issues.yaml")
+          out = src.with_name("known_issues.downstream.yaml")
+          doc = yaml.safe_load(src.read_text()) or {}
+
+          def listed(e):
+              lines = (src.parent / e["match_file"]).read_text().splitlines() if e.get("match_file") else []
+              return [x.strip() for x in lines if x.strip() and not x.strip().startswith("#")]
+
+          def targets(p):
+              return any(fnmatch.fnmatchcase(s, p.split("::", 1)[0]) for s in suites)
+
+          kept = []
+          for e in doc.get("issues", []):
+              match = [p for p in e.get("match", []) if targets(p)]
+              in_file = any(targets(p) for p in listed(e))
+              if not (match or in_file):
+                  continue
+              e = dict(e)
+              if match:
+                  e["match"] = match
+              else:
+                  e.pop("match", None)
+              if not in_file:
+                  e.pop("match_file", None)
+              kept.append(e)
+          out.write_text(yaml.safe_dump({"schema": doc.get("schema", 1), "issues": kept}, sort_keys=False, width=1000))
+          print(f"{out}: {len(kept)} of {len(doc.get('issues', []))} entries:", " ".join(e["id"] for e in kept))
+          EOF
+
+      - name: Merge and triage
+        id: triage
+        env:
+          EXPECTED: ${{ needs.plan.outputs.expected }}
+          TIER: ${{ needs.resolve-release.outputs.tier }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          night="$(date -u +%F)"
+          python3 build_tools/results/merge.py --results "${RUNNER_TEMP}/downloaded" --out "${RUNNER_TEMP}/merged" --expect "${EXPECTED}"
+          # Hosted runners have no GPU by design, so merge.py's red
+          # preflight::infra::no-gpu is dropped. results-environment keeps
+          # gpu_present: false and prepared.json instead of leaving them out:
+          # triage then still sees a night without a GPU, applies the
+          # gfx: [none] known issues (M13-nogpu, L-roccv-cpu-nogpu) and counts
+          # the "no GPU detected" checks as known_blocked. Without them those
+          # failures would be new (red) and the checks blocked (yellow).
+          jq -c 'select(.id != "preflight::infra::no-gpu")' "${RUNNER_TEMP}/merged/results.jsonl" > "${RUNNER_TEMP}/results.jsonl"
+          cp "${RUNNER_TEMP}/results.jsonl" "${RUNNER_TEMP}/merged/results.jsonl"
+          python3 report/triage.py --merged "${RUNNER_TEMP}/merged" --known baselines/known_issues.downstream.yaml \
+            --plan "${RUNNER_TEMP}/plan/run-plan.json" --tier "${TIER}" --night "${night}" --run-url "${RUN_URL}" \
+            --out "${RUNNER_TEMP}/triage.json" --summary "${RUNNER_TEMP}/summary.md"
+          echo "verdict=$(jq -r .verdict "${RUNNER_TEMP}/triage.json")" >> "$GITHUB_OUTPUT"
+          sed -i '1s/^## Nightly QA: /## Downstream QA: /' "${RUNNER_TEMP}/summary.md"
+          if [[ -s "${RUNNER_TEMP}/release-warnings.md" ]]; then
+            printf '\n### Release warnings\n\n' >> "${RUNNER_TEMP}/summary.md"
+            cat "${RUNNER_TEMP}/release-warnings.md" >> "${RUNNER_TEMP}/summary.md"
+          fi
+          cat "${RUNNER_TEMP}/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: ${{ !cancelled() }}
+        with:
+          name: downstream-report
+          path: |
+            ${{ runner.temp }}/triage.json
+            ${{ runner.temp }}/summary.md
+            ${{ runner.temp }}/merged
+          retention-days: 90
+
+      - name: Fail on a red verdict
+        env:
+          VERDICT: ${{ steps.triage.outputs.verdict }}
+        run: |
+          case "${VERDICT}" in
+            green|yellow) echo "downstream verdict: ${VERDICT}" ;;
+            *) echo "::error title=downstream::verdict ${VERDICT:-missing}; see the job summary"; exit 1 ;;
+          esac
