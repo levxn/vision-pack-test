@@ -4,6 +4,11 @@
   "green_streak": 0,
   "last_red": "2026-10-06"
  },
+ "b94d06119f": {
+  "key": "packaging::deb",
+  "green_streak": 0,
+  "last_red": "2026-10-06"
+ },
  "80da0054c7": {
   "key": "packaging::install-deb",
   "green_streak": 0,
@@ -16,6 +21,11 @@
  },
  "4cb9a97540": {
   "key": "packaging::rpm",
+  "green_streak": 0,
+  "last_red": "2026-10-06"
+ },
+ "cc27f91246": {
+  "key": "packaging::tarball",
   "green_streak": 0,
   "last_red": "2026-10-06"
  },
