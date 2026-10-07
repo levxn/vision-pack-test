@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "night": "2026-10-07",
- "generated_at": "2026-10-07T17:49:04+00:00",
+ "generated_at": "2026-10-07T22:24:03+00:00",
  "run": {
   "tag": "nightly-20261007",
   "version": "10.2.0-20261007",
@@ -10,7 +10,7 @@
   "fingerprint": "276853161c62609a",
   "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37651588654",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37692920173",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-07/",
   "upstream": {
    "status": "completed",
@@ -56,7 +56,7 @@
    "suite": "loader-audit",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 13,
+   "wall_seconds": 12,
    "total": 265,
    "classes": {
     "pass": 195,
@@ -89,7 +89,7 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 117,
+   "wall_seconds": 65,
    "total": 358,
    "classes": {
     "pass": 271,
@@ -122,7 +122,7 @@
    "suite": "robustness-nogpu",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 8,
+   "wall_seconds": 5,
    "total": 29,
    "classes": {
     "pass": 25,
@@ -175,7 +175,7 @@
    "suite": "sdk-consumer",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 111,
+   "wall_seconds": 159,
    "total": 342,
    "classes": {
     "pass": 278,
@@ -1869,7 +1869,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.26
+   "duration_s": 0.174
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.vs-reference",
@@ -1917,7 +1917,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.054
+   "duration_s": 0.041
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip0",
@@ -1933,7 +1933,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.054
+   "duration_s": 0.041
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip1",
@@ -1949,7 +1949,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.054
+   "duration_s": 0.041
   },
   {
    "id": "sdk-consumer::contamination.unset.explicit::roccv-offload-arch",
@@ -1997,7 +1997,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.053
+   "duration_s": 0.051
   },
   {
    "id": "loader-audit::docs::install-usage",
@@ -2877,7 +2877,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.033
+   "duration_s": 0.029
   },
   {
    "id": "loader-audit::link::rocal-c-consumer-run",
@@ -2893,7 +2893,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.031
+   "duration_s": 0.03
   },
   {
    "id": "loader-audit::py-import.py313-negative::rocal_pybind",
@@ -3405,7 +3405,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.916
+   "duration_s": 0.665
   },
   {
    "id": "robustness-nogpu::rocal::cpu-decode-resize",
@@ -3421,7 +3421,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.215
+   "duration_s": 0.164
   },
   {
    "id": "robustness-nogpu::roccv::cpu-flip-copy-to",
@@ -3437,7 +3437,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.164
+   "duration_s": 0.114
   },
   {
    "id": "robustness-nogpu::rocpydecode::jpeg-decoder-clean-error",
@@ -3469,7 +3469,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.093
+   "duration_s": 0.069
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-replicate",
@@ -3485,7 +3485,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 9,
-   "duration_s": 0.093
+   "duration_s": 0.069
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::GPU.border-constant",
