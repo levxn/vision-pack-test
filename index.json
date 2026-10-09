@@ -363,7 +363,7 @@
    "night": "2026-10-09",
    "dir": "nightly/2026-10-09",
    "event": "schedule",
-   "run_id": "37956867675",
+   "run_id": "37994567917",
    "tier": "comprehensive",
    "gfx": "",
    "verdict": "red",
@@ -372,16 +372,16 @@
    "sha": "10bdbf55dba208e4de42ba43db05cfe95e4288f7",
    "fingerprint": "79daaa5f187edd3c",
    "counts": {
-    "pass": 769,
+    "pass": 746,
     "fixed": 35,
     "blocked": 17,
     "skip": 4,
-    "known_fail": 86,
-    "still_failing": 77,
+    "known_fail": 85,
+    "still_failing": 50,
     "known_blocked": 6,
     "infra_error": 5
    },
-   "records": 999
+   "records": 948
   }
  ]
 }

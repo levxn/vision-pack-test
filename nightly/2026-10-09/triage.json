@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "night": "2026-10-09",
- "generated_at": "2026-10-09T16:41:43+00:00",
+ "generated_at": "2026-10-09T22:05:56+00:00",
  "run": {
   "tag": "nightly-20261009",
   "version": "10.2.0-20261009",
@@ -10,7 +10,7 @@
   "fingerprint": "79daaa5f187edd3c",
   "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37956867675",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/37994567917",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-09/",
   "upstream": {
    "status": "not-found"
@@ -23,26 +23,28 @@
  "verdict": "red",
  "reasons": [
   "5 infra error",
-  "77 still failing",
+  "50 still failing",
   "packaging::rpm: 207 results, expected at least 221",
+  "packaging::install-deb: 0 results, expected at least 6",
+  "packaging::install-rpm: 0 results, expected at least 7",
   "fixed known issues to remove from the baseline: H1, H3, H4"
  ],
  "totals": {
-  "records": 999,
+  "records": 948,
   "by_status": {
-   "pass": 804,
+   "pass": 781,
    "blocked": 23,
    "skip": 4,
-   "fail": 156,
+   "fail": 128,
    "error": 12
   },
   "by_class": {
-   "pass": 769,
+   "pass": 746,
    "fixed": 35,
    "blocked": 17,
    "skip": 4,
-   "known_fail": 86,
-   "still_failing": 77,
+   "known_fail": 85,
+   "still_failing": 50,
    "known_blocked": 6,
    "infra_error": 5
   }
@@ -52,7 +54,7 @@
    "suite": "loader-audit",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 14,
+   "wall_seconds": 10,
    "total": 265,
    "classes": {
     "pass": 195,
@@ -85,18 +87,18 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 88,
-   "total": 358,
+   "wall_seconds": 17,
+   "total": 307,
    "classes": {
-    "pass": 271,
-    "still_failing": 69,
-    "known_fail": 9,
+    "pass": 248,
+    "still_failing": 42,
     "known_blocked": 3,
-    "fixed": 6
+    "fixed": 6,
+    "known_fail": 8
    },
    "status_counts": {
-    "pass": 277,
-    "fail": 78,
+    "pass": 254,
+    "fail": 50,
     "error": 0,
     "skip": 0,
     "blocked": 3,
@@ -118,7 +120,7 @@
    "suite": "robustness-nogpu",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 7,
+   "wall_seconds": 6,
    "total": 29,
    "classes": {
     "pass": 25,
@@ -171,7 +173,7 @@
    "suite": "sdk-consumer",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 157,
+   "wall_seconds": 166,
    "total": 342,
    "classes": {
     "pass": 278,
@@ -436,24 +438,6 @@
   },
   {
    "suite": "packaging",
-   "group": "install-deb",
-   "total": 24,
-   "counts": {
-    "pass": 12,
-    "fail": 12
-   }
-  },
-  {
-   "suite": "packaging",
-   "group": "install-rpm",
-   "total": 27,
-   "counts": {
-    "pass": 11,
-    "fail": 16
-   }
-  },
-  {
-   "suite": "packaging",
    "group": "rpm",
    "total": 207,
    "counts": {
@@ -714,438 +698,6 @@
    "prev": "fail",
    "nights_failing": 4,
    "duration_s": 0.0
-  },
-  {
-   "id": "packaging::install-deb::dpkg.verify",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian ",
-   "repro": "",
-   "log": "logs/dpkg-verify.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::import::amd.rocal",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' ",
-   "repro": "",
-   "log": "logs/install-deb__import__amd.rocal.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::import::pyRocVideoDecode.decoder",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' ",
-   "repro": "",
-   "log": "logs/install-deb__import__pyRocVideoDecode.decoder.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 7,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::import::rocal_pybind",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' ",
-   "repro": "",
-   "log": "logs/install-deb__import__rocal_pybind.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 7,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::import::rocpycv",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' ",
-   "repro": "",
-   "log": "logs/install-deb__import__rocpycv.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 7,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::import::rocpydecode",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' ",
-   "repro": "",
-   "log": "logs/install-deb__import__rocpydecode.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 7,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::import::rocpyjpegdecode",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' ",
-   "repro": "",
-   "log": "logs/install-deb__import__rocpyjpegdecode.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 7,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::isolation.jpeg_std_error",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::isolation.librocal",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "/opt/rocm/lib/librocal.so missing or unreadable",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::isolation.needed",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "no vision libraries found under /opt/rocm/lib",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::pth.shipped",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "/usr/lib/python3/dist-packages/amdrocm-vision.pth missing or not '/opt/rocm/lib'",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-deb::pth.syspath",
-   "suite": "packaging",
-   "group": "install-deb",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "/opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::depends::python3.12",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "not in the repository (needs any; required by amdrocm-vision-pythonpath10.2)",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0.0
-  },
-  {
-   "id": "packaging::install-rpm::import::amd.rocal",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' ",
-   "repro": "",
-   "log": "logs/install-rpm__import__amd.rocal.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::import::pyRocVideoDecode.decoder",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' ",
-   "repro": "",
-   "log": "logs/install-rpm__import__pyRocVideoDecode.decoder.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::import::rocal_pybind",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' ",
-   "repro": "",
-   "log": "logs/install-rpm__import__rocal_pybind.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::import::rocpycv",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' ",
-   "repro": "",
-   "log": "logs/install-rpm__import__rocpycv.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::import::rocpydecode",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' ",
-   "repro": "",
-   "log": "logs/install-rpm__import__rocpydecode.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::import::rocpyjpegdecode",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' ",
-   "repro": "",
-   "log": "logs/install-rpm__import__rocpyjpegdecode.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::install.therock",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261009-20261009.x86_64 from @commandline - nothing provides libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261009-20261009.x86_64 from @commandline - nothing provides libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.1)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261009-20261009.x86_64 from @commandline - nothing provides libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.2)(64bit",
-   "repro": "",
-   "log": "logs/install-therock.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::isolation.jpeg_std_error",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::isolation.librocal",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "/opt/rocm/lib/librocal.so missing or unreadable",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::isolation.needed",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "no vision libraries found under /opt/rocm/lib",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::pth.python3.12",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::pth.shipped",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "no amdrocm-vision.pth in any python3 site-packages; %post did not register it",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::pth.syspath",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "/opt/rocm/lib not on sys.path of Python 3.9.25",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 4,
-   "duration_s": 0
-  },
-  {
-   "id": "packaging::install-rpm::rpm.verify",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "still_failing",
-   "known": null,
-   "message": "Unsatisfied dependencies for amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64: \tamdrocm-rpp10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64 \tamdrocm-runtime10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64 \tlibamdhip64.so.7()(64bit) is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64 \tlibamdhip64.so.7(hip_4.2)(64bit) is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64 ",
-   "repro": "",
-   "log": "logs/rpm-verify.log",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0
   },
   {
    "id": "packaging::rpm::amdrocm-mivisionx-devel10.2::header",
@@ -1865,7 +1417,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.148
+   "duration_s": 0.167
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.vs-reference",
@@ -1913,7 +1465,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.04
+   "duration_s": 0.043
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip0",
@@ -1929,7 +1481,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.04
+   "duration_s": 0.043
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip1",
@@ -1945,7 +1497,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.04
+   "duration_s": 0.043
   },
   {
    "id": "sdk-consumer::contamination.unset.explicit::roccv-offload-arch",
@@ -1993,7 +1545,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.065
+   "duration_s": 0.053
   },
   {
    "id": "loader-audit::docs::install-usage",
@@ -2873,7 +2425,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.033
+   "duration_s": 0.03
   },
   {
    "id": "loader-audit::link::rocal-c-consumer-run",
@@ -2889,7 +2441,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.032
+   "duration_s": 0.029
   },
   {
    "id": "loader-audit::py-import.py313-negative::rocal_pybind",
@@ -3148,22 +2700,6 @@
    "duration_s": 0.0
   },
   {
-   "id": "packaging::install-rpm::depends::capabilities",
-   "suite": "packaging",
-   "group": "install-rpm",
-   "status": "fail",
-   "class": "known_fail",
-   "known": "N6",
-   "message": "5/16 automatic capabilities have no provider: libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.0)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.1)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.2)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_2.0)(64bit); the -rocm-vision ones must come from the vision set itself, which does not provide them (see rpm::<pkg>::requires.closure)",
-   "repro": "",
-   "log": "",
-   "backend": "",
-   "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "fail",
-   "nights_failing": 11,
-   "duration_s": 0.0
-  },
-  {
    "id": "packaging::tarball::asan-doc-dirs",
    "suite": "packaging",
    "group": "tarball",
@@ -3401,7 +2937,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "error",
    "nights_failing": 11,
-   "duration_s": 0.916
+   "duration_s": 0.666
   },
   {
    "id": "robustness-nogpu::rocal::cpu-decode-resize",
@@ -3417,7 +2953,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.214
+   "duration_s": 0.164
   },
   {
    "id": "robustness-nogpu::roccv::cpu-flip-copy-to",
@@ -3433,7 +2969,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.164
+   "duration_s": 0.114
   },
   {
    "id": "robustness-nogpu::rocpydecode::jpeg-decoder-clean-error",
@@ -3465,7 +3001,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.065
+   "duration_s": 0.066
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-replicate",
@@ -3481,7 +3017,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 11,
-   "duration_s": 0.065
+   "duration_s": 0.066
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::GPU.border-constant",
@@ -5030,8 +4566,8 @@
    "issue": "",
    "review_by": "2026-12-31",
    "strict": true,
-   "state": "reproduced",
-   "failing": 1,
+   "state": "not-run",
+   "failing": 0,
    "passing": 0,
    "not_run": 0
   },
@@ -5513,16 +5049,16 @@
    "suite": "packaging",
    "group": "install-deb",
    "min": 6,
-   "actual": 24,
-   "ok": true,
+   "actual": 0,
+   "ok": false,
    "note": ""
   },
   {
    "suite": "packaging",
    "group": "install-rpm",
    "min": 7,
-   "actual": 27,
-   "ok": true,
+   "actual": 0,
+   "ok": false,
    "note": ""
   },
   {
@@ -5784,10 +5320,62 @@
  ],
  "delta": {
   "previous_night": "2026-10-08",
-  "removed": [],
-  "removed_count": 0,
+  "removed": [
+   "packaging::install-deb::decoys",
+   "packaging::install-deb::depends::amdrocm-decode10.2",
+   "packaging::install-deb::depends::amdrocm-hipfile10.2",
+   "packaging::install-deb::depends::amdrocm-jpeg10.2",
+   "packaging::install-deb::depends::amdrocm-rpp10.2",
+   "packaging::install-deb::depends::amdrocm-runtime10.2",
+   "packaging::install-deb::dpkg.verify",
+   "packaging::install-deb::import::amd.rocal",
+   "packaging::install-deb::import::pyRocVideoDecode.decoder",
+   "packaging::install-deb::import::rocal_pybind",
+   "packaging::install-deb::import::rocpycv",
+   "packaging::install-deb::import::rocpydecode",
+   "packaging::install-deb::import::rocpyjpegdecode",
+   "packaging::install-deb::install",
+   "packaging::install-deb::install.therock",
+   "packaging::install-deb::isolation.decoys",
+   "packaging::install-deb::isolation.jpeg_std_error",
+   "packaging::install-deb::isolation.librocal",
+   "packaging::install-deb::isolation.needed",
+   "packaging::install-deb::plan",
+   "packaging::install-deb::pth.shipped",
+   "packaging::install-deb::pth.syspath",
+   "packaging::install-deb::remove.clean",
+   "packaging::install-deb::therock.repo",
+   "packaging::install-rpm::decoys",
+   "packaging::install-rpm::depends::amdrocm-decode10.2",
+   "packaging::install-rpm::depends::amdrocm-hipfile10.2",
+   "packaging::install-rpm::depends::amdrocm-jpeg10.2",
+   "packaging::install-rpm::depends::amdrocm-rpp10.2",
+   "packaging::install-rpm::depends::amdrocm-runtime10.2",
+   "packaging::install-rpm::depends::capabilities",
+   "packaging::install-rpm::depends::python3.12",
+   "packaging::install-rpm::import::amd.rocal",
+   "packaging::install-rpm::import::pyRocVideoDecode.decoder",
+   "packaging::install-rpm::import::rocal_pybind",
+   "packaging::install-rpm::import::rocpycv",
+   "packaging::install-rpm::import::rocpydecode",
+   "packaging::install-rpm::import::rocpyjpegdecode",
+   "packaging::install-rpm::install",
+   "packaging::install-rpm::install.therock",
+   "packaging::install-rpm::isolation.decoys",
+   "packaging::install-rpm::isolation.jpeg_std_error",
+   "packaging::install-rpm::isolation.librocal",
+   "packaging::install-rpm::isolation.needed",
+   "packaging::install-rpm::plan",
+   "packaging::install-rpm::pth.python3.12",
+   "packaging::install-rpm::pth.shipped",
+   "packaging::install-rpm::pth.syspath",
+   "packaging::install-rpm::remove.clean",
+   "packaging::install-rpm::rpm.verify",
+   "packaging::install-rpm::therock.repo"
+  ],
+  "removed_count": 51,
   "new_failure": 0,
-  "still_failing": 77,
+  "still_failing": 50,
   "fixed": 35,
   "new_test": 0
  },
@@ -6182,22 +5770,6 @@
    "nights": 4,
    "title": "Nightly regression: packaging::deb [b94d06119f]",
    "body": "2 result(s) in `packaging::deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 4 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-09/\n\n- `packaging::deb::set::packages` (fail): 16 DEB files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test,\n- `packaging::deb::amdrocm-vision-pythonpath10.2::payload.empty-dirs` (fail): owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
-  },
-  {
-   "action": "open_or_comment",
-   "fingerprint": "80da0054c7",
-   "key": "packaging::install-deb",
-   "nights": 11,
-   "title": "Nightly regression: packaging::install-deb [80da0054c7]",
-   "body": "12 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 11 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-09/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::isolation.needed` (fail): no vision libraries found under /opt/rocm/lib\n- `packaging::install-deb::isolation.librocal` (fail): /opt/rocm/lib/librocal.so missing or unreadable\n- `packaging::install-deb::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n- `packaging::install-deb::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-deb::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-deb::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-deb::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-deb::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-deb::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
-  },
-  {
-   "action": "open_or_comment",
-   "fingerprint": "82323088f1",
-   "key": "packaging::install-rpm",
-   "nights": 11,
-   "title": "Nightly regression: packaging::install-rpm [82323088f1]",
-   "body": "15 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 11 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-09/\n\n- `packaging::install-rpm::depends::python3.12` (fail): not in the repository (needs any; required by amdrocm-vision-pythonpath10.2)\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261009-2\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64: \tamdrocm-rpp10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261009-20261009.x86_64 \tamdrocm-\n- `packaging::install-rpm::isolation.needed` (fail): no vision libraries found under /opt/rocm/lib\n- `packaging::install-rpm::isolation.librocal` (fail): /opt/rocm/lib/librocal.so missing or unreadable\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.shipped` (fail): no amdrocm-vision.pth in any python3 site-packages; %post did not register it\n- `packaging::install-rpm::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.9.25\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",

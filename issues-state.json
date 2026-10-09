@@ -9,16 +9,6 @@
   "green_streak": 0,
   "last_red": "2026-10-09"
  },
- "80da0054c7": {
-  "key": "packaging::install-deb",
-  "green_streak": 0,
-  "last_red": "2026-10-09"
- },
- "82323088f1": {
-  "key": "packaging::install-rpm",
-  "green_streak": 0,
-  "last_red": "2026-10-09"
- },
  "4cb9a97540": {
   "key": "packaging::rpm",
   "green_streak": 0,
@@ -67,6 +57,16 @@
  "0f525b6809": {
   "key": "sdk-consumer::contamination.unset.implicit",
   "green_streak": 0,
+  "last_red": "2026-10-09"
+ },
+ "80da0054c7": {
+  "key": "packaging::install-deb",
+  "green_streak": 1,
+  "last_red": "2026-10-09"
+ },
+ "82323088f1": {
+  "key": "packaging::install-rpm",
+  "green_streak": 1,
   "last_red": "2026-10-09"
  },
  "4729d3f753": {
