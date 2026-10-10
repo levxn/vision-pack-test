@@ -1,16 +1,16 @@
 {
  "schema": 1,
  "night": "2026-10-10",
- "generated_at": "2026-10-10T15:50:09+00:00",
+ "generated_at": "2026-10-10T21:00:33+00:00",
  "run": {
   "tag": "nightly-20261010",
   "version": "10.2.0-20261010",
   "sha": "749575aee61a8e1c25761992ffc95e6e45029758",
   "mode": "release",
-  "fingerprint": "41cb932b7e03dda0",
-  "tier": "comprehensive",
+  "fingerprint": "f33ad3143b437cb9",
+  "tier": "full",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/38063034557",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/38084170086",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-10/",
   "upstream": {
    "status": "completed",
@@ -26,40 +26,51 @@
  "no_gpu": null,
  "verdict": "red",
  "reasons": [
-  "5 infra error",
-  "27 new failure",
-  "50 still failing",
+  "6 infra error",
+  "53 new failure",
+  "24 still failing",
   "packaging::rpm: 207 results, expected at least 221",
   "fixed known issues to remove from the baseline: H1, H3, H4"
  ],
  "totals": {
-  "records": 999,
+  "records": 1000,
   "by_status": {
    "pass": 804,
    "blocked": 23,
    "skip": 4,
    "fail": 156,
-   "error": 12
+   "error": 13
   },
   "by_class": {
-   "pass": 746,
+   "pass": 545,
    "fixed": 35,
    "blocked": 17,
    "skip": 4,
    "known_fail": 86,
-   "new_test": 23,
-   "new_failure": 27,
-   "still_failing": 50,
+   "new_test": 224,
+   "still_failing": 24,
+   "new_failure": 53,
    "known_blocked": 6,
-   "infra_error": 5
+   "infra_error": 6
   }
  },
  "suites": [
   {
+   "suite": "install-test",
+   "missing": true,
+   "no_gpu": false,
+   "wall_seconds": null,
+   "total": 1,
+   "classes": {
+    "infra_error": 1
+   },
+   "status_counts": {}
+  },
+  {
    "suite": "loader-audit",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 13,
+   "wall_seconds": 12,
    "total": 265,
    "classes": {
     "pass": 195,
@@ -92,14 +103,14 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 92,
+   "wall_seconds": 67,
    "total": 358,
    "classes": {
-    "new_test": 23,
-    "new_failure": 27,
+    "pass": 47,
+    "new_test": 224,
+    "still_failing": 16,
+    "new_failure": 53,
     "known_fail": 9,
-    "pass": 248,
-    "still_failing": 42,
     "known_blocked": 3,
     "fixed": 6
    },
@@ -180,7 +191,7 @@
    "suite": "sdk-consumer",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 94,
+   "wall_seconds": 158,
    "total": 342,
    "classes": {
     "pass": 278,
@@ -201,6 +212,14 @@
   }
  ],
  "groups": [
+  {
+   "suite": "install-test",
+   "group": "infra",
+   "total": 1,
+   "counts": {
+    "error": 1
+   }
+  },
   {
    "suite": "loader-audit",
    "group": "cwd-hijack",
@@ -677,6 +696,22 @@
  ],
  "items": [
   {
+   "id": "install-test::infra::no-results",
+   "suite": "install-test",
+   "group": "infra",
+   "status": "error",
+   "class": "infra_error",
+   "known": null,
+   "message": "the suite job produced no results (job failed, timed out or was cancelled)",
+   "repro": "",
+   "log": "",
+   "backend": "",
+   "result_dir": "",
+   "prev": "error",
+   "nights_failing": 2,
+   "duration_s": 0.0
+  },
+  {
    "id": "mivisionx::infra::no-results",
    "suite": "mivisionx",
    "group": "infra",
@@ -689,7 +724,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -697,15 +732,15 @@
    "suite": "packaging",
    "group": "deb",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -713,15 +748,15 @@
    "suite": "packaging",
    "group": "deb",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "16 DEB files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test, amdrocm-roccv, amdrocm-roccv-devel, amdrocm-roccv-test, amdrocm-vision (+4 more); unexpected: amdrocm-mivisionx-devel10.2, amdrocm-mivisionx-test10.2, amdrocm-mivisionx10.2, amdrocm-pydecode-test10.2, amdrocm-pydecode10.2, amdrocm-rocal-devel10.2, amdrocm-rocal-test10.2, amdrocm-rocal10.2, amdrocm-roccv-devel10.2, amdrocm-roccv-test10.2, amdrocm-roccv10.2, amdrocm-vision-pythonpath10.2 (+4 more)",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": "pass",
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -729,15 +764,15 @@
    "suite": "packaging",
    "group": "install-deb",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian ",
    "repro": "",
    "log": "logs/dpkg-verify.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -752,7 +787,7 @@
    "log": "logs/install-deb__import__amd.rocal.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -761,15 +796,15 @@
    "suite": "packaging",
    "group": "install-deb",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' ",
    "repro": "",
    "log": "logs/install-deb__import__pyRocVideoDecode.decoder.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -777,15 +812,15 @@
    "suite": "packaging",
    "group": "install-deb",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' ",
    "repro": "",
    "log": "logs/install-deb__import__rocal_pybind.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -793,15 +828,15 @@
    "suite": "packaging",
    "group": "install-deb",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' ",
    "repro": "",
    "log": "logs/install-deb__import__rocpycv.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -809,15 +844,15 @@
    "suite": "packaging",
    "group": "install-deb",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' ",
    "repro": "",
    "log": "logs/install-deb__import__rocpydecode.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -825,15 +860,15 @@
    "suite": "packaging",
    "group": "install-deb",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' ",
    "repro": "",
    "log": "logs/install-deb__import__rocpyjpegdecode.log",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -848,7 +883,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -864,7 +899,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -880,7 +915,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -896,7 +931,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -912,7 +947,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -937,15 +972,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' ",
    "repro": "",
    "log": "logs/install-rpm__import__amd.rocal.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -953,15 +988,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' ",
    "repro": "",
    "log": "logs/install-rpm__import__pyRocVideoDecode.decoder.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -969,15 +1004,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' ",
    "repro": "",
    "log": "logs/install-rpm__import__rocal_pybind.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -985,15 +1020,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' ",
    "repro": "",
    "log": "logs/install-rpm__import__rocpycv.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1001,15 +1036,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' ",
    "repro": "",
    "log": "logs/install-rpm__import__rocpydecode.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1017,15 +1052,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' ",
    "repro": "",
    "log": "logs/install-rpm__import__rocpyjpegdecode.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1033,15 +1068,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261010-20261010.x86_64 from @commandline - nothing provides libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261010-20261010.x86_64 from @commandline - nothing provides libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.1)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261010-20261010.x86_64 from @commandline - nothing provides libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.2)(64bit",
    "repro": "",
    "log": "logs/install-therock.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1049,15 +1084,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1072,7 +1107,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -1088,7 +1123,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -1097,15 +1132,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1120,7 +1155,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -1136,7 +1171,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
+   "prev": "pass",
    "nights_failing": 1,
    "duration_s": 0
   },
@@ -1145,15 +1180,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "Unsatisfied dependencies for amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64: \tamdrocm-rpp10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64 \tamdrocm-runtime10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64 \tlibamdhip64.so.7()(64bit) is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64 \tlibamdhip64.so.7(hip_4.2)(64bit) is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64 ",
    "repro": "",
    "log": "logs/rpm-verify.log",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -1161,15 +1196,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1177,15 +1212,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1193,15 +1228,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1209,15 +1244,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/libopenvx.so.1.3.2, /opt/rocm/core-10.2/lib/libvx_rpp.so.3.3.2, /opt/rocm/core-10.2/lib/libvxu.so.1.3.2",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1225,15 +1260,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1241,15 +1276,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1257,15 +1292,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/rocpydecode.cpython-312-x86_64-linux-gnu.so, /opt/rocm/core-10.2/lib/rocpyjpegdecode.cpython-312-x86_64-linux-gnu.so",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1273,15 +1308,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1289,15 +1324,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1305,15 +1340,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1321,15 +1356,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "automatic requirements no package provides (dnf: 'nothing provides ...'): libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.0)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.1)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.2)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_2.0)(64bit)",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1337,15 +1372,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/librocal.so.2.5.0, /opt/rocm/core-10.2/lib/rocal_pybind.cpython-312-x86_64-linux-gnu.so",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1353,15 +1388,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1369,15 +1404,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1385,15 +1420,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1401,15 +1436,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/libroccv.so.0.4.0, /opt/rocm/core-10.2/lib/rocpycv.cpython-312-x86_64-linux-gnu.so",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1417,15 +1452,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1433,15 +1468,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1449,15 +1484,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "1 files (DEB 1); only in RPM: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth; only in DEB: /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1465,15 +1500,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "paths outside the expected prefix: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1481,15 +1516,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "Prefixes: /opt/rocm/core-10.2 but these paths are outside it, so rpm --prefix/--relocate fails: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1497,15 +1532,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "only in RPM Requires: python3.12",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1513,15 +1548,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1529,15 +1564,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision-sdk10.2/README; only in DEB: /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian, /usr/share/doc/amdrocm-vision-sdk10.2/changelog.Debian.gz, /usr/share/doc/amdrocm-vision-sdk10.2/copyright",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1545,15 +1580,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "paths outside the expected prefix: /usr/share/doc/amdrocm-vision-sdk10.2/README",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1561,15 +1596,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "amdrocm-mivisionx-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-roccv-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-vision10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1577,15 +1612,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1593,15 +1628,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "provides stock-named capabilities (the bundled libraries' version definitions still carry the upstream SONAME, M1): libjpeg.so.62(LIBJPEGTURBO_6.2)(64bit), libjpeg.so.62(LIBJPEG_6.2)(64bit), libsndfile.so.1(libsndfile.so.1.0)(64bit), libturbojpeg.so.0(TURBOJPEG_1.0)(64bit), libturbojpeg.so.0(TURBOJPEG_1.1)(64bit), libturbojpeg.so.0(TURBOJPEG_1.2)(64bit), libturbojpeg.so.0(TURBOJPEG_1.4)(64bit), libturbojpeg.so.0(TURBOJPEG_2.0)(64bit), libturbojpeg.so.0(TURBOJPEG_3)(64bit), libturbojpeg.so.0(TURBOJPEG_3.1)(64bit), libturbojpeg.so.0(TURBOJPEG_3.2)(64bit)",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1609,15 +1644,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/libjpeg-rocm-vision.so.62.4.0, /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/liblmdb-rocm-vision.so, /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/libprotobuf-rocm-vision.so.3.21.12.0, /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/libsndfile-rocm-vision.so.1.0.37, /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/libturbojpeg-rocm-vision.so.0.5.0",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1625,15 +1660,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1641,15 +1676,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision-tests10.2/README; only in DEB: /usr/share/doc/amdrocm-vision-tests10.2/README.Debian, /usr/share/doc/amdrocm-vision-tests10.2/changelog.Debian.gz, /usr/share/doc/amdrocm-vision-tests10.2/copyright",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1657,15 +1692,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "paths outside the expected prefix: /usr/share/doc/amdrocm-vision-tests10.2/README",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1673,15 +1708,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "amdrocm-mivisionx-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-pydecode-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-roccv-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-vision-sdk10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1689,15 +1724,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1705,15 +1740,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision10.2/README; only in DEB: /usr/share/doc/amdrocm-vision10.2/README.Debian, /usr/share/doc/amdrocm-vision10.2/changelog.Debian.gz, /usr/share/doc/amdrocm-vision10.2/copyright",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1721,15 +1756,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "paths outside the expected prefix: /usr/share/doc/amdrocm-vision10.2/README",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1737,15 +1772,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "amdrocm-mivisionx10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-pydecode10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-roccv10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1753,15 +1788,15 @@
    "suite": "packaging",
    "group": "rpm",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "16 RPM files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test, amdrocm-roccv, amdrocm-roccv-devel, amdrocm-roccv-test, amdrocm-vision (+4 more); unexpected: amdrocm-mivisionx-devel10.2, amdrocm-mivisionx-test10.2, amdrocm-mivisionx10.2, amdrocm-pydecode-test10.2, amdrocm-pydecode10.2, amdrocm-rocal-devel10.2, amdrocm-rocal-test10.2, amdrocm-rocal10.2, amdrocm-roccv-devel10.2, amdrocm-roccv-test10.2, amdrocm-roccv10.2, amdrocm-vision-pythonpath10.2 (+4 more)",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-rpm",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": "pass",
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1769,15 +1804,15 @@
    "suite": "packaging",
    "group": "tarball",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "missing from tarball: core-10.2/lib/libopenvx.so (amdrocm-mivisionx10.2), core-10.2/lib/libopenvx.so.1 (amdrocm-mivisionx10.2), core-10.2/lib/libvx_rpp.so (amdrocm-mivisionx10.2), core-10.2/lib/libvx_rpp.so.3 (amdrocm-mivisionx10.2), core-10.2/lib/libvxu.so (amdrocm-mivisionx10.2), core-10.2/lib/libvxu.so.1 (amdrocm-mivisionx10.2), core-10.2/lib/librocal.so (amdrocm-rocal10.2), core-10.2/lib/librocal.so.2 (amdrocm-rocal10.2), core-10.2/lib/libroccv.so (amdrocm-roccv10.2), core-10.2/lib/libroccv.so.0 (amdrocm-roccv10.2), core-10.2/lib/rocm_sysdeps/lib/libjpeg-rocm-vision.so (amdrocm-vision-sysd",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": "pass",
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1785,15 +1820,15 @@
    "suite": "packaging",
    "group": "tarball",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "file version 10.2.0-20261010, manifest version 0.2.0+g749575a",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
-   "prev": "fail",
-   "nights_failing": 5,
+   "prev": "pass",
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -1809,7 +1844,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1825,7 +1860,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1841,7 +1876,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1857,7 +1892,7 @@
    "backend": "",
    "result_dir": "",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1873,8 +1908,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
-   "duration_s": 0.162
+   "nights_failing": 2,
+   "duration_s": 0.188
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.vs-reference",
@@ -1889,7 +1924,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1905,7 +1940,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1921,8 +1956,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
-   "duration_s": 0.037
+   "nights_failing": 2,
+   "duration_s": 0.043
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip0",
@@ -1937,8 +1972,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
-   "duration_s": 0.037
+   "nights_failing": 2,
+   "duration_s": 0.043
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip1",
@@ -1953,8 +1988,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
-   "duration_s": 0.037
+   "nights_failing": 2,
+   "duration_s": 0.043
   },
   {
    "id": "sdk-consumer::contamination.unset.explicit::roccv-offload-arch",
@@ -1969,7 +2004,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -1985,7 +2020,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2002,7 +2037,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.058
+   "duration_s": 0.063
   },
   {
    "id": "loader-audit::docs::install-usage",
@@ -2017,7 +2052,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2032,7 +2067,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -2048,7 +2083,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -2064,7 +2099,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -2080,7 +2115,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -2096,7 +2131,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -2113,7 +2148,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2129,7 +2164,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2145,7 +2180,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2161,7 +2196,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2177,7 +2212,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2193,7 +2228,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2209,7 +2244,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2225,7 +2260,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2241,7 +2276,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2257,7 +2292,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2273,7 +2308,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2289,7 +2324,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 9,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2305,7 +2340,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2321,7 +2356,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2337,7 +2372,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2353,7 +2388,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2369,7 +2404,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2465,7 +2500,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2481,7 +2516,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2497,7 +2532,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2513,7 +2548,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2529,7 +2564,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2545,7 +2580,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2561,7 +2596,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2593,7 +2628,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2609,7 +2644,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2625,7 +2660,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2641,7 +2676,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2657,7 +2692,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2673,7 +2708,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2689,7 +2724,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2833,7 +2868,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2977,7 +3012,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -2993,7 +3028,7 @@
    "backend": "",
    "result_dir": "results-loader-audit",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3008,7 +3043,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3024,7 +3059,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3040,7 +3075,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3056,7 +3091,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3072,7 +3107,7 @@
    "log": "logs/elf-audit.log",
    "backend": "",
    "result_dir": "results-loader-audit",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3120,7 +3155,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
-   "prev": "blocked",
+   "prev": "pass",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3136,7 +3171,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
-   "prev": "blocked",
+   "prev": "pass",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3152,7 +3187,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-packages/packaging-deb",
-   "prev": "blocked",
+   "prev": "pass",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3168,8 +3203,8 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": null,
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3185,7 +3220,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3201,7 +3236,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3217,7 +3252,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3233,7 +3268,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3249,7 +3284,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3345,7 +3380,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3377,7 +3412,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3393,7 +3428,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3409,8 +3444,8 @@
    "backend": "CPU",
    "result_dir": "results-robustness-nogpu",
    "prev": "error",
-   "nights_failing": 12,
-   "duration_s": 0.766
+   "nights_failing": 2,
+   "duration_s": 0.866
   },
   {
    "id": "robustness-nogpu::rocal::cpu-decode-resize",
@@ -3425,7 +3460,7 @@
    "backend": "CPU",
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.214
   },
   {
@@ -3441,7 +3476,7 @@
    "backend": "CPU",
    "result_dir": "results-robustness-nogpu",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.164
   },
   {
@@ -3473,8 +3508,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
-   "duration_s": 0.066
+   "nights_failing": 2,
+   "duration_s": 0.069
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-replicate",
@@ -3489,8 +3524,8 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
-   "duration_s": 0.066
+   "nights_failing": 2,
+   "duration_s": 0.069
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::GPU.border-constant",
@@ -3681,7 +3716,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3697,7 +3732,7 @@
    "backend": "CPU",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3728,7 +3763,7 @@
    "log": "logs/consumer-rocal.log",
    "backend": "",
    "result_dir": "results-sdk-consumer",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -3809,7 +3844,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3825,7 +3860,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3841,7 +3876,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3857,7 +3892,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "error",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3873,7 +3908,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3889,7 +3924,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3905,7 +3940,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3921,7 +3956,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3937,7 +3972,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3953,7 +3988,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3969,7 +4004,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -3985,7 +4020,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4001,7 +4036,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4017,7 +4052,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4033,7 +4068,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4049,7 +4084,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4065,7 +4100,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4081,7 +4116,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4097,7 +4132,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4113,7 +4148,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4129,7 +4164,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4145,7 +4180,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4161,7 +4196,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4177,7 +4212,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4193,7 +4228,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4209,7 +4244,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4225,7 +4260,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4241,7 +4276,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4257,7 +4292,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4273,7 +4308,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4289,7 +4324,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4305,7 +4340,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4321,7 +4356,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4337,7 +4372,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -4353,7 +4388,7 @@
    "backend": "",
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
-   "nights_failing": 12,
+   "nights_failing": 2,
    "duration_s": 0.0
   }
  ],
@@ -5792,13 +5827,344 @@
   }
  ],
  "delta": {
-  "previous_night": "2026-10-09",
-  "removed": [],
-  "removed_count": 0,
-  "new_failure": 27,
-  "still_failing": 50,
+  "previous_night": "2026-10-03",
+  "removed": [
+   "packaging::deb::amdrocm-mivisionx",
+   "packaging::deb::amdrocm-mivisionx-devel",
+   "packaging::deb::amdrocm-mivisionx-devel::payload.build-paths",
+   "packaging::deb::amdrocm-mivisionx-devel::payload.empty-dirs",
+   "packaging::deb::amdrocm-mivisionx-test",
+   "packaging::deb::amdrocm-mivisionx-test::payload.build-paths",
+   "packaging::deb::amdrocm-mivisionx-test::payload.empty-dirs",
+   "packaging::deb::amdrocm-mivisionx-test::refs.any-package",
+   "packaging::deb::amdrocm-mivisionx-test::refs.closure",
+   "packaging::deb::amdrocm-mivisionx::license.own",
+   "packaging::deb::amdrocm-mivisionx::payload.build-paths",
+   "packaging::deb::amdrocm-mivisionx::payload.empty-dirs",
+   "packaging::deb::amdrocm-pydecode",
+   "packaging::deb::amdrocm-pydecode-test",
+   "packaging::deb::amdrocm-pydecode-test::payload.build-paths",
+   "packaging::deb::amdrocm-pydecode-test::payload.empty-dirs",
+   "packaging::deb::amdrocm-pydecode-test::refs.any-package",
+   "packaging::deb::amdrocm-pydecode-test::refs.closure",
+   "packaging::deb::amdrocm-pydecode::license.dlpack",
+   "packaging::deb::amdrocm-pydecode::license.own",
+   "packaging::deb::amdrocm-pydecode::license.pybind11",
+   "packaging::deb::amdrocm-pydecode::payload.build-paths",
+   "packaging::deb::amdrocm-pydecode::payload.empty-dirs",
+   "packaging::deb::amdrocm-rocal",
+   "packaging::deb::amdrocm-rocal-devel",
+   "packaging::deb::amdrocm-rocal-devel::payload.build-paths",
+   "packaging::deb::amdrocm-rocal-devel::payload.empty-dirs",
+   "packaging::deb::amdrocm-rocal-test",
+   "packaging::deb::amdrocm-rocal-test::payload.build-paths",
+   "packaging::deb::amdrocm-rocal-test::payload.empty-dirs",
+   "packaging::deb::amdrocm-rocal-test::refs.any-package",
+   "packaging::deb::amdrocm-rocal-test::refs.closure",
+   "packaging::deb::amdrocm-rocal::license.dlpack",
+   "packaging::deb::amdrocm-rocal::license.own",
+   "packaging::deb::amdrocm-rocal::license.pybind11",
+   "packaging::deb::amdrocm-rocal::license.rapidjson",
+   "packaging::deb::amdrocm-rocal::payload.build-paths",
+   "packaging::deb::amdrocm-rocal::payload.empty-dirs",
+   "packaging::deb::amdrocm-roccv",
+   "packaging::deb::amdrocm-roccv-devel",
+   "packaging::deb::amdrocm-roccv-devel::payload.build-paths",
+   "packaging::deb::amdrocm-roccv-devel::payload.empty-dirs",
+   "packaging::deb::amdrocm-roccv-test",
+   "packaging::deb::amdrocm-roccv-test::payload.build-paths",
+   "packaging::deb::amdrocm-roccv-test::payload.empty-dirs",
+   "packaging::deb::amdrocm-roccv-test::refs.any-package",
+   "packaging::deb::amdrocm-roccv-test::refs.closure",
+   "packaging::deb::amdrocm-roccv::license.dlpack",
+   "packaging::deb::amdrocm-roccv::license.own",
+   "packaging::deb::amdrocm-roccv::license.pybind11",
+   "packaging::deb::amdrocm-roccv::payload.build-paths",
+   "packaging::deb::amdrocm-roccv::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision",
+   "packaging::deb::amdrocm-vision-pythonpath",
+   "packaging::deb::amdrocm-vision-pythonpath::payload.build-paths",
+   "packaging::deb::amdrocm-vision-pythonpath::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-sdk",
+   "packaging::deb::amdrocm-vision-sdk::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-sysdeps",
+   "packaging::deb::amdrocm-vision-sysdeps::license.libjpeg-turbo",
+   "packaging::deb::amdrocm-vision-sysdeps::license.libsndfile",
+   "packaging::deb::amdrocm-vision-sysdeps::license.lmdb",
+   "packaging::deb::amdrocm-vision-sysdeps::license.protobuf",
+   "packaging::deb::amdrocm-vision-sysdeps::payload.build-paths",
+   "packaging::deb::amdrocm-vision-sysdeps::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-tests",
+   "packaging::deb::amdrocm-vision-tests::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision::payload.empty-dirs",
+   "packaging::install-deb::depends::amdrocm-decode",
+   "packaging::install-deb::depends::amdrocm-jpeg",
+   "packaging::install-deb::depends::amdrocm-rpp",
+   "packaging::install-deb::depends::amdrocm-runtime",
+   "packaging::install-deb::ldd::libjpeg-rocm-vision.so",
+   "packaging::install-deb::ldd::liblmdb-rocm-vision.so",
+   "packaging::install-deb::ldd::libopenvx.so",
+   "packaging::install-deb::ldd::libprotobuf-rocm-vision.so",
+   "packaging::install-deb::ldd::librocal.so",
+   "packaging::install-deb::ldd::libroccv.so",
+   "packaging::install-deb::ldd::libsndfile-rocm-vision.so",
+   "packaging::install-deb::ldd::libturbojpeg-rocm-vision.so",
+   "packaging::install-deb::ldd::libvx_rpp.so",
+   "packaging::install-deb::ldd::libvxu.so",
+   "packaging::install-deb::ldd::rocal_pybind.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-deb::ldd::rocpycv.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-deb::ldd::rocpydecode.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-deb::ldd::rocpyjpegdecode.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-rpm::depends::amdrocm-decode",
+   "packaging::install-rpm::depends::amdrocm-jpeg",
+   "packaging::install-rpm::depends::amdrocm-rpp",
+   "packaging::install-rpm::ldd::libjpeg-rocm-vision.so",
+   "packaging::install-rpm::ldd::liblmdb-rocm-vision.so",
+   "packaging::install-rpm::ldd::libopenvx.so",
+   "packaging::install-rpm::ldd::libprotobuf-rocm-vision.so",
+   "packaging::install-rpm::ldd::librocal.so",
+   "packaging::install-rpm::ldd::libroccv.so",
+   "packaging::install-rpm::ldd::libsndfile-rocm-vision.so",
+   "packaging::install-rpm::ldd::libturbojpeg-rocm-vision.so",
+   "packaging::install-rpm::ldd::libvx_rpp.so",
+   "packaging::install-rpm::ldd::libvxu.so",
+   "packaging::install-rpm::ldd::rocal_pybind.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-rpm::ldd::rocpycv.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-rpm::ldd::rocpydecode.cpython-312-x86_64-linux-gnu.so",
+   "packaging::install-rpm::ldd::rocpyjpegdecode.cpython-312-x86_64-linux-gnu.so",
+   "packaging::rpm::amdrocm-mivisionx-devel::header",
+   "packaging::rpm::amdrocm-mivisionx-devel::payload.build-paths",
+   "packaging::rpm::amdrocm-mivisionx-devel::payload.cpio",
+   "packaging::rpm::amdrocm-mivisionx-devel::payload.empty-dirs",
+   "packaging::rpm::amdrocm-mivisionx-devel::payload.matches-deb",
+   "packaging::rpm::amdrocm-mivisionx-devel::payload.prefix",
+   "packaging::rpm::amdrocm-mivisionx-devel::payload.relocatable",
+   "packaging::rpm::amdrocm-mivisionx-devel::provides.isolation",
+   "packaging::rpm::amdrocm-mivisionx-devel::requires.closure",
+   "packaging::rpm::amdrocm-mivisionx-devel::requires.mirror-deb",
+   "packaging::rpm::amdrocm-mivisionx-devel::requires.relations",
+   "packaging::rpm::amdrocm-mivisionx-devel::scriptlets",
+   "packaging::rpm::amdrocm-mivisionx-devel::so-mode",
+   "packaging::rpm::amdrocm-mivisionx-test::header",
+   "packaging::rpm::amdrocm-mivisionx-test::payload.build-paths",
+   "packaging::rpm::amdrocm-mivisionx-test::payload.cpio",
+   "packaging::rpm::amdrocm-mivisionx-test::payload.empty-dirs",
+   "packaging::rpm::amdrocm-mivisionx-test::payload.matches-deb",
+   "packaging::rpm::amdrocm-mivisionx-test::payload.prefix",
+   "packaging::rpm::amdrocm-mivisionx-test::payload.relocatable",
+   "packaging::rpm::amdrocm-mivisionx-test::provides.isolation",
+   "packaging::rpm::amdrocm-mivisionx-test::refs.any-package",
+   "packaging::rpm::amdrocm-mivisionx-test::refs.closure",
+   "packaging::rpm::amdrocm-mivisionx-test::requires.closure",
+   "packaging::rpm::amdrocm-mivisionx-test::requires.mirror-deb",
+   "packaging::rpm::amdrocm-mivisionx-test::requires.relations",
+   "packaging::rpm::amdrocm-mivisionx-test::scriptlets",
+   "packaging::rpm::amdrocm-mivisionx-test::so-mode",
+   "packaging::rpm::amdrocm-mivisionx::header",
+   "packaging::rpm::amdrocm-mivisionx::license.own",
+   "packaging::rpm::amdrocm-mivisionx::payload.build-paths",
+   "packaging::rpm::amdrocm-mivisionx::payload.cpio",
+   "packaging::rpm::amdrocm-mivisionx::payload.empty-dirs",
+   "packaging::rpm::amdrocm-mivisionx::payload.matches-deb",
+   "packaging::rpm::amdrocm-mivisionx::payload.prefix",
+   "packaging::rpm::amdrocm-mivisionx::payload.relocatable",
+   "packaging::rpm::amdrocm-mivisionx::provides.isolation",
+   "packaging::rpm::amdrocm-mivisionx::requires.closure",
+   "packaging::rpm::amdrocm-mivisionx::requires.mirror-deb",
+   "packaging::rpm::amdrocm-mivisionx::requires.relations",
+   "packaging::rpm::amdrocm-mivisionx::scriptlets",
+   "packaging::rpm::amdrocm-mivisionx::so-mode",
+   "packaging::rpm::amdrocm-pydecode-test::header",
+   "packaging::rpm::amdrocm-pydecode-test::payload.build-paths",
+   "packaging::rpm::amdrocm-pydecode-test::payload.cpio",
+   "packaging::rpm::amdrocm-pydecode-test::payload.empty-dirs",
+   "packaging::rpm::amdrocm-pydecode-test::payload.matches-deb",
+   "packaging::rpm::amdrocm-pydecode-test::payload.prefix",
+   "packaging::rpm::amdrocm-pydecode-test::payload.relocatable",
+   "packaging::rpm::amdrocm-pydecode-test::provides.isolation",
+   "packaging::rpm::amdrocm-pydecode-test::refs.any-package",
+   "packaging::rpm::amdrocm-pydecode-test::refs.closure",
+   "packaging::rpm::amdrocm-pydecode-test::requires.closure",
+   "packaging::rpm::amdrocm-pydecode-test::requires.mirror-deb",
+   "packaging::rpm::amdrocm-pydecode-test::requires.relations",
+   "packaging::rpm::amdrocm-pydecode-test::scriptlets",
+   "packaging::rpm::amdrocm-pydecode-test::so-mode",
+   "packaging::rpm::amdrocm-pydecode::header",
+   "packaging::rpm::amdrocm-pydecode::license.dlpack",
+   "packaging::rpm::amdrocm-pydecode::license.own",
+   "packaging::rpm::amdrocm-pydecode::license.pybind11",
+   "packaging::rpm::amdrocm-pydecode::payload.build-paths",
+   "packaging::rpm::amdrocm-pydecode::payload.cpio",
+   "packaging::rpm::amdrocm-pydecode::payload.empty-dirs",
+   "packaging::rpm::amdrocm-pydecode::payload.matches-deb",
+   "packaging::rpm::amdrocm-pydecode::payload.prefix",
+   "packaging::rpm::amdrocm-pydecode::payload.relocatable",
+   "packaging::rpm::amdrocm-pydecode::provides.isolation",
+   "packaging::rpm::amdrocm-pydecode::requires.closure",
+   "packaging::rpm::amdrocm-pydecode::requires.mirror-deb",
+   "packaging::rpm::amdrocm-pydecode::requires.relations",
+   "packaging::rpm::amdrocm-pydecode::scriptlets",
+   "packaging::rpm::amdrocm-pydecode::so-mode",
+   "packaging::rpm::amdrocm-rocal-devel::header",
+   "packaging::rpm::amdrocm-rocal-devel::payload.build-paths",
+   "packaging::rpm::amdrocm-rocal-devel::payload.cpio",
+   "packaging::rpm::amdrocm-rocal-devel::payload.empty-dirs",
+   "packaging::rpm::amdrocm-rocal-devel::payload.matches-deb",
+   "packaging::rpm::amdrocm-rocal-devel::payload.prefix",
+   "packaging::rpm::amdrocm-rocal-devel::payload.relocatable",
+   "packaging::rpm::amdrocm-rocal-devel::provides.isolation",
+   "packaging::rpm::amdrocm-rocal-devel::requires.closure",
+   "packaging::rpm::amdrocm-rocal-devel::requires.mirror-deb",
+   "packaging::rpm::amdrocm-rocal-devel::requires.relations",
+   "packaging::rpm::amdrocm-rocal-devel::scriptlets",
+   "packaging::rpm::amdrocm-rocal-devel::so-mode",
+   "packaging::rpm::amdrocm-rocal-test::header",
+   "packaging::rpm::amdrocm-rocal-test::payload.build-paths",
+   "packaging::rpm::amdrocm-rocal-test::payload.cpio",
+   "packaging::rpm::amdrocm-rocal-test::payload.empty-dirs",
+   "packaging::rpm::amdrocm-rocal-test::payload.matches-deb",
+   "packaging::rpm::amdrocm-rocal-test::payload.prefix",
+   "packaging::rpm::amdrocm-rocal-test::payload.relocatable",
+   "packaging::rpm::amdrocm-rocal-test::provides.isolation",
+   "packaging::rpm::amdrocm-rocal-test::refs.any-package",
+   "packaging::rpm::amdrocm-rocal-test::refs.closure",
+   "packaging::rpm::amdrocm-rocal-test::requires.closure",
+   "packaging::rpm::amdrocm-rocal-test::requires.mirror-deb",
+   "packaging::rpm::amdrocm-rocal-test::requires.relations",
+   "packaging::rpm::amdrocm-rocal-test::scriptlets",
+   "packaging::rpm::amdrocm-rocal-test::so-mode",
+   "packaging::rpm::amdrocm-rocal::header",
+   "packaging::rpm::amdrocm-rocal::license.dlpack",
+   "packaging::rpm::amdrocm-rocal::license.own",
+   "packaging::rpm::amdrocm-rocal::license.pybind11",
+   "packaging::rpm::amdrocm-rocal::license.rapidjson",
+   "packaging::rpm::amdrocm-rocal::payload.build-paths",
+   "packaging::rpm::amdrocm-rocal::payload.cpio",
+   "packaging::rpm::amdrocm-rocal::payload.empty-dirs",
+   "packaging::rpm::amdrocm-rocal::payload.matches-deb",
+   "packaging::rpm::amdrocm-rocal::payload.prefix",
+   "packaging::rpm::amdrocm-rocal::payload.relocatable",
+   "packaging::rpm::amdrocm-rocal::provides.isolation",
+   "packaging::rpm::amdrocm-rocal::requires.closure",
+   "packaging::rpm::amdrocm-rocal::requires.mirror-deb",
+   "packaging::rpm::amdrocm-rocal::requires.relations",
+   "packaging::rpm::amdrocm-rocal::scriptlets",
+   "packaging::rpm::amdrocm-rocal::so-mode",
+   "packaging::rpm::amdrocm-roccv-devel::header",
+   "packaging::rpm::amdrocm-roccv-devel::payload.build-paths",
+   "packaging::rpm::amdrocm-roccv-devel::payload.cpio",
+   "packaging::rpm::amdrocm-roccv-devel::payload.empty-dirs",
+   "packaging::rpm::amdrocm-roccv-devel::payload.matches-deb",
+   "packaging::rpm::amdrocm-roccv-devel::payload.prefix",
+   "packaging::rpm::amdrocm-roccv-devel::payload.relocatable",
+   "packaging::rpm::amdrocm-roccv-devel::provides.isolation",
+   "packaging::rpm::amdrocm-roccv-devel::requires.closure",
+   "packaging::rpm::amdrocm-roccv-devel::requires.mirror-deb",
+   "packaging::rpm::amdrocm-roccv-devel::requires.relations",
+   "packaging::rpm::amdrocm-roccv-devel::scriptlets",
+   "packaging::rpm::amdrocm-roccv-devel::so-mode",
+   "packaging::rpm::amdrocm-roccv-test::header",
+   "packaging::rpm::amdrocm-roccv-test::payload.build-paths",
+   "packaging::rpm::amdrocm-roccv-test::payload.cpio",
+   "packaging::rpm::amdrocm-roccv-test::payload.empty-dirs",
+   "packaging::rpm::amdrocm-roccv-test::payload.matches-deb",
+   "packaging::rpm::amdrocm-roccv-test::payload.prefix",
+   "packaging::rpm::amdrocm-roccv-test::payload.relocatable",
+   "packaging::rpm::amdrocm-roccv-test::provides.isolation",
+   "packaging::rpm::amdrocm-roccv-test::refs.any-package",
+   "packaging::rpm::amdrocm-roccv-test::refs.closure",
+   "packaging::rpm::amdrocm-roccv-test::requires.closure",
+   "packaging::rpm::amdrocm-roccv-test::requires.mirror-deb",
+   "packaging::rpm::amdrocm-roccv-test::requires.relations",
+   "packaging::rpm::amdrocm-roccv-test::scriptlets",
+   "packaging::rpm::amdrocm-roccv-test::so-mode",
+   "packaging::rpm::amdrocm-roccv::header",
+   "packaging::rpm::amdrocm-roccv::license.dlpack",
+   "packaging::rpm::amdrocm-roccv::license.own",
+   "packaging::rpm::amdrocm-roccv::license.pybind11",
+   "packaging::rpm::amdrocm-roccv::payload.build-paths",
+   "packaging::rpm::amdrocm-roccv::payload.cpio",
+   "packaging::rpm::amdrocm-roccv::payload.empty-dirs",
+   "packaging::rpm::amdrocm-roccv::payload.matches-deb",
+   "packaging::rpm::amdrocm-roccv::payload.prefix",
+   "packaging::rpm::amdrocm-roccv::payload.relocatable",
+   "packaging::rpm::amdrocm-roccv::provides.isolation",
+   "packaging::rpm::amdrocm-roccv::requires.closure",
+   "packaging::rpm::amdrocm-roccv::requires.mirror-deb",
+   "packaging::rpm::amdrocm-roccv::requires.relations",
+   "packaging::rpm::amdrocm-roccv::scriptlets",
+   "packaging::rpm::amdrocm-roccv::so-mode",
+   "packaging::rpm::amdrocm-vision-pythonpath::header",
+   "packaging::rpm::amdrocm-vision-pythonpath::payload.build-paths",
+   "packaging::rpm::amdrocm-vision-pythonpath::payload.cpio",
+   "packaging::rpm::amdrocm-vision-pythonpath::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-pythonpath::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-pythonpath::payload.prefix",
+   "packaging::rpm::amdrocm-vision-pythonpath::payload.relocatable",
+   "packaging::rpm::amdrocm-vision-pythonpath::provides.isolation",
+   "packaging::rpm::amdrocm-vision-pythonpath::pth.content",
+   "packaging::rpm::amdrocm-vision-pythonpath::pth.site-dir",
+   "packaging::rpm::amdrocm-vision-pythonpath::requires.closure",
+   "packaging::rpm::amdrocm-vision-pythonpath::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-pythonpath::requires.relations",
+   "packaging::rpm::amdrocm-vision-pythonpath::scriptlets",
+   "packaging::rpm::amdrocm-vision-pythonpath::so-mode",
+   "packaging::rpm::amdrocm-vision-sdk::header",
+   "packaging::rpm::amdrocm-vision-sdk::payload.cpio",
+   "packaging::rpm::amdrocm-vision-sdk::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-sdk::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-sdk::payload.prefix",
+   "packaging::rpm::amdrocm-vision-sdk::provides.isolation",
+   "packaging::rpm::amdrocm-vision-sdk::requires.closure",
+   "packaging::rpm::amdrocm-vision-sdk::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-sdk::requires.relations",
+   "packaging::rpm::amdrocm-vision-sdk::scriptlets",
+   "packaging::rpm::amdrocm-vision-sdk::so-mode",
+   "packaging::rpm::amdrocm-vision-sysdeps::header",
+   "packaging::rpm::amdrocm-vision-sysdeps::license.libjpeg-turbo",
+   "packaging::rpm::amdrocm-vision-sysdeps::license.libsndfile",
+   "packaging::rpm::amdrocm-vision-sysdeps::license.lmdb",
+   "packaging::rpm::amdrocm-vision-sysdeps::license.protobuf",
+   "packaging::rpm::amdrocm-vision-sysdeps::payload.build-paths",
+   "packaging::rpm::amdrocm-vision-sysdeps::payload.cpio",
+   "packaging::rpm::amdrocm-vision-sysdeps::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-sysdeps::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-sysdeps::payload.prefix",
+   "packaging::rpm::amdrocm-vision-sysdeps::payload.relocatable",
+   "packaging::rpm::amdrocm-vision-sysdeps::provides.isolation",
+   "packaging::rpm::amdrocm-vision-sysdeps::requires.closure",
+   "packaging::rpm::amdrocm-vision-sysdeps::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-sysdeps::requires.relations",
+   "packaging::rpm::amdrocm-vision-sysdeps::scriptlets",
+   "packaging::rpm::amdrocm-vision-sysdeps::so-mode",
+   "packaging::rpm::amdrocm-vision-tests::header",
+   "packaging::rpm::amdrocm-vision-tests::payload.cpio",
+   "packaging::rpm::amdrocm-vision-tests::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-tests::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-tests::payload.prefix",
+   "packaging::rpm::amdrocm-vision-tests::provides.isolation",
+   "packaging::rpm::amdrocm-vision-tests::requires.closure",
+   "packaging::rpm::amdrocm-vision-tests::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-tests::requires.relations",
+   "packaging::rpm::amdrocm-vision-tests::scriptlets",
+   "packaging::rpm::amdrocm-vision-tests::so-mode",
+   "packaging::rpm::amdrocm-vision::header",
+   "packaging::rpm::amdrocm-vision::payload.cpio",
+   "packaging::rpm::amdrocm-vision::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision::payload.prefix",
+   "packaging::rpm::amdrocm-vision::provides.isolation",
+   "packaging::rpm::amdrocm-vision::requires.closure",
+   "packaging::rpm::amdrocm-vision::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision::requires.relations",
+   "packaging::rpm::amdrocm-vision::scriptlets",
+   "packaging::rpm::amdrocm-vision::so-mode"
+  ],
+  "removed_count": 330,
+  "new_failure": 53,
+  "still_failing": 24,
   "fixed": 35,
-  "new_test": 23
+  "new_test": 224
  },
  "perf": {
   "metrics": [],
@@ -6202,115 +6568,123 @@
  "issue_actions": [
   {
    "action": "open_or_comment",
+   "fingerprint": "4729d3f753",
+   "key": "install-test::infra",
+   "nights": 2,
+   "title": "Nightly regression: install-test::infra [4729d3f753]",
+   "body": "1 result(s) in `install-test::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `install-test::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+  },
+  {
+   "action": "open_or_comment",
    "fingerprint": "d3cee6816a",
    "key": "mivisionx::infra",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: mivisionx::infra [d3cee6816a]",
-   "body": "1 result(s) in `mivisionx::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `mivisionx::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `mivisionx::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `mivisionx::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "b94d06119f",
    "key": "packaging::deb",
-   "nights": 5,
+   "nights": 1,
    "title": "Nightly regression: packaging::deb [b94d06119f]",
-   "body": "2 result(s) in `packaging::deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 5 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::deb::set::packages` (fail): 16 DEB files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test,\n- `packaging::deb::amdrocm-vision-pythonpath10.2::payload.empty-dirs` (fail): owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "2 result(s) in `packaging::deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::deb::set::packages` (fail): 16 DEB files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test,\n- `packaging::deb::amdrocm-vision-pythonpath10.2::payload.empty-dirs` (fail): owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "80da0054c7",
    "key": "packaging::install-deb",
-   "nights": 1,
+   "nights": 2,
    "title": "Nightly regression: packaging::install-deb [80da0054c7]",
-   "body": "12 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::isolation.needed` (fail): no vision libraries found under /opt/rocm/lib\n- `packaging::install-deb::isolation.librocal` (fail): /opt/rocm/lib/librocal.so missing or unreadable\n- `packaging::install-deb::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n- `packaging::install-deb::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-deb::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-deb::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-deb::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-deb::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-deb::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "12 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::isolation.needed` (fail): no vision libraries found under /opt/rocm/lib\n- `packaging::install-deb::isolation.librocal` (fail): /opt/rocm/lib/librocal.so missing or unreadable\n- `packaging::install-deb::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n- `packaging::install-deb::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-deb::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-deb::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-deb::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-deb::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-deb::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "82323088f1",
    "key": "packaging::install-rpm",
-   "nights": 1,
+   "nights": 2,
    "title": "Nightly regression: packaging::install-rpm [82323088f1]",
-   "body": "15 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::install-rpm::depends::python3.12` (fail): not in the repository (needs any; required by amdrocm-vision-pythonpath10.2)\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261010-2\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64: \tamdrocm-rpp10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64 \tamdrocm-\n- `packaging::install-rpm::isolation.needed` (fail): no vision libraries found under /opt/rocm/lib\n- `packaging::install-rpm::isolation.librocal` (fail): /opt/rocm/lib/librocal.so missing or unreadable\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.shipped` (fail): no amdrocm-vision.pth in any python3 site-packages; %post did not register it\n- `packaging::install-rpm::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.9.25\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "15 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::install-rpm::depends::python3.12` (fail): not in the repository (needs any; required by amdrocm-vision-pythonpath10.2)\n- `packaging::install-rpm::install.therock` (fail): dnf cannot resolve against TheRock's repo: Error: Problem 1: conflicting requests - nothing provides libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit) needed by amdrocm-rocal10.2-10.2.0_20261010-2\n- `packaging::install-rpm::rpm.verify` (fail): Unsatisfied dependencies for amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64: \tamdrocm-rpp10.2 >= 10.2.0~ is needed by (installed) amdrocm-mivisionx10.2-10.2.0_20261010-20261010.x86_64 \tamdrocm-\n- `packaging::install-rpm::isolation.needed` (fail): no vision libraries found under /opt/rocm/lib\n- `packaging::install-rpm::isolation.librocal` (fail): /opt/rocm/lib/librocal.so missing or unreadable\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.shipped` (fail): no amdrocm-vision.pth in any python3 site-packages; %post did not register it\n- `packaging::install-rpm::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.9.25\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n- `packaging::install-rpm::import::rocal_pybind` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocal_pybind' \n- `packaging::install-rpm::import::rocpycv` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpycv' \n- `packaging::install-rpm::import::rocpydecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpydecode' \n- `packaging::install-rpm::import::rocpyjpegdecode` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'rocpyjpegdecode' \n- `packaging::install-rpm::import::amd.rocal` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'amd' \n- `packaging::install-rpm::import::pyRocVideoDecode.decoder` (fail): rc 1: Traceback (most recent call last):   File \"<string>\", line 1, in <module> ModuleNotFoundError: No module named 'pyRocVideoDecode' \n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "4cb9a97540",
    "key": "packaging::rpm",
-   "nights": 5,
+   "nights": 1,
    "title": "Nightly regression: packaging::rpm [4cb9a97540]",
-   "body": "38 result(s) in `packaging::rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 5 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::rpm::set::packages` (fail): 16 RPM files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test,\n- `packaging::rpm::amdrocm-mivisionx-devel10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-mivisionx-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-mivisionx10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-mivisionx10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/libopenvx.so.1.3.2, /opt/rocm/core-10.2/lib/libvx_rpp\n- `packaging::rpm::amdrocm-pydecode-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-pydecode10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-pydecode10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/rocpydecode.cpython-312-x86_64-linux-gnu.so, /opt/roc\n- `packaging::rpm::amdrocm-rocal-devel10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-rocal-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-rocal10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-rocal10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/librocal.so.2.5.0, /opt/rocm/core-10.2/lib/rocal_pybi\n- `packaging::rpm::amdrocm-rocal10.2::requires.closure` (fail): automatic requirements no package provides (dnf: 'nothing provides ...'): libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.0)(64bit), libturbojpeg-rocm-\n- `packaging::rpm::amdrocm-roccv-devel10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-roccv-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-roccv10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-roccv10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/libroccv.so.0.4.0, /opt/rocm/core-10.2/lib/rocpycv.cp\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.relocatable` (fail): Prefixes: /opt/rocm/core-10.2 but these paths are outside it, so rpm --prefix/--relocate fails: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.empty-dirs` (fail): owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.matches-deb` (fail): 1 files (DEB 1); only in RPM: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth; only in DEB: /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::requires.mirror-deb` (fail): only in RPM Requires: python3.12\n- `packaging::rpm::amdrocm-vision-sdk10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010\n- `packaging::rpm::amdrocm-vision-sdk10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/share/doc/amdrocm-vision-sdk10.2/README\n- `packaging::rpm::amdrocm-vision-sdk10.2::payload.matches-deb` (fail): 1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision-sdk10.2/README; only in DEB: /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian, /usr/share/doc/amdrocm-vision-sdk10.2/changelog.Debian.gz,\n- `packaging::rpm::amdrocm-vision-sdk10.2::requires.mirror-deb` (fail): amdrocm-mivisionx-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-roccv-devel10.2: DEB >= 10.2.0-2026101\n- `packaging::rpm::amdrocm-vision-sysdeps10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-vision-sysdeps10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/libjpeg-rocm-vision.so.62.4.0, /opt/\n- `packaging::rpm::amdrocm-vision-sysdeps10.2::provides.isolation` (fail): provides stock-named capabilities (the bundled libraries' version definitions still carry the upstream SONAME, M1): libjpeg.so.62(LIBJPEGTURBO_6.2)(64bit), libjpeg.so.62(LIBJPEG_6.2)(64bit), libsndfil\n- `packaging::rpm::amdrocm-vision-tests10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010\n- `packaging::rpm::amdrocm-vision-tests10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/share/doc/amdrocm-vision-tests10.2/README\n- `packaging::rpm::amdrocm-vision-tests10.2::payload.matches-deb` (fail): 1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision-tests10.2/README; only in DEB: /usr/share/doc/amdrocm-vision-tests10.2/README.Debian, /usr/share/doc/amdrocm-vision-tests10.2/changelog.Debi\n- `packaging::rpm::amdrocm-vision-tests10.2::requires.mirror-deb` (fail): amdrocm-mivisionx-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-pydecode-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal-test10.2: DEB >= 10.2.0-2026101\n- `packaging::rpm::amdrocm-vision10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010\n- `packaging::rpm::amdrocm-vision10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/share/doc/amdrocm-vision10.2/README\n- `packaging::rpm::amdrocm-vision10.2::payload.matches-deb` (fail): 1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision10.2/README; only in DEB: /usr/share/doc/amdrocm-vision10.2/README.Debian, /usr/share/doc/amdrocm-vision10.2/changelog.Debian.gz, /usr/share/\n- `packaging::rpm::amdrocm-vision10.2::requires.mirror-deb` (fail): amdrocm-mivisionx10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-pydecode10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "38 result(s) in `packaging::rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::rpm::set::packages` (fail): 16 RPM files, 16 packages; missing: amdrocm-mivisionx, amdrocm-mivisionx-devel, amdrocm-mivisionx-test, amdrocm-pydecode, amdrocm-pydecode-test, amdrocm-rocal, amdrocm-rocal-devel, amdrocm-rocal-test,\n- `packaging::rpm::amdrocm-mivisionx-devel10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-mivisionx-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-mivisionx10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-mivisionx10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/libopenvx.so.1.3.2, /opt/rocm/core-10.2/lib/libvx_rpp\n- `packaging::rpm::amdrocm-pydecode-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-pydecode10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-pydecode10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/rocpydecode.cpython-312-x86_64-linux-gnu.so, /opt/roc\n- `packaging::rpm::amdrocm-rocal-devel10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-rocal-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-rocal10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-rocal10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/librocal.so.2.5.0, /opt/rocm/core-10.2/lib/rocal_pybi\n- `packaging::rpm::amdrocm-rocal10.2::requires.closure` (fail): automatic requirements no package provides (dnf: 'nothing provides ...'): libsndfile-rocm-vision.so.1(libsndfile.so.1.0)(64bit), libturbojpeg-rocm-vision.so.0(TURBOJPEG_1.0)(64bit), libturbojpeg-rocm-\n- `packaging::rpm::amdrocm-roccv-devel10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-roccv-test10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-roccv10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-roccv10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/libroccv.so.0.4.0, /opt/rocm/core-10.2/lib/rocpycv.cp\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.relocatable` (fail): Prefixes: /opt/rocm/core-10.2 but these paths are outside it, so rpm --prefix/--relocate fails: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.empty-dirs` (fail): owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): /opt/rocm/core-10.2\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::payload.matches-deb` (fail): 1 files (DEB 1); only in RPM: /usr/lib/python3.12/site-packages/amdrocm-vision10.2.pth; only in DEB: /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth\n- `packaging::rpm::amdrocm-vision-pythonpath10.2::requires.mirror-deb` (fail): only in RPM Requires: python3.12\n- `packaging::rpm::amdrocm-vision-sdk10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010\n- `packaging::rpm::amdrocm-vision-sdk10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/share/doc/amdrocm-vision-sdk10.2/README\n- `packaging::rpm::amdrocm-vision-sdk10.2::payload.matches-deb` (fail): 1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision-sdk10.2/README; only in DEB: /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian, /usr/share/doc/amdrocm-vision-sdk10.2/changelog.Debian.gz,\n- `packaging::rpm::amdrocm-vision-sdk10.2::requires.mirror-deb` (fail): amdrocm-mivisionx-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal-devel10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-roccv-devel10.2: DEB >= 10.2.0-2026101\n- `packaging::rpm::amdrocm-vision-sysdeps10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010-20261010\n- `packaging::rpm::amdrocm-vision-sysdeps10.2::so-mode` (fail): shared libraries without the exec bit (rpmlint shared-library-not-executable; RPM's debuginfo and strip passes skip them): /opt/rocm/core-10.2/lib/rocm_sysdeps/lib/libjpeg-rocm-vision.so.62.4.0, /opt/\n- `packaging::rpm::amdrocm-vision-sysdeps10.2::provides.isolation` (fail): provides stock-named capabilities (the bundled libraries' version definitions still carry the upstream SONAME, M1): libjpeg.so.62(LIBJPEGTURBO_6.2)(64bit), libjpeg.so.62(LIBJPEG_6.2)(64bit), libsndfil\n- `packaging::rpm::amdrocm-vision-tests10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010\n- `packaging::rpm::amdrocm-vision-tests10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/share/doc/amdrocm-vision-tests10.2/README\n- `packaging::rpm::amdrocm-vision-tests10.2::payload.matches-deb` (fail): 1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision-tests10.2/README; only in DEB: /usr/share/doc/amdrocm-vision-tests10.2/README.Debian, /usr/share/doc/amdrocm-vision-tests10.2/changelog.Debi\n- `packaging::rpm::amdrocm-vision-tests10.2::requires.mirror-deb` (fail): amdrocm-mivisionx-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-pydecode-test10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal-test10.2: DEB >= 10.2.0-2026101\n- `packaging::rpm::amdrocm-vision10.2::header` (fail): unexpected package name; version 10.2.0_20261010-20261010 differs from DEB 10.2.0-20261010\n- `packaging::rpm::amdrocm-vision10.2::payload.prefix` (fail): paths outside the expected prefix: /usr/share/doc/amdrocm-vision10.2/README\n- `packaging::rpm::amdrocm-vision10.2::payload.matches-deb` (fail): 1 files (DEB 3); only in RPM: /usr/share/doc/amdrocm-vision10.2/README; only in DEB: /usr/share/doc/amdrocm-vision10.2/README.Debian, /usr/share/doc/amdrocm-vision10.2/changelog.Debian.gz, /usr/share/\n- `packaging::rpm::amdrocm-vision10.2::requires.mirror-deb` (fail): amdrocm-mivisionx10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-pydecode10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.2.0_20261010; amdrocm-rocal10.2: DEB >= 10.2.0-20261010 vs RPM >= 10.\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "cc27f91246",
    "key": "packaging::tarball",
-   "nights": 5,
+   "nights": 1,
    "title": "Nightly regression: packaging::tarball [cc27f91246]",
-   "body": "2 result(s) in `packaging::tarball` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 5 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::tarball::name` (fail): file version 10.2.0-20261010, manifest version 0.2.0+g749575a\n- `packaging::tarball::deb-subset` (fail): missing from tarball: core-10.2/lib/libopenvx.so (amdrocm-mivisionx10.2), core-10.2/lib/libopenvx.so.1 (amdrocm-mivisionx10.2), core-10.2/lib/libvx_rpp.so (amdrocm-mivisionx10.2), core-10.2/lib/libvx_\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "2 result(s) in `packaging::tarball` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `packaging::tarball::name` (fail): file version 10.2.0-20261010, manifest version 0.2.0+g749575a\n- `packaging::tarball::deb-subset` (fail): missing from tarball: core-10.2/lib/libopenvx.so (amdrocm-mivisionx10.2), core-10.2/lib/libopenvx.so.1 (amdrocm-mivisionx10.2), core-10.2/lib/libvx_rpp.so (amdrocm-mivisionx10.2), core-10.2/lib/libvx_\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "a98bcd24a6",
    "key": "robustness::infra",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: robustness::infra [a98bcd24a6]",
-   "body": "1 result(s) in `robustness::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `robustness::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `robustness::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `robustness::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "f0ed1b2245",
    "key": "rocal::infra",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: rocal::infra [f0ed1b2245]",
-   "body": "1 result(s) in `rocal::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `rocal::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `rocal::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `rocal::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "630c79d6b7",
    "key": "roccv::infra",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: roccv::infra [630c79d6b7]",
-   "body": "1 result(s) in `roccv::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `roccv::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `roccv::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `roccv::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "9d1c369709",
    "key": "rocpydecode::infra",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: rocpydecode::infra [9d1c369709]",
-   "body": "1 result(s) in `rocpydecode::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `rocpydecode::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `rocpydecode::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `rocpydecode::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "442e663e5e",
    "key": "sdk-consumer::consumer.rocal",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: sdk-consumer::consumer.rocal [442e663e5e]",
-   "body": "3 result(s) in `sdk-consumer::consumer.rocal` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::consumer.rocal::CPU.pipeline` (fail): graph/verify:  { verify } vxVerifyGraph failed -1\n- `sdk-consumer::consumer.rocal::cpu-threads-1` (error): no output to compare (cpu_t1 ok=False, reference CPU 1-thread)\n- `sdk-consumer::consumer.rocal::CPU.vs-reference` (error): no output or no reference images\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "3 result(s) in `sdk-consumer::consumer.rocal` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::consumer.rocal::CPU.pipeline` (fail): graph/verify:  { verify } vxVerifyGraph failed -1\n- `sdk-consumer::consumer.rocal::cpu-threads-1` (error): no output to compare (cpu_t1 ok=False, reference CPU 1-thread)\n- `sdk-consumer::consumer.rocal::CPU.vs-reference` (error): no output or no reference images\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "bea857f92d",
    "key": "sdk-consumer::consumer.roccv",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: sdk-consumer::consumer.roccv [bea857f92d]",
-   "body": "3 result(s) in `sdk-consumer::consumer.roccv` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::consumer.roccv::CPU.flip1` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip0` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip-1` (fail): hipStreamCreate failed\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "3 result(s) in `sdk-consumer::consumer.roccv` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::consumer.roccv::CPU.flip1` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip0` (fail): hipStreamCreate failed\n- `sdk-consumer::consumer.roccv::CPU.flip-1` (fail): hipStreamCreate failed\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "fa1ddc6992",
    "key": "sdk-consumer::contamination.unset.explicit",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: sdk-consumer::contamination.unset.explicit [fa1ddc6992]",
-   "body": "1 result(s) in `sdk-consumer::contamination.unset.explicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::contamination.unset.explicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `sdk-consumer::contamination.unset.explicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::contamination.unset.explicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "0f525b6809",
    "key": "sdk-consumer::contamination.unset.implicit",
-   "nights": 12,
+   "nights": 2,
    "title": "Nightly regression: sdk-consumer::contamination.unset.implicit [0f525b6809]",
-   "body": "1 result(s) in `sdk-consumer::contamination.unset.implicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 12 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::contamination.unset.implicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `sdk-consumer::contamination.unset.implicit` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-10/\n\n- `sdk-consumer::contamination.unset.implicit::roccv-offload-arch` (fail): hip::device carries no --offload-arch: device code would silently target the compiler default\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   }
  ]
 }
