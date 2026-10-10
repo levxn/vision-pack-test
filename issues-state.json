@@ -2,72 +2,72 @@
  "d3cee6816a": {
   "key": "mivisionx::infra",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "b94d06119f": {
   "key": "packaging::deb",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
+ },
+ "80da0054c7": {
+  "key": "packaging::install-deb",
+  "green_streak": 0,
+  "last_red": "2026-10-10"
+ },
+ "82323088f1": {
+  "key": "packaging::install-rpm",
+  "green_streak": 0,
+  "last_red": "2026-10-10"
  },
  "4cb9a97540": {
   "key": "packaging::rpm",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "cc27f91246": {
   "key": "packaging::tarball",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "a98bcd24a6": {
   "key": "robustness::infra",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "f0ed1b2245": {
   "key": "rocal::infra",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "630c79d6b7": {
   "key": "roccv::infra",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "9d1c369709": {
   "key": "rocpydecode::infra",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "442e663e5e": {
   "key": "sdk-consumer::consumer.rocal",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "bea857f92d": {
   "key": "sdk-consumer::consumer.roccv",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "fa1ddc6992": {
   "key": "sdk-consumer::contamination.unset.explicit",
   "green_streak": 0,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "0f525b6809": {
   "key": "sdk-consumer::contamination.unset.implicit",
   "green_streak": 0,
-  "last_red": "2026-10-09"
- },
- "80da0054c7": {
-  "key": "packaging::install-deb",
-  "green_streak": 1,
-  "last_red": "2026-10-09"
- },
- "82323088f1": {
-  "key": "packaging::install-rpm",
-  "green_streak": 1,
-  "last_red": "2026-10-09"
+  "last_red": "2026-10-10"
  },
  "4729d3f753": {
   "key": "install-test::infra",
