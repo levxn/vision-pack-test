@@ -139,11 +139,11 @@ jobs:
         env:
           SHA: ${{ inputs.sha }}
         run: build_tools/pin_submodule.sh "${SHA}"
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.deb_artifact }}
           path: ${{ runner.temp }}/in
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.rpm_artifact }}
           path: ${{ runner.temp }}/in
@@ -162,7 +162,7 @@ jobs:
         run: |
           suites/packaging/validate_rpms.sh --rpms "${RUNNER_TEMP}/assets/rpm" --debs "${RUNNER_TEMP}/assets/deb" \
             --out "${RUNNER_TEMP}/results/packaging-rpm"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-packaging-packages
@@ -182,11 +182,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.tarball_artifact }}
           path: ${{ runner.temp }}/in
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.deb_artifact }}
           path: ${{ runner.temp }}/in
@@ -201,7 +201,7 @@ jobs:
           # release.json travels in the tarball artifact of fetched releases (not in build mode).
           [[ -f "${RUNNER_TEMP}/assets/release.json" ]] && args+=(--release-json "${RUNNER_TEMP}/assets/release.json")
           suites/packaging/verify_tarball.sh "${args[@]}"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-packaging-tarball
@@ -225,11 +225,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ matrix.kind == 'deb' && inputs.deb_artifact || inputs.rpm_artifact }}
           path: ${{ runner.temp }}/in
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.tarball_artifact }}
           path: ${{ runner.temp }}/in
@@ -250,7 +250,7 @@ jobs:
             "${image}" bash "/w/suites/packaging/install_smoke_${KIND}.sh" "${flag}" "/in/${KIND}" --out /out \
             ${sdk_date:+--therock-date "${sdk_date}"}
           sudo chown -R "$(id -u):$(id -g)" "${RUNNER_TEMP}/results" "${GITHUB_WORKSPACE}"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-packaging-install-${{ matrix.kind }}
@@ -290,7 +290,7 @@ jobs:
         env:
           SHA: ${{ inputs.sha }}
         run: build_tools/pin_submodule.sh "${SHA}"
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.tarball_artifact }}
           path: ${{ env.RUN_DIR }}/in
@@ -390,7 +390,7 @@ jobs:
               no_gpu_reason:$reason,
               images:{test:$test, media:$media, extended:$extended}}' \
             > "${RUN_DIR}/results/environment/environment.json"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-environment
@@ -421,7 +421,7 @@ jobs:
         env:
           SHA: ${{ inputs.sha }}
         run: build_tools/pin_submodule.sh "${SHA}"
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: matrix.suite == 'install-test'
         with:
           name: ${{ inputs.deb_artifact }}
@@ -450,7 +450,7 @@ jobs:
           IMAGE_MEDIA: ${{ needs.prepare-rocm.outputs.image_media }}
           IMAGE_EXTENDED: ${{ needs.prepare-rocm.outputs.image_extended }}
         run: build_tools/ci_run_suite.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-${{ matrix.suite }}
@@ -506,7 +506,7 @@ jobs:
           IMAGE_MEDIA: ${{ needs.prepare-rocm.outputs.image_media }}
           IMAGE_EXTENDED: ${{ needs.prepare-rocm.outputs.image_extended }}
         run: build_tools/ci_run_suite.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-${{ matrix.suite }}
@@ -563,7 +563,7 @@ jobs:
           IMAGE_MEDIA: ${{ needs.prepare-rocm.outputs.image_media }}
           IMAGE_EXTENDED: ${{ needs.prepare-rocm.outputs.image_extended }}
         run: build_tools/ci_run_suite.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-${{ matrix.suite }}
@@ -612,7 +612,7 @@ jobs:
         env:
           SHA: ${{ inputs.sha }}
         run: build_tools/pin_submodule.sh "${SHA}"
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ inputs.tarball_artifact }}
           path: ${{ env.RUN_DIR }}/in
@@ -648,7 +648,7 @@ jobs:
         run: |
           tar -czf "${RUN_DIR}/rocm-prefix.tar.gz" -C "${RUN_DIR}" rocm
           cp "${TARBALL}" "${RUN_DIR}/dist.tar.gz"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: nogpu-hosted-prefix
           path: |
@@ -690,7 +690,7 @@ jobs:
               no_gpu_reason:"no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is",
               images:{test:$test, media:$media, extended:$extended}}' \
             > "${RUN_DIR}/results/environment/environment.json"
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-environment
@@ -726,7 +726,7 @@ jobs:
         run: build_tools/pin_submodule.sh "${SHA}"
       # This VM never saw prepare-nogpu-hosted's disk -- download what it
       # archived there (the prefix and the dist tarball) and re-extract.
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: nogpu-hosted-prefix
           path: ${{ env.RUN_DIR }}
@@ -755,7 +755,7 @@ jobs:
           IMAGE_MEDIA: ${{ needs.prepare-nogpu-hosted.outputs.image_media }}
           IMAGE_EXTENDED: ${{ needs.prepare-nogpu-hosted.outputs.image_extended }}
         run: build_tools/ci_run_suite.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ !cancelled() }}
         with:
           name: results-${{ matrix.suite }}
