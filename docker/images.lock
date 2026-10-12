@@ -3,5 +3,5 @@
 # a PR that updates this file. An empty value makes build_tools/ensure_image.sh
 # build the image on the runner from docker/ instead (tagged by content hash).
 # The extended image is always built on the runner.
-test=ghcr.io/levxn/vision-pack-test/test@sha256:a4cd20d9e0f1775277578c98f37f08ad4fcdd5d1d9a447da25d887d81c839b32
-media=ghcr.io/levxn/vision-pack-test/media@sha256:de1659cd70252f41c4b45bfaeac4e4ff858d57f40a51d2b54e77b3a5ab0637a6
+test=ghcr.io/levxn/vision-pack-test/test@sha256:0b855c97fdf93b3b7372f2b234e04b4538f418ceea494727e342e71bc35c3a6e
+media=ghcr.io/levxn/vision-pack-test/media@sha256:d640774f0c82e3275afdd6afc69a21f8415831f8bab62044d284d326d9f035a2
