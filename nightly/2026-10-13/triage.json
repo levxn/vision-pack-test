@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "night": "2026-10-13",
- "generated_at": "2026-10-13T17:28:06+00:00",
+ "generated_at": "2026-10-13T22:17:55+00:00",
  "run": {
   "tag": "nightly-20261013",
   "version": "10.2.0-20261013",
@@ -10,7 +10,7 @@
   "fingerprint": "0d7f12040b3c0c99",
   "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/38434305161",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/38473344484",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-13/",
   "upstream": {
    "status": "completed",
@@ -56,7 +56,7 @@
    "suite": "loader-audit",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 14,
+   "wall_seconds": 13,
    "total": 265,
    "classes": {
     "pass": 195,
@@ -89,7 +89,7 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 81,
+   "wall_seconds": 80,
    "total": 358,
    "classes": {
     "pass": 271,
@@ -122,7 +122,7 @@
    "suite": "robustness-nogpu",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 8,
+   "wall_seconds": 7,
    "total": 29,
    "classes": {
     "pass": 25,
@@ -175,7 +175,7 @@
    "suite": "sdk-consumer",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 138,
+   "wall_seconds": 120,
    "total": 342,
    "classes": {
     "pass": 278,
@@ -1869,7 +1869,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 14,
-   "duration_s": 0.141
+   "duration_s": 0.764
   },
   {
    "id": "sdk-consumer::consumer.rocal::CPU.vs-reference",
@@ -1917,7 +1917,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 14,
-   "duration_s": 0.041
+   "duration_s": 0.042
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip0",
@@ -1933,7 +1933,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 14,
-   "duration_s": 0.041
+   "duration_s": 0.042
   },
   {
    "id": "sdk-consumer::consumer.roccv::CPU.flip1",
@@ -1949,7 +1949,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 14,
-   "duration_s": 0.041
+   "duration_s": 0.042
   },
   {
    "id": "sdk-consumer::contamination.unset.explicit::roccv-offload-arch",
@@ -1997,7 +1997,7 @@
    "result_dir": "results-loader-audit",
    "prev": "pass",
    "nights_failing": 0,
-   "duration_s": 0.053
+   "duration_s": 0.071
   },
   {
    "id": "loader-audit::docs::install-usage",
@@ -3405,7 +3405,7 @@
    "result_dir": "results-robustness-nogpu",
    "prev": "error",
    "nights_failing": 14,
-   "duration_s": 0.866
+   "duration_s": 0.816
   },
   {
    "id": "robustness-nogpu::rocal::cpu-decode-resize",
@@ -3469,7 +3469,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 14,
-   "duration_s": 0.066
+   "duration_s": 0.902
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::CPU.border-replicate",
@@ -3485,7 +3485,7 @@
    "result_dir": "results-sdk-consumer",
    "prev": "fail",
    "nights_failing": 14,
-   "duration_s": 0.066
+   "duration_s": 0.902
   },
   {
    "id": "sdk-consumer::consumer.mivisionx::GPU.border-constant",
