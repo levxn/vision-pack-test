@@ -482,6 +482,31 @@
     "infra_error": 5
    },
    "records": 999
+  },
+  {
+   "night": "2026-10-14",
+   "dir": "nightly/2026-10-14",
+   "event": "schedule",
+   "run_id": "38580816966",
+   "tier": "comprehensive",
+   "gfx": "",
+   "verdict": "red",
+   "tag": "nightly-20261014",
+   "version": "10.2.0-20261014",
+   "sha": "27b564b0257521969a39fadb59f03c3f311425c7",
+   "fingerprint": "2fd6a0f988f26b02",
+   "counts": {
+    "pass": 770,
+    "fixed": 51,
+    "blocked": 17,
+    "skip": 4,
+    "known_fail": 70,
+    "still_failing": 60,
+    "known_blocked": 6,
+    "new_failure": 16,
+    "infra_error": 5
+   },
+   "records": 999
   }
  ]
 }
