@@ -136,14 +136,22 @@ if grep -qvE '^\s*$' "${vlog}"; then
 else
   vp_result "${G}::rpm.verify" pass "installed files match the RPM database" 0 "${vlog}"
 fi
+# Read the real install prefix and release suffix from what was just installed, rather than
+# assuming the bare pre-suffix /opt/rocm/lib and amdrocm-vision.pth (vision-pack has moved both).
+PK_VISION_LIB_DIR="$(pk_detect_install_prefix)/lib"
+export PK_VISION_LIB_DIR
+rel="$(pk_detect_rel "${names[@]}")"
 pk_isolation_checks "${G}" "${planted}"
 
-pth=/usr/lib/python3/dist-packages/amdrocm-vision.pth
-site_pth="$(python3 -c 'import site,os; print(next((os.path.join(d,"amdrocm-vision.pth") for d in site.getsitepackages() if os.path.exists(os.path.join(d,"amdrocm-vision.pth"))), ""))')"
+pth="/usr/lib/python3/dist-packages/amdrocm-vision${rel}.pth"
+pth_name="amdrocm-vision${rel}.pth"
+site_pth="$(python3 -c 'import os, site, sys
+name = sys.argv[1]
+print(next((os.path.join(d, name) for d in site.getsitepackages() if os.path.exists(os.path.join(d, name))), ""))' "${pth_name}")"
 if [[ -n "${site_pth}" ]]; then
   vp_result "${G}::pth.shipped" pass "%post wrote ${site_pth} (payload copy at ${pth} is not a site dir on EL)"
 else
-  vp_result "${G}::pth.shipped" fail "no amdrocm-vision.pth in any python3 site-packages; %post did not register it"
+  vp_result "${G}::pth.shipped" fail "no ${pth_name} in any python3 site-packages; %post did not register it"
 fi
 syspath_ok() { env -u PYTHONPATH "$1" -c 'import sys; sys.exit(0 if any(p.rstrip("/") == "/opt/rocm/lib" for p in sys.path) else 1)'; }
 if syspath_ok python3; then

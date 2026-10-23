@@ -12,6 +12,11 @@ VP_REPO="${VP_REPO:-$(cd "${PK_DIR}/../.." && pwd)}"
 PK_PY="${PK_DIR}/pkgcheck.py"
 PK_CURL=(curl -fsSL --retry 5 --retry-delay 5 --retry-all-errors --connect-timeout 20)
 PK_THEROCK_BASE="${VP_THEROCK_BASE:-https://nightly.repo.amd.com/rocm/core/packages}"
+# Where the vision packages install their .so files. vision-pack has moved this before (bare
+# /opt/rocm/lib -> a versioned /opt/rocm/core-<rel>/lib); callers that just installed the real
+# packages should set this via pk_detect_install_prefix before calling pk_isolation_checks/
+# pk_ldd_checks, instead of relying on this bare-prefix default.
+PK_VISION_LIB_DIR="${PK_VISION_LIB_DIR:-/opt/rocm/lib}"
 
 pk_die() { echo "error: $1" >&2; exit "${2:-2}"; }
 
@@ -97,11 +102,33 @@ pk_cleanup_work() {
   rm -rf -- "${d}"
 }
 
+# pk_detect_install_prefix: the real install prefix (e.g. /opt/rocm/core-10.2), detected from the
+# filesystem after a real install, since vision-pack has moved this before; "/opt/rocm" if no
+# versioned core-* directory exists (the bare pre-suffix layout). Call this, and set
+# PK_VISION_LIB_DIR="$(pk_detect_install_prefix)/lib", after the real packages are installed and
+# before pk_isolation_checks/pk_ldd_checks/pk_import_checks.
+pk_detect_install_prefix() {
+  local d
+  d="$(find /opt/rocm -maxdepth 1 -type d -name 'core-*' 2>/dev/null \
+    | grep -E '/core-[0-9]+(\.[0-9]+)*$' | sort -V | tail -1)"
+  printf '%s' "${d:-/opt/rocm}"
+}
+
+# pk_detect_rel <package name...>: the release suffix glued onto package names (e.g. "10.2"), or ""
+# for the bare pre-suffix naming. A majority vote over every name that matches, so one odd/meta
+# package name can't skew it. Mirrors pkgcheck.py's detect_rel(), so the shell and Python checks
+# never disagree about where the version suffix starts (after any "-devel"/"-test" tail).
+pk_detect_rel() {
+  printf '%s\n' "$@" \
+    | grep -oE '^amdrocm-(mivisionx|rocal|roccv|pydecode)(-devel|-test)?[0-9]+(\.[0-9]+)+$' \
+    | grep -oE '[0-9]+(\.[0-9]+)+$' | sort | uniq -c | sort -rn | head -1 | awk '{print $2}'
+}
+
 # pk_real_vision_libs: real ELF files the vision packages installed into
-# /opt/rocm/lib and lib/rocm_sysdeps/lib, one per line.
+# ${PK_VISION_LIB_DIR} and its rocm_sysdeps/lib, one per line.
 pk_real_vision_libs() {
   local f
-  for f in /opt/rocm/lib/*.so* /opt/rocm/lib/rocm_sysdeps/lib/*-rocm-vision.so*; do
+  for f in "${PK_VISION_LIB_DIR}"/*.so* "${PK_VISION_LIB_DIR}"/rocm_sysdeps/lib/*-rocm-vision.so*; do
     [[ -f "${f}" && ! -L "${f}" ]] && printf '%s\n' "${f}"
   done
 }
@@ -126,21 +153,21 @@ pk_isolation_checks() {
     [[ -n "${stock}" ]] && bad+="$(basename "${lib}"): $(tr -s ' \n' ' ' <<<"${stock}"); "
   done < <(pk_real_vision_libs)
   if [[ "${checked}" -eq 0 ]]; then
-    vp_result "${g}::isolation.needed" fail "no vision libraries found under /opt/rocm/lib"
+    vp_result "${g}::isolation.needed" fail "no vision libraries found under ${PK_VISION_LIB_DIR}"
   elif [[ -n "${bad}" ]]; then
     vp_result "${g}::isolation.needed" fail "stock bundled SONAMEs NEEDed: ${bad}"
   else
     vp_result "${g}::isolation.needed" pass "${checked} libraries reference only *-rocm-vision SONAMEs"
   fi
-  n="$(readelf -d /opt/rocm/lib/librocal.so 2>/dev/null | grep -i NEEDED || true)"
+  n="$(readelf -d "${PK_VISION_LIB_DIR}/librocal.so" 2>/dev/null | grep -i NEEDED || true)"
   if [[ -z "${n}" ]]; then
-    vp_result "${g}::isolation.librocal" fail "/opt/rocm/lib/librocal.so missing or unreadable"
+    vp_result "${g}::isolation.librocal" fail "${PK_VISION_LIB_DIR}/librocal.so missing or unreadable"
   elif grep -qi libprotobuf-rocm-vision <<<"${n}" && grep -qi libjpeg-rocm-vision <<<"${n}"; then
     vp_result "${g}::isolation.librocal" pass "librocal NEEDs the isolated protobuf and libjpeg"
   else
     vp_result "${g}::isolation.librocal" fail "librocal lacks libprotobuf-rocm-vision or libjpeg-rocm-vision NEEDED (#39)"
   fi
-  lib="$(find /opt/rocm/lib/rocm_sysdeps/lib -name 'libjpeg-rocm-vision.so*' -type f 2>/dev/null | head -1)"
+  lib="$(find "${PK_VISION_LIB_DIR}/rocm_sysdeps/lib" -name 'libjpeg-rocm-vision.so*' -type f 2>/dev/null | head -1)"
   if [[ -n "${lib}" ]] && readelf -sW "${lib}" | grep -q ' jpeg_std_error$'; then
     vp_result "${g}::isolation.jpeg_std_error" pass "$(basename "${lib}") exports jpeg_std_error"
   else
@@ -205,7 +232,7 @@ pk_ldd_checks() {
     elif [[ "${mode}" == stubs || "${mode}" == force-depends || "${mode}" == nodeps ]]; then
       vp_result "${g}::ldd::${id}" blocked "ROCm libraries are not installed in ${mode} mode: ${nf}" 0 "${log}"
     else
-      vp_result "${g}::ldd::${id}" fail "not found: ${nf}(vision libs sit in /opt/rocm/lib with \$ORIGIN RUNPATHs; TheRock packages install to /opt/rocm/core-<ver>)" 0 "${log}"
+      vp_result "${g}::ldd::${id}" fail "not found: ${nf}(vision libs sit in ${PK_VISION_LIB_DIR} with \$ORIGIN RUNPATHs)" 0 "${log}"
     fi
   done < <(pk_real_vision_libs)
 }

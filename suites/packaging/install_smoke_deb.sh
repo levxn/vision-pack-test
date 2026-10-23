@@ -184,9 +184,14 @@ if [[ -s "${vlog}" ]]; then
 else
   vp_result "${G}::dpkg.verify" pass "installed files match the md5sums" 0 "${vlog}"
 fi
+# Read the real install prefix and release suffix from what was just installed, rather than
+# assuming the bare pre-suffix /opt/rocm/lib and amdrocm-vision.pth (vision-pack has moved both).
+PK_VISION_LIB_DIR="$(pk_detect_install_prefix)/lib"
+export PK_VISION_LIB_DIR
+rel="$(pk_detect_rel "${pkgs[@]}")"
 pk_isolation_checks "${G}" "${planted}"
 
-pth=/usr/lib/python3/dist-packages/amdrocm-vision.pth
+pth="/usr/lib/python3/dist-packages/amdrocm-vision${rel}.pth"
 if [[ -f "${pth}" && "$(tr -d '[:space:]' <"${pth}")" == /opt/rocm/lib ]]; then
   vp_result "${G}::pth.shipped" pass "${pth}: /opt/rocm/lib"
 else

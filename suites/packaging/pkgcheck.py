@@ -42,8 +42,16 @@ import emit  # noqa: E402
 # ---------------------------------------------------------------------------
 # The vision-pack package model (mirrors vision-pack packaging/CMakeLists.txt
 # and build_tools/validate_packages.sh).
+#
+# Package names and the install prefix carry a ROCm release suffix (e.g.
+# "amdrocm-mivisionx" -> "amdrocm-mivisionx10.2", "/opt/rocm" ->
+# "/opt/rocm/core-10.2") that vision-pack has changed before and will change
+# again. The BASE_* dicts below are bare, suffix-free names; detect_rel() and
+# detect_install_prefix() read the real suffix/prefix from the package set
+# under test, and suffix_dict()/suffix_keys()/suffix_map()/pth_path() apply
+# it, so a future ROCm version bump needs no edit here.
 # ---------------------------------------------------------------------------
-METAS = {
+BASE_METAS = {
     "amdrocm-vision": ["amdrocm-mivisionx", "amdrocm-rocal", "amdrocm-roccv", "amdrocm-pydecode"],
     "amdrocm-vision-sdk": ["amdrocm-vision", "amdrocm-mivisionx-devel", "amdrocm-rocal-devel",
                            "amdrocm-roccv-devel"],
@@ -51,7 +59,7 @@ METAS = {
                              "amdrocm-roccv-test", "amdrocm-pydecode-test"],
 }
 # Internal relations every package must declare (runtime <-> devel <-> test).
-RELATIONS = {
+BASE_RELATIONS = {
     "amdrocm-mivisionx": [],
     "amdrocm-mivisionx-devel": ["amdrocm-mivisionx"],
     "amdrocm-mivisionx-test": ["amdrocm-mivisionx"],
@@ -65,26 +73,74 @@ RELATIONS = {
     "amdrocm-pydecode-test": ["amdrocm-pydecode"],
     "amdrocm-vision-sysdeps": [],
     "amdrocm-vision-pythonpath": [],
-    **METAS,
+    **BASE_METAS,
 }
-EXPECTED_PACKAGES = sorted(RELATIONS)
 # -test packages whose shipped tests are CMake projects and so need headers (N2).
-TEST_NEEDS_DEVEL = {
+BASE_TEST_NEEDS_DEVEL = {
     "amdrocm-mivisionx-test": "amdrocm-mivisionx-devel",
     "amdrocm-rocal-test": "amdrocm-rocal-devel",
     "amdrocm-roccv-test": "amdrocm-roccv-devel",
 }
-PTH_PATH = "/usr/lib/python3/dist-packages/amdrocm-vision.pth"
+# The .pth *content* is deliberately still bare -- it names a TheRock "alternatives" symlink
+# target, not vision-pack's own versioned install prefix -- so it is not suffixed.
 PTH_CONTENT = "/opt/rocm/lib"
 
-# Third-party code each package redistributes (H4). "own" is the library's own license.
-LICENSES_REQUIRED = {
+# Third-party code each package redistributes (H4). "own" is the library's own license. Only the
+# keys are package names (and so need the release suffix); the license-component values do not.
+BASE_LICENSES_REQUIRED = {
     "amdrocm-mivisionx": ["own"],
     "amdrocm-rocal": ["own", "rapidjson", "pybind11", "dlpack"],
     "amdrocm-roccv": ["own", "pybind11", "dlpack"],
     "amdrocm-pydecode": ["own", "pybind11", "dlpack"],
     "amdrocm-vision-sysdeps": ["libjpeg-turbo", "libsndfile", "lmdb", "protobuf"],
 }
+# A real package name carrying the release suffix, e.g. "amdrocm-mivisionx-test10.2". The suffix is
+# appended after any "-devel"/"-test" tail, never before it.
+REL_NAME_RE = re.compile(r"^amdrocm-(?:mivisionx|rocal|roccv|pydecode)(?:-devel|-test)?(\d+(?:\.\d+)+)$")
+# A real installed payload path carrying the release suffix, e.g. "/opt/rocm/core-10.2/bin/runvx".
+REL_PREFIX_RE = re.compile(r"^/opt/rocm/(core-\d+(?:\.\d+)+)/")
+
+
+def detect_rel(names) -> str:
+    """The release suffix glued onto package names (e.g. "10.2"), or "" for the bare pre-suffix
+    naming. A majority vote over every name that matches, so one odd/meta package name can't skew it."""
+    counts: dict[str, int] = defaultdict(int)
+    for n in names:
+        m = REL_NAME_RE.match(n)
+        if m:
+            counts[m.group(1)] += 1
+    return max(counts, key=counts.get) if counts else ""
+
+
+def detect_install_prefix(pkgs: dict) -> str:
+    """Where the non-meta packages actually install, e.g. "/opt/rocm/core-10.2", detected from a real
+    payload path rather than assumed (vision-pack has moved this before). "/opt/rocm" if none found."""
+    counts: dict[str, int] = defaultdict(int)
+    for p in pkgs.values():
+        for e in p.files:
+            m = REL_PREFIX_RE.match(e.path)
+            if m:
+                counts[f"/opt/rocm/{m.group(1)}"] += 1
+    return max(counts, key=counts.get) if counts else "/opt/rocm"
+
+
+def suffix_dict(base: dict, rel: str) -> dict:
+    """Re-key and re-value a {package: [package, ...]} dict (names on both sides) with ``rel``."""
+    return {f"{k}{rel}": [f"{d}{rel}" for d in deps] for k, deps in base.items()}
+
+
+def suffix_keys(base: dict, rel: str) -> dict:
+    """Re-key a dict whose keys are package names but whose values are not, with ``rel``."""
+    return {f"{k}{rel}": v for k, v in base.items()}
+
+
+def suffix_map(base: dict, rel: str) -> dict:
+    """Re-key and re-value a {package: package} dict (names on both sides) with ``rel``."""
+    return {f"{k}{rel}": f"{v}{rel}" for k, v in base.items()}
+
+
+def pth_path(rel: str) -> str:
+    return f"/usr/lib/python3/dist-packages/amdrocm-vision{rel}.pth"
 LICENSE_TOKENS = {
     "libjpeg-turbo": r"libjpeg-turbo|turbojpeg|libjpeg",
     "libsndfile": r"sndfile",
@@ -419,8 +475,8 @@ def load_dir(d: Path, fmt: str, **kw) -> dict[str, Pkg]:
     return pkgs
 
 
-def is_meta(name: str) -> bool:
-    return name in METAS
+def is_meta(name: str, metas: dict) -> bool:
+    return name in metas
 
 
 # ---------------------------------------------------------------------------
@@ -561,11 +617,17 @@ def cmd_deb(a) -> int:
     rec = Recorder(a.results, a.suite, "deb")
     pkgs = load_dir(Path(a.debs), "deb", want_text=want_text)
     names = set(pkgs)
-    missing = sorted(set(EXPECTED_PACKAGES) - names)
-    extra = sorted(names - set(EXPECTED_PACKAGES))
+    rel = detect_rel(names)
+    metas = suffix_dict(BASE_METAS, rel)
+    relations = suffix_dict(BASE_RELATIONS, rel)
+    licenses_required = suffix_keys(BASE_LICENSES_REQUIRED, rel)
+    test_needs_devel = suffix_map(BASE_TEST_NEEDS_DEVEL, rel)
+    expected_packages = sorted(relations)
+    missing = sorted(set(expected_packages) - names)
+    extra = sorted(names - set(expected_packages))
     n_files = len(list(Path(a.debs).glob("*.deb")))
     msg = f"{n_files} DEB files, {len(names)} packages"
-    if missing or extra or n_files != len(EXPECTED_PACKAGES):
+    if missing or extra or n_files != len(expected_packages):
         rec("set::packages", "fail", f"{msg}; missing: {short_list(missing)}; unexpected: {short_list(extra)}")
     else:
         rec("set::packages", "pass", msg)
@@ -585,7 +647,7 @@ def cmd_deb(a) -> int:
         rec(g + "payload.empty-dirs", "fail" if ed else "pass",
             ("owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): "
              + short_list(ed)) if ed else "")
-        if not p.files or is_meta(name):
+        if not p.files or is_meta(name, metas):
             continue
         dest = Path(a.work) / name
         rc, err = extract_deb(p.file, dest)
@@ -606,10 +668,10 @@ def cmd_deb(a) -> int:
                 hits.append(e.path)
         rec(g + "payload.build-paths", "fail" if hits else "pass",
             ("build-machine paths in RUNPATHs or text files: " + short_list(hits, 6)) if hits else "")
-    for name, needs in LICENSES_REQUIRED.items():
+    for name, needs in licenses_required.items():
         if name in pkgs:
             record_licenses(rec, f"{name}::", [e.path for e in pkgs[name].files], needs)
-    for test, devel in TEST_NEEDS_DEVEL.items():
+    for test, devel in test_needs_devel.items():
         if test not in pkgs:
             rec(f"{test}::depends.devel", "blocked", f"{test} not in the package set")
             continue
@@ -784,10 +846,17 @@ def cmd_rpm(a) -> int:
         except (RuntimeError, OSError) as e:
             print(f"warning: cannot read DEBs for comparison: {e}", file=sys.stderr)
     names = set(pkgs)
-    missing, extra = sorted(set(EXPECTED_PACKAGES) - names), sorted(names - set(EXPECTED_PACKAGES))
+    rel = detect_rel(names)
+    metas = suffix_dict(BASE_METAS, rel)
+    relations = suffix_dict(BASE_RELATIONS, rel)
+    licenses_required = suffix_keys(BASE_LICENSES_REQUIRED, rel)
+    pth = pth_path(rel)
+    install_prefix = detect_install_prefix(pkgs)
+    expected_packages = sorted(relations)
+    missing, extra = sorted(set(expected_packages) - names), sorted(names - set(expected_packages))
     n_files = len(list(rdir.glob("*.rpm")))
     msg = f"{n_files} RPM files, {len(names)} packages"
-    rec("set::packages", "fail" if (missing or extra or n_files != len(EXPECTED_PACKAGES)) else "pass",
+    rec("set::packages", "fail" if (missing or extra or n_files != len(expected_packages)) else "pass",
         msg + (f"; missing: {short_list(missing)}; unexpected: {short_list(extra)}" if missing or extra else ""))
     vers = {p.version for p in pkgs.values()}
     rels = {p.release for p in pkgs.values()}
@@ -805,7 +874,7 @@ def cmd_rpm(a) -> int:
         counts[name] = len(p.files)
         # header
         problems = []
-        if name not in RELATIONS:
+        if name not in relations:
             problems.append("unexpected package name")
         if not re.match(r"^\d", p.version):
             problems.append(f"version {p.version!r} does not start with a digit")
@@ -823,17 +892,17 @@ def cmd_rpm(a) -> int:
             "; ".join(problems) or f"{p.version}-{p.release} {p.arch} License={p.fields.get('License')}")
         # payload prefix
         files = p.files
-        if is_meta(name):
+        if is_meta(name, metas):
             stray = [e.path for e in files if not e.path.startswith("/usr/share/doc/")]
         else:
-            stray = [e.path for e in files if not e.path.startswith("/opt/rocm/")
-                     and not (name == "amdrocm-vision-pythonpath" and e.path == PTH_PATH)]
+            stray = [e.path for e in files if not e.path.startswith(install_prefix.rstrip("/") + "/")
+                     and not (name == f"amdrocm-vision-pythonpath{rel}" and e.path == pth)]
         if not files:
             rec(g + "payload.prefix", "fail", "package ships no files")
         else:
             rec(g + "payload.prefix", "fail" if stray else "pass",
                 ("paths outside the expected prefix: " + short_list(stray)) if stray
-                else f"{len(files)} files under {'/usr/share/doc' if is_meta(name) else '/opt/rocm'}")
+                else f"{len(files)} files under {'/usr/share/doc' if is_meta(name, metas) else install_prefix}")
         if p.prefixes:
             outside = [e.path for e in p.entries
                        if not any(e.path == x or e.path.startswith(x.rstrip('/') + '/') for x in p.prefixes)]
@@ -854,7 +923,7 @@ def cmd_rpm(a) -> int:
             ("owns directories with no payload of its own (CPack FILES_MATCHING copies the whole tree): "
              + short_list(ed)) if ed else "")
         # matches DEB
-        if name in debs and not is_meta(name):
+        if name in debs and not is_meta(name, metas):
             rp = {(e.path, e.kind) for e in files}
             dp = {(e.path, e.kind) for e in debs[name].files}
             only_r, only_d = sorted(x[0] for x in rp - dp), sorted(x[0] for x in dp - rp)
@@ -868,7 +937,7 @@ def cmd_rpm(a) -> int:
             else:
                 rec(g + "payload.matches-deb", "pass",
                     detail + (f"; mode differs: {short_list(modes)}" if modes else ""))
-        elif is_meta(name) and name in debs:
+        elif is_meta(name, metas) and name in debs:
             rec(g + "payload.matches-deb", "pass",
                 f"meta: RPM {len(files)} doc file(s), DEB {len(debs[name].files)} (equivs docs)")
         elif not debs:
@@ -884,7 +953,7 @@ def cmd_rpm(a) -> int:
         # requires: relations
         man = [(n, op, v) for n, t, op, v in p.requires if t == "manual" or (t == "" and not n.startswith("rpmlib("))]
         man_names = {n for n, _, _ in man}
-        want = RELATIONS.get(name, [])
+        want = relations.get(name, [])
         miss = [w for w in want if w not in man_names]
         badver = [f"{n} {op} {v}" for n, op, v in man if n in want and not (op == ">=" and v == p.version)]
         rec(g + "requires.relations", "fail" if miss or badver else "pass",
@@ -895,7 +964,7 @@ def cmd_rpm(a) -> int:
         if name in debs:
             dd = {(n, op.replace(">>", ">").replace("<<", "<"), v)
                   for n, op, v in parse_deb_depends(debs[name].fields.get("Depends", ""))}
-            rr = {(n, op, v) for n, op, v in man if n not in ("python3",) or name != "amdrocm-vision-pythonpath"}
+            rr = {(n, op, v) for n, op, v in man if n not in ("python3",) or name != f"amdrocm-vision-pythonpath{rel}"}
             dnames, rnames = {x[0] for x in dd}, {x[0] for x in rr}
             diffs = []
             if dnames - rnames:
@@ -946,7 +1015,7 @@ def cmd_rpm(a) -> int:
         rec(g + "scriptlets", "fail" if issues else "pass",
             "; ".join(issues) or (("scriptlets: " + ", ".join(notes)) if notes else "no scriptlets"))
         # payload scan (extract once)
-        if files and not is_meta(name):
+        if files and not is_meta(name, metas):
             dest = work / name
             rc, err = extract_rpm(p.file, dest)
             if rc != 0:
@@ -967,11 +1036,11 @@ def cmd_rpm(a) -> int:
                         hits.append(e.path)
                 rec(g + "payload.build-paths", "fail" if hits else "pass",
                     ("build-machine paths in RUNPATHs or text files: " + short_list(hits, 6)) if hits else "")
-                if name == "amdrocm-vision-pythonpath":
-                    pth = dest / PTH_PATH.lstrip("/")
-                    content = pth.read_text(errors="replace").strip() if pth.is_file() else None
+                if name == f"amdrocm-vision-pythonpath{rel}":
+                    pth_file = dest / pth.lstrip("/")
+                    content = pth_file.read_text(errors="replace").strip() if pth_file.is_file() else None
                     rec(g + "pth.content", "pass" if content == PTH_CONTENT else "fail",
-                        f"{PTH_PATH}: {content!r}" if content is not None else f"{PTH_PATH} not in payload")
+                        f"{pth}: {content!r}" if content is not None else f"{pth} not in payload")
                 # -test packages: every samples/ path their shipped tests
                 # reference must live inside the package's own Depends
                 # closure (N1/N2 on the DEB side; RPMs share the install
@@ -1011,13 +1080,13 @@ def cmd_rpm(a) -> int:
                             rec(g + "refs.any-package", "fail", f"referenced files ship in no package: {describe(nowhere)}")
                         else:
                             rec(g + "refs.any-package", "pass", f"{len(refs)} referenced file(s) all shipped")
-            if name == "amdrocm-vision-pythonpath":
+            if name == f"amdrocm-vision-pythonpath{rel}":
                 rec(g + "pth.site-dir", "fail",
-                    f"ships the Debian-only {PTH_PATH} (no EL interpreter reads it) and relies on an untracked "
+                    f"ships the Debian-only {pth} (no EL interpreter reads it) and relies on an untracked "
                     "%post copy into python3's site-packages; on EL9 python3 is 3.9, while the vision modules are "
                     "cp312-only, so python3.12 never gets the path")
-        if name in LICENSES_REQUIRED:
-            record_licenses(rec, g, [e.path for e in files], LICENSES_REQUIRED[name])
+        if name in licenses_required:
+            record_licenses(rec, g, [e.path for e in files], licenses_required[name])
     print("file counts (non-directory entries): " + ", ".join(f"{n}={c}" for n, c in sorted(counts.items())))
     return 0
 
@@ -1245,8 +1314,9 @@ def cmd_tarball(a) -> int:
         except (RuntimeError, OSError) as e:
             rec("deb-subset", "error", str(e))
             debs = {}
+        vp_metas = suffix_dict(BASE_METAS, detect_rel(set(debs)))
         for name, pkg in sorted(debs.items()):
-            if is_meta(name):
+            if is_meta(name, vp_metas):
                 continue
             for e in pkg.files:
                 if not e.path.startswith("/opt/rocm/"):
