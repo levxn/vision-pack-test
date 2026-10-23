@@ -1,4 +1,39 @@
 {
+ "e87e7c0c50": {
+  "key": "loader-audit::infra",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
+ "80da0054c7": {
+  "key": "packaging::install-deb",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
+ "82323088f1": {
+  "key": "packaging::install-rpm",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
+ "cc27f91246": {
+  "key": "packaging::tarball",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
+ "f13910f62a": {
+  "key": "robustness-nogpu::infra",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
+ "d96ce3a94d": {
+  "key": "runner::no-gpu",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
+ "f2232a9046": {
+  "key": "sdk-consumer::infra",
+  "green_streak": 0,
+  "last_red": "2026-10-23"
+ },
  "d3cee6816a": {
   "key": "mivisionx::infra",
   "green_streak": 0,
@@ -6,27 +41,12 @@
  },
  "b94d06119f": {
   "key": "packaging::deb",
-  "green_streak": 0,
-  "last_red": "2026-10-15"
- },
- "80da0054c7": {
-  "key": "packaging::install-deb",
-  "green_streak": 0,
-  "last_red": "2026-10-15"
- },
- "82323088f1": {
-  "key": "packaging::install-rpm",
-  "green_streak": 0,
+  "green_streak": 1,
   "last_red": "2026-10-15"
  },
  "4cb9a97540": {
   "key": "packaging::rpm",
-  "green_streak": 0,
-  "last_red": "2026-10-15"
- },
- "cc27f91246": {
-  "key": "packaging::tarball",
-  "green_streak": 0,
+  "green_streak": 1,
   "last_red": "2026-10-15"
  },
  "a98bcd24a6": {
