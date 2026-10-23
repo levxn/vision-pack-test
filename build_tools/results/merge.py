@@ -117,10 +117,15 @@ def merge(root: Path, out: Path, expect: list[str], need_gpu: set[str] | None = 
             suites.setdefault(suite, {"suite": suite, "result_dirs": []})["runner"] = st
 
     # results-environment holds environment/ and preflight/ (test.yml); files of
-    # the same name inside suite result directories are not the run's.
+    # the same name inside suite result directories are not the run's. The
+    # uploaded directory is literally named "environment"/"preflight" (local
+    # --results runs reproduce that layout directly), but actions/download-artifact
+    # names the extracted folder after the *artifact* instead
+    # ("results-environment"/"results-preflight"), so both forms must match here.
     for name in ENV_FILES:
         for f in sorted(root.rglob(name)):
-            if out in f.parents or f.parent.name not in ("environment", "preflight"):
+            if out in f.parents or f.parent.name not in ("environment", "preflight",
+                                                           "results-environment", "results-preflight"):
                 continue
             environment[name.removesuffix(".json")] = _load(f)
     pre = environment.get("preflight")
