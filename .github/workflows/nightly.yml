@@ -130,7 +130,8 @@ jobs:
       - name: Resolve
         id: resolve
         env:
-          GH_TOKEN: ${{ github.token }}
+          # kiritigowda/vision-pack is private; github.token only covers this repo.
+          GH_TOKEN: ${{ secrets.VISION_PACK_READ_TOKEN }}
           MODE: ${{ inputs.mode || 'release' }}
           TAG: ${{ inputs.release_tag }}
           REF: ${{ inputs.vision_pack_ref || 'main' }}
@@ -203,7 +204,8 @@ jobs:
       - name: Download and verify the release
         id: fetch
         env:
-          GH_TOKEN: ${{ github.token }}
+          # kiritigowda/vision-pack is private; github.token only covers this repo.
+          GH_TOKEN: ${{ secrets.VISION_PACK_READ_TOKEN }}
           TAG: ${{ needs.resolve-release.outputs.tag }}
           SHA: ${{ needs.resolve-release.outputs.sha }}
         run: |
