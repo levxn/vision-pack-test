@@ -41,12 +41,12 @@
  },
  "b94d06119f": {
   "key": "packaging::deb",
-  "green_streak": 1,
+  "green_streak": 2,
   "last_red": "2026-10-15"
  },
  "4cb9a97540": {
   "key": "packaging::rpm",
-  "green_streak": 1,
+  "green_streak": 2,
   "last_red": "2026-10-15"
  },
  "a98bcd24a6": {
