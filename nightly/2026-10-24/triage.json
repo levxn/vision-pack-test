@@ -1,16 +1,16 @@
 {
  "schema": 1,
  "night": "2026-10-24",
- "generated_at": "2026-10-24T13:52:11+00:00",
+ "generated_at": "2026-10-24T19:59:43+00:00",
  "run": {
   "tag": "nightly-20261015",
   "version": "10.2.0-20261015",
   "sha": "ef871403eb794afc613c43da8aac02bf10f993f6",
   "mode": "release",
-  "fingerprint": "5c2499916047a117",
-  "tier": "comprehensive",
+  "fingerprint": "167e891230578f33",
+  "tier": "full",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/40097404315",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/40125344961",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-10-24/",
   "upstream": {
    "status": "not-found"
@@ -37,7 +37,7 @@
  "no_gpu": "no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is",
  "verdict": "red",
  "reasons": [
-  "runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is): 5 GPU suites did not run",
+  "runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is): 6 GPU suites did not run",
   "3 infra error",
   "1 new failure",
   "10 still failing",
@@ -46,22 +46,34 @@
   "fixed known issues to remove from the baseline: H4, N6"
  ],
  "totals": {
-  "records": 163,
+  "records": 164,
   "by_status": {
    "pass": 138,
    "fail": 16,
-   "error": 9
+   "error": 10
   },
   "by_class": {
-   "pass": 128,
+   "pass": 70,
    "still_failing": 10,
+   "new_test": 58,
    "fixed": 10,
    "new_failure": 1,
    "known_fail": 5,
-   "infra_error": 9
+   "infra_error": 10
   }
  },
  "suites": [
+  {
+   "suite": "install-test",
+   "missing": true,
+   "no_gpu": true,
+   "wall_seconds": null,
+   "total": 1,
+   "classes": {
+    "infra_error": 1
+   },
+   "status_counts": {}
+  },
   {
    "suite": "loader-audit",
    "missing": true,
@@ -88,11 +100,12 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 76,
+   "wall_seconds": 65,
    "total": 154,
    "classes": {
-    "pass": 128,
+    "pass": 70,
     "still_failing": 10,
+    "new_test": 58,
     "fixed": 10,
     "new_failure": 1,
     "known_fail": 5
@@ -185,6 +198,14 @@
   }
  ],
  "groups": [
+  {
+   "suite": "install-test",
+   "group": "infra",
+   "total": 1,
+   "counts": {
+    "error": 1
+   }
+  },
   {
    "suite": "loader-audit",
    "group": "infra",
@@ -287,6 +308,22 @@
  ],
  "items": [
   {
+   "id": "install-test::infra::no-gpu",
+   "suite": "install-test",
+   "group": "infra",
+   "status": "error",
+   "class": "infra_error",
+   "known": null,
+   "message": "not run: the runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is)",
+   "repro": "",
+   "log": "",
+   "backend": "",
+   "result_dir": "",
+   "prev": null,
+   "nights_failing": 1,
+   "duration_s": 0.0
+  },
+  {
    "id": "loader-audit::infra::no-results",
    "suite": "loader-audit",
    "group": "infra",
@@ -298,8 +335,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -314,8 +351,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -331,7 +368,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 3,
    "duration_s": 0
   },
   {
@@ -347,7 +384,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -363,7 +400,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -379,7 +416,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -387,15 +424,15 @@
    "suite": "packaging",
    "group": "install-rpm",
    "status": "fail",
-   "class": "new_failure",
+   "class": "still_failing",
    "known": null,
    "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "pass",
-   "nights_failing": 1,
+   "prev": "fail",
+   "nights_failing": 3,
    "duration_s": 0
   },
   {
@@ -411,7 +448,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 3,
    "duration_s": 0
   },
   {
@@ -427,7 +464,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -443,7 +480,7 @@
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
    "prev": "fail",
-   "nights_failing": 7,
+   "nights_failing": 2,
    "duration_s": 0
   },
   {
@@ -459,7 +496,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 11,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -467,15 +504,15 @@
    "suite": "packaging",
    "group": "tarball",
    "status": "fail",
-   "class": "still_failing",
+   "class": "new_failure",
    "known": null,
    "message": "top-level: README-vision-pack.md bin include lib share; unexpected: README-vision-pack.md",
    "repro": "",
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
-   "prev": "fail",
-   "nights_failing": 4,
+   "prev": "pass",
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -491,7 +528,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 11,
+   "nights_failing": 2,
    "duration_s": 0.0
   },
   {
@@ -506,8 +543,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -522,8 +559,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -538,8 +575,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -554,8 +591,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -570,8 +607,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -586,8 +623,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -602,8 +639,8 @@
    "log": "",
    "backend": "",
    "result_dir": "",
-   "prev": "error",
-   "nights_failing": 2,
+   "prev": null,
+   "nights_failing": 1,
    "duration_s": 0.0
   },
   {
@@ -618,7 +655,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-install-rpm/packaging-install-rpm",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -634,7 +671,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -650,7 +687,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -666,7 +703,7 @@
    "log": "",
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
-   "prev": "pass",
+   "prev": "fail",
    "nights_failing": 0,
    "duration_s": 0.0
   },
@@ -683,7 +720,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 18,
+   "nights_failing": 3,
    "duration_s": 0.0
   },
   {
@@ -699,7 +736,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 18,
+   "nights_failing": 3,
    "duration_s": 0.0
   },
   {
@@ -795,7 +832,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 18,
+   "nights_failing": 3,
    "duration_s": 0.0
   },
   {
@@ -827,7 +864,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 18,
+   "nights_failing": 3,
    "duration_s": 0.0
   },
   {
@@ -843,7 +880,7 @@
    "backend": "",
    "result_dir": "results-packaging-tarball/packaging-tarball",
    "prev": "fail",
-   "nights_failing": 18,
+   "nights_failing": 3,
    "duration_s": 0.0
   }
  ],
@@ -2026,13 +2063,276 @@
   }
  ],
  "delta": {
-  "previous_night": "2026-10-23",
-  "removed": [],
-  "removed_count": 0,
+  "previous_night": "2026-10-10",
+  "removed": [
+   "packaging::deb::amdrocm-mivisionx-devel10.2",
+   "packaging::deb::amdrocm-mivisionx-devel10.2::payload.build-paths",
+   "packaging::deb::amdrocm-mivisionx-devel10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-mivisionx-test10.2",
+   "packaging::deb::amdrocm-mivisionx-test10.2::payload.build-paths",
+   "packaging::deb::amdrocm-mivisionx-test10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-mivisionx-test::depends.devel",
+   "packaging::deb::amdrocm-mivisionx10.2",
+   "packaging::deb::amdrocm-mivisionx10.2::payload.build-paths",
+   "packaging::deb::amdrocm-mivisionx10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-pydecode-test10.2",
+   "packaging::deb::amdrocm-pydecode-test10.2::payload.build-paths",
+   "packaging::deb::amdrocm-pydecode-test10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-pydecode10.2",
+   "packaging::deb::amdrocm-pydecode10.2::payload.build-paths",
+   "packaging::deb::amdrocm-pydecode10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-rocal-devel10.2",
+   "packaging::deb::amdrocm-rocal-devel10.2::payload.build-paths",
+   "packaging::deb::amdrocm-rocal-devel10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-rocal-test10.2",
+   "packaging::deb::amdrocm-rocal-test10.2::payload.build-paths",
+   "packaging::deb::amdrocm-rocal-test10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-rocal-test::depends.devel",
+   "packaging::deb::amdrocm-rocal10.2",
+   "packaging::deb::amdrocm-rocal10.2::payload.build-paths",
+   "packaging::deb::amdrocm-rocal10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-roccv-devel10.2",
+   "packaging::deb::amdrocm-roccv-devel10.2::payload.build-paths",
+   "packaging::deb::amdrocm-roccv-devel10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-roccv-test10.2",
+   "packaging::deb::amdrocm-roccv-test10.2::payload.build-paths",
+   "packaging::deb::amdrocm-roccv-test10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-roccv-test::depends.devel",
+   "packaging::deb::amdrocm-roccv10.2",
+   "packaging::deb::amdrocm-roccv10.2::payload.build-paths",
+   "packaging::deb::amdrocm-roccv10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-pythonpath10.2",
+   "packaging::deb::amdrocm-vision-pythonpath10.2::payload.build-paths",
+   "packaging::deb::amdrocm-vision-pythonpath10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-sdk10.2",
+   "packaging::deb::amdrocm-vision-sdk10.2::payload.build-paths",
+   "packaging::deb::amdrocm-vision-sdk10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-sysdeps10.2",
+   "packaging::deb::amdrocm-vision-sysdeps10.2::payload.build-paths",
+   "packaging::deb::amdrocm-vision-sysdeps10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision-tests10.2",
+   "packaging::deb::amdrocm-vision-tests10.2::payload.build-paths",
+   "packaging::deb::amdrocm-vision-tests10.2::payload.empty-dirs",
+   "packaging::deb::amdrocm-vision10.2",
+   "packaging::deb::amdrocm-vision10.2::payload.build-paths",
+   "packaging::deb::amdrocm-vision10.2::payload.empty-dirs",
+   "packaging::deb::cross-package",
+   "packaging::deb::set::packages",
+   "packaging::deb::set::version",
+   "packaging::deb::summary",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::header",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::payload.cpio",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::payload.prefix",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::provides.isolation",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::requires.closure",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::requires.relations",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::scriptlets",
+   "packaging::rpm::amdrocm-mivisionx-devel10.2::so-mode",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::header",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::payload.cpio",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::payload.prefix",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::provides.isolation",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::requires.closure",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::requires.relations",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::scriptlets",
+   "packaging::rpm::amdrocm-mivisionx-test10.2::so-mode",
+   "packaging::rpm::amdrocm-mivisionx10.2::header",
+   "packaging::rpm::amdrocm-mivisionx10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-mivisionx10.2::payload.cpio",
+   "packaging::rpm::amdrocm-mivisionx10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-mivisionx10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-mivisionx10.2::payload.prefix",
+   "packaging::rpm::amdrocm-mivisionx10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-mivisionx10.2::provides.isolation",
+   "packaging::rpm::amdrocm-mivisionx10.2::requires.closure",
+   "packaging::rpm::amdrocm-mivisionx10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-mivisionx10.2::requires.relations",
+   "packaging::rpm::amdrocm-mivisionx10.2::scriptlets",
+   "packaging::rpm::amdrocm-mivisionx10.2::so-mode",
+   "packaging::rpm::amdrocm-pydecode-test10.2::header",
+   "packaging::rpm::amdrocm-pydecode-test10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-pydecode-test10.2::payload.cpio",
+   "packaging::rpm::amdrocm-pydecode-test10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-pydecode-test10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-pydecode-test10.2::payload.prefix",
+   "packaging::rpm::amdrocm-pydecode-test10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-pydecode-test10.2::provides.isolation",
+   "packaging::rpm::amdrocm-pydecode-test10.2::requires.closure",
+   "packaging::rpm::amdrocm-pydecode-test10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-pydecode-test10.2::requires.relations",
+   "packaging::rpm::amdrocm-pydecode-test10.2::scriptlets",
+   "packaging::rpm::amdrocm-pydecode-test10.2::so-mode",
+   "packaging::rpm::amdrocm-pydecode10.2::header",
+   "packaging::rpm::amdrocm-pydecode10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-pydecode10.2::payload.cpio",
+   "packaging::rpm::amdrocm-pydecode10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-pydecode10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-pydecode10.2::payload.prefix",
+   "packaging::rpm::amdrocm-pydecode10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-pydecode10.2::provides.isolation",
+   "packaging::rpm::amdrocm-pydecode10.2::requires.closure",
+   "packaging::rpm::amdrocm-pydecode10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-pydecode10.2::requires.relations",
+   "packaging::rpm::amdrocm-pydecode10.2::scriptlets",
+   "packaging::rpm::amdrocm-pydecode10.2::so-mode",
+   "packaging::rpm::amdrocm-rocal-devel10.2::header",
+   "packaging::rpm::amdrocm-rocal-devel10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-rocal-devel10.2::payload.cpio",
+   "packaging::rpm::amdrocm-rocal-devel10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-rocal-devel10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-rocal-devel10.2::payload.prefix",
+   "packaging::rpm::amdrocm-rocal-devel10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-rocal-devel10.2::provides.isolation",
+   "packaging::rpm::amdrocm-rocal-devel10.2::requires.closure",
+   "packaging::rpm::amdrocm-rocal-devel10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-rocal-devel10.2::requires.relations",
+   "packaging::rpm::amdrocm-rocal-devel10.2::scriptlets",
+   "packaging::rpm::amdrocm-rocal-devel10.2::so-mode",
+   "packaging::rpm::amdrocm-rocal-test10.2::header",
+   "packaging::rpm::amdrocm-rocal-test10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-rocal-test10.2::payload.cpio",
+   "packaging::rpm::amdrocm-rocal-test10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-rocal-test10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-rocal-test10.2::payload.prefix",
+   "packaging::rpm::amdrocm-rocal-test10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-rocal-test10.2::provides.isolation",
+   "packaging::rpm::amdrocm-rocal-test10.2::requires.closure",
+   "packaging::rpm::amdrocm-rocal-test10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-rocal-test10.2::requires.relations",
+   "packaging::rpm::amdrocm-rocal-test10.2::scriptlets",
+   "packaging::rpm::amdrocm-rocal-test10.2::so-mode",
+   "packaging::rpm::amdrocm-rocal10.2::header",
+   "packaging::rpm::amdrocm-rocal10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-rocal10.2::payload.cpio",
+   "packaging::rpm::amdrocm-rocal10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-rocal10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-rocal10.2::payload.prefix",
+   "packaging::rpm::amdrocm-rocal10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-rocal10.2::provides.isolation",
+   "packaging::rpm::amdrocm-rocal10.2::requires.closure",
+   "packaging::rpm::amdrocm-rocal10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-rocal10.2::requires.relations",
+   "packaging::rpm::amdrocm-rocal10.2::scriptlets",
+   "packaging::rpm::amdrocm-rocal10.2::so-mode",
+   "packaging::rpm::amdrocm-roccv-devel10.2::header",
+   "packaging::rpm::amdrocm-roccv-devel10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-roccv-devel10.2::payload.cpio",
+   "packaging::rpm::amdrocm-roccv-devel10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-roccv-devel10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-roccv-devel10.2::payload.prefix",
+   "packaging::rpm::amdrocm-roccv-devel10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-roccv-devel10.2::provides.isolation",
+   "packaging::rpm::amdrocm-roccv-devel10.2::requires.closure",
+   "packaging::rpm::amdrocm-roccv-devel10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-roccv-devel10.2::requires.relations",
+   "packaging::rpm::amdrocm-roccv-devel10.2::scriptlets",
+   "packaging::rpm::amdrocm-roccv-devel10.2::so-mode",
+   "packaging::rpm::amdrocm-roccv-test10.2::header",
+   "packaging::rpm::amdrocm-roccv-test10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-roccv-test10.2::payload.cpio",
+   "packaging::rpm::amdrocm-roccv-test10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-roccv-test10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-roccv-test10.2::payload.prefix",
+   "packaging::rpm::amdrocm-roccv-test10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-roccv-test10.2::provides.isolation",
+   "packaging::rpm::amdrocm-roccv-test10.2::requires.closure",
+   "packaging::rpm::amdrocm-roccv-test10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-roccv-test10.2::requires.relations",
+   "packaging::rpm::amdrocm-roccv-test10.2::scriptlets",
+   "packaging::rpm::amdrocm-roccv-test10.2::so-mode",
+   "packaging::rpm::amdrocm-roccv10.2::header",
+   "packaging::rpm::amdrocm-roccv10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-roccv10.2::payload.cpio",
+   "packaging::rpm::amdrocm-roccv10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-roccv10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-roccv10.2::payload.prefix",
+   "packaging::rpm::amdrocm-roccv10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-roccv10.2::provides.isolation",
+   "packaging::rpm::amdrocm-roccv10.2::requires.closure",
+   "packaging::rpm::amdrocm-roccv10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-roccv10.2::requires.relations",
+   "packaging::rpm::amdrocm-roccv10.2::scriptlets",
+   "packaging::rpm::amdrocm-roccv10.2::so-mode",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::header",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::payload.cpio",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::payload.prefix",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::provides.isolation",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::requires.closure",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::requires.relations",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::scriptlets",
+   "packaging::rpm::amdrocm-vision-pythonpath10.2::so-mode",
+   "packaging::rpm::amdrocm-vision-sdk10.2::header",
+   "packaging::rpm::amdrocm-vision-sdk10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-vision-sdk10.2::payload.cpio",
+   "packaging::rpm::amdrocm-vision-sdk10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-sdk10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-sdk10.2::payload.prefix",
+   "packaging::rpm::amdrocm-vision-sdk10.2::provides.isolation",
+   "packaging::rpm::amdrocm-vision-sdk10.2::requires.closure",
+   "packaging::rpm::amdrocm-vision-sdk10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-sdk10.2::requires.relations",
+   "packaging::rpm::amdrocm-vision-sdk10.2::scriptlets",
+   "packaging::rpm::amdrocm-vision-sdk10.2::so-mode",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::header",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::payload.cpio",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::payload.prefix",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::payload.relocatable",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::provides.isolation",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::requires.closure",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::requires.relations",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::scriptlets",
+   "packaging::rpm::amdrocm-vision-sysdeps10.2::so-mode",
+   "packaging::rpm::amdrocm-vision-tests10.2::header",
+   "packaging::rpm::amdrocm-vision-tests10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-vision-tests10.2::payload.cpio",
+   "packaging::rpm::amdrocm-vision-tests10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision-tests10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision-tests10.2::payload.prefix",
+   "packaging::rpm::amdrocm-vision-tests10.2::provides.isolation",
+   "packaging::rpm::amdrocm-vision-tests10.2::requires.closure",
+   "packaging::rpm::amdrocm-vision-tests10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision-tests10.2::requires.relations",
+   "packaging::rpm::amdrocm-vision-tests10.2::scriptlets",
+   "packaging::rpm::amdrocm-vision-tests10.2::so-mode",
+   "packaging::rpm::amdrocm-vision10.2::header",
+   "packaging::rpm::amdrocm-vision10.2::payload.build-paths",
+   "packaging::rpm::amdrocm-vision10.2::payload.cpio",
+   "packaging::rpm::amdrocm-vision10.2::payload.empty-dirs",
+   "packaging::rpm::amdrocm-vision10.2::payload.matches-deb",
+   "packaging::rpm::amdrocm-vision10.2::payload.prefix",
+   "packaging::rpm::amdrocm-vision10.2::provides.isolation",
+   "packaging::rpm::amdrocm-vision10.2::requires.closure",
+   "packaging::rpm::amdrocm-vision10.2::requires.mirror-deb",
+   "packaging::rpm::amdrocm-vision10.2::requires.relations",
+   "packaging::rpm::amdrocm-vision10.2::scriptlets",
+   "packaging::rpm::amdrocm-vision10.2::so-mode",
+   "packaging::rpm::set::packages",
+   "packaging::rpm::set::version"
+  ],
+  "removed_count": 262,
   "new_failure": 1,
   "still_failing": 10,
   "fixed": 10,
-  "new_test": 0
+  "new_test": 58
  },
  "perf": {
   "metrics": [],
@@ -2631,57 +2931,57 @@
    "action": "open_or_comment",
    "fingerprint": "e87e7c0c50",
    "key": "loader-audit::infra",
-   "nights": 2,
+   "nights": 1,
    "title": "Nightly regression: loader-audit::infra [e87e7c0c50]",
-   "body": "1 result(s) in `loader-audit::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `loader-audit::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `loader-audit::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `loader-audit::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "80da0054c7",
    "key": "packaging::install-deb",
-   "nights": 7,
+   "nights": 3,
    "title": "Nightly regression: packaging::install-deb [80da0054c7]",
-   "body": "3 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 7 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "3 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 3 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "82323088f1",
    "key": "packaging::install-rpm",
-   "nights": 7,
+   "nights": 3,
    "title": "Nightly regression: packaging::install-rpm [82323088f1]",
-   "body": "5 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 7 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `packaging::install-rpm::depends::python3.12` (fail): not in the repository (needs any; required by amdrocm-pydecode10.2, amdrocm-rocal10.2, amdrocm-roccv10.2, amdrocm-vision-pythonpath10.2)\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.shipped` (fail): no amdrocm-vision10.2.pth in any python3 site-packages; %post did not register it\n- `packaging::install-rpm::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.9.25\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "5 result(s) in `packaging::install-rpm` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 3 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `packaging::install-rpm::depends::python3.12` (fail): not in the repository (needs any; required by amdrocm-pydecode10.2, amdrocm-rocal10.2, amdrocm-roccv10.2, amdrocm-vision-pythonpath10.2)\n- `packaging::install-rpm::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-rpm::pth.shipped` (fail): no amdrocm-vision10.2.pth in any python3 site-packages; %post did not register it\n- `packaging::install-rpm::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.9.25\n- `packaging::install-rpm::pth.python3.12` (fail): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "cc27f91246",
    "key": "packaging::tarball",
-   "nights": 11,
+   "nights": 2,
    "title": "Nightly regression: packaging::tarball [cc27f91246]",
-   "body": "3 result(s) in `packaging::tarball` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 11 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `packaging::tarball::name` (fail): file version 10.2.0-20261015, manifest version 0.2.0+gef87140\n- `packaging::tarball::layout` (fail): top-level: README-vision-pack.md bin include lib share; unexpected: README-vision-pack.md\n- `packaging::tarball::deb-subset` (fail): missing from tarball: core-10.2/lib/pkgconfig/openvx.pc (amdrocm-mivisionx-devel10.2), core-10.2/lib/pkgconfig/vx_rpp.pc (amdrocm-mivisionx-devel10.2), core-10.2/share/mivisionx/samples/gdf/gdf-opencv\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "3 result(s) in `packaging::tarball` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `packaging::tarball::name` (fail): file version 10.2.0-20261015, manifest version 0.2.0+gef87140\n- `packaging::tarball::layout` (fail): top-level: README-vision-pack.md bin include lib share; unexpected: README-vision-pack.md\n- `packaging::tarball::deb-subset` (fail): missing from tarball: core-10.2/lib/pkgconfig/openvx.pc (amdrocm-mivisionx-devel10.2), core-10.2/lib/pkgconfig/vx_rpp.pc (amdrocm-mivisionx-devel10.2), core-10.2/share/mivisionx/samples/gdf/gdf-opencv\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "f13910f62a",
    "key": "robustness-nogpu::infra",
-   "nights": 2,
+   "nights": 1,
    "title": "Nightly regression: robustness-nogpu::infra [f13910f62a]",
-   "body": "1 result(s) in `robustness-nogpu::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `robustness-nogpu::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `robustness-nogpu::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `robustness-nogpu::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "d96ce3a94d",
    "key": "runner::no-gpu",
-   "nights": 2,
+   "nights": 1,
    "title": "Nightly infrastructure: runner had no usable GPU [d96ce3a94d]",
-   "body": "The self-hosted runner had no usable GPU: no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is.\n5 GPU suite(s) did not run: mivisionx, robustness, rocal, roccv, rocpydecode. Only the suites with `needs_gpu: false` ran, and the night was not recorded as tested, so the next poll tests the release again.\nNo GPU for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\nCheck the runner host: is the amdgpu driver loaded (`/dev/kfd`, `/dev/dri/renderD*`, `/sys/class/kfd/kfd/topology/nodes`)? Does the build target its GPU (`build_tools/detect_gpu.sh --manifest <manifest>`)? See `infra::no-gpu` in docs/triage.md."
+   "body": "The self-hosted runner had no usable GPU: no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is.\n6 GPU suite(s) did not run: install-test, mivisionx, robustness, rocal, roccv, rocpydecode. Only the suites with `needs_gpu: false` ran, and the night was not recorded as tested, so the next poll tests the release again.\nNo GPU for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\nCheck the runner host: is the amdgpu driver loaded (`/dev/kfd`, `/dev/dri/renderD*`, `/sys/class/kfd/kfd/topology/nodes`)? Does the build target its GPU (`build_tools/detect_gpu.sh --manifest <manifest>`)? See `infra::no-gpu` in docs/triage.md."
   },
   {
    "action": "open_or_comment",
    "fingerprint": "f2232a9046",
    "key": "sdk-consumer::infra",
-   "nights": 2,
+   "nights": 1,
    "title": "Nightly regression: sdk-consumer::infra [f2232a9046]",
-   "body": "1 result(s) in `sdk-consumer::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 2 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `sdk-consumer::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "1 result(s) in `sdk-consumer::infra` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 1 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-24/\n\n- `sdk-consumer::infra::no-results` (error): the suite job produced no results (job failed, timed out or was cancelled)\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   }
  ]
 }
