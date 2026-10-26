@@ -2,7 +2,7 @@
 
 vision-pack `10.2.0-20261015` (nightly-20261015, `ef871403eb79`) on no GPU, tier **comprehensive**, 2026-10-26.
 
-**Why:** runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is): 5 GPU suites did not run; 3 infra error; 1 new failure; 10 still failing; packaging::deb: 0 results, expected at least 46; packaging::rpm: 0 results, expected at least 221; fixed known issues to remove from the baseline: H4, N6.
+**Why:** runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is): 5 GPU suites did not run; 3 infra error; 11 still failing; packaging::deb: 0 results, expected at least 46; packaging::rpm: 0 results, expected at least 221; fixed known issues to remove from the baseline: H4, N6.
 
 Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-26/
 
@@ -10,7 +10,7 @@ Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-26/
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | loader-audit | no results | | | | | | | |
 | mivisionx | not run: no GPU | | | | | | | |
-| packaging | 154 | 1 | 10 | 5 | 0 | 10 | 0 | 0 |
+| packaging | 154 | 0 | 11 | 5 | 0 | 10 | 0 | 0 |
 | preflight | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | robustness | not run: no GPU | | | | | | | |
 | robustness-nogpu | no results | | | | | | | |
@@ -24,10 +24,10 @@ Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-26/
 - `loader-audit::infra::no-results` (error, failing 3 nights): the suite job produced no results (job failed, timed out or was cancelled)
 - `mivisionx::infra::no-gpu` (error, failing 3 nights): not run: the runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is)
 - `packaging::install-deb::dpkg.verify` (fail, failing 8 nights): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amd
-- `packaging::install-deb::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)
 - `packaging::install-deb::pth.shipped` (fail, failing 8 nights): /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth missing or not '/opt/rocm/lib'
 - `packaging::install-deb::pth.syspath` (fail, failing 8 nights): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured
 - `packaging::install-rpm::depends::python3.12` (fail, failing 8 nights): not in the repository (needs any; required by amdrocm-pydecode10.2, amdrocm-rocal10.2, amdrocm-roccv10.2, amdrocm-vision-pythonpath10.2)
+- `packaging::install-rpm::isolation.jpeg_std_error` (fail, failing 2 nights): isolated libjpeg missing or does not export jpeg_std_error (#39)
 - `packaging::install-rpm::pth.python3.12` (fail, failing 8 nights): python3.12 (the only interpreter the cp312 modules load in) does not get /opt/rocm/lib: %post registered the path for Python 3.9.25 only
 - `packaging::install-rpm::pth.shipped` (fail, failing 8 nights): no amdrocm-vision10.2.pth in any python3 site-packages; %post did not register it
 - `packaging::install-rpm::pth.syspath` (fail, failing 8 nights): /opt/rocm/lib not on sys.path of Python 3.9.25
@@ -59,4 +59,4 @@ Report: https://levxn.github.io/vision-pack-test/nightly/2026-10-26/
 - SDK: `?` (fallback: ?)
 - Runner: github-hosted (no self-hosted runner registered), driver , kernel 
 - Upstream nightly: not-found 
-- Compared with 2026-10-25: 1 new failures, 10 fixed, 0 new tests, 0 removed
+- Compared with 2026-10-25: 0 new failures, 10 fixed, 0 new tests, 0 removed

@@ -625,7 +625,7 @@
    "night": "2026-10-26",
    "dir": "nightly/2026-10-26",
    "event": "schedule",
-   "run_id": "40355545820",
+   "run_id": "40405843378",
    "tier": "comprehensive",
    "gfx": "",
    "verdict": "red",
@@ -635,8 +635,7 @@
    "fingerprint": "5c2499916047a117",
    "counts": {
     "pass": 128,
-    "still_failing": 10,
-    "new_failure": 1,
+    "still_failing": 11,
     "fixed": 10,
     "known_fail": 5,
     "infra_error": 9
