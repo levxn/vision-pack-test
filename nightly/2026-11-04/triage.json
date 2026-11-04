@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "night": "2026-11-04",
- "generated_at": "2026-11-04T17:38:55+00:00",
+ "generated_at": "2026-11-04T23:08:24+00:00",
  "run": {
   "tag": "nightly-20261015",
   "version": "10.2.0-20261015",
@@ -10,7 +10,7 @@
   "fingerprint": "5c2499916047a117",
   "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/41874263824",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/41926670645",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-11-04/",
   "upstream": {
    "status": "not-found"
@@ -88,7 +88,7 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 79,
+   "wall_seconds": 72,
    "total": 154,
    "classes": {
     "pass": 128,
