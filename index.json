@@ -789,6 +789,27 @@
     "infra_error": 10
    },
    "records": 164
+  },
+  {
+   "night": "2026-11-08",
+   "dir": "nightly/2026-11-08",
+   "event": "schedule",
+   "run_id": "42497189895",
+   "tier": "full",
+   "gfx": "",
+   "verdict": "red",
+   "tag": "nightly-20261015",
+   "version": "10.2.0-20261015",
+   "sha": "ef871403eb794afc613c43da8aac02bf10f993f6",
+   "fingerprint": "167e891230578f33",
+   "counts": {
+    "pass": 128,
+    "still_failing": 11,
+    "fixed": 10,
+    "known_fail": 5,
+    "infra_error": 10
+   },
+   "records": 164
   }
  ]
 }
