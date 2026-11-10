@@ -837,7 +837,7 @@
    "night": "2026-11-10",
    "dir": "nightly/2026-11-10",
    "event": "schedule",
-   "run_id": "42860062901",
+   "run_id": "42913367448",
    "tier": "comprehensive",
    "gfx": "",
    "verdict": "red",
@@ -846,8 +846,9 @@
    "sha": "ef871403eb794afc613c43da8aac02bf10f993f6",
    "fingerprint": "5c2499916047a117",
    "counts": {
-    "pass": 129,
+    "pass": 128,
     "still_failing": 10,
+    "new_failure": 1,
     "fixed": 10,
     "known_fail": 5,
     "infra_error": 9

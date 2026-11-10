@@ -1,7 +1,7 @@
 {
  "schema": 1,
  "night": "2026-11-10",
- "generated_at": "2026-11-10T17:30:50+00:00",
+ "generated_at": "2026-11-10T22:51:17+00:00",
  "run": {
   "tag": "nightly-20261015",
   "version": "10.2.0-20261015",
@@ -10,7 +10,7 @@
   "fingerprint": "5c2499916047a117",
   "tier": "comprehensive",
   "gfx": "",
-  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/42860062901",
+  "run_url": "https://github.com/levxn/vision-pack-test/actions/runs/42913367448",
   "report_url": "https://levxn.github.io/vision-pack-test/nightly/2026-11-10/",
   "upstream": {
    "status": "not-found"
@@ -39,6 +39,7 @@
  "reasons": [
   "runner had no usable GPU (no self-hosted runner is registered (vp-gpu/vp-cpu); set the VP_HAS_SELF_HOSTED repo variable once one is): 5 GPU suites did not run",
   "3 infra error",
+  "1 new failure",
   "10 still failing",
   "packaging::deb: 0 results, expected at least 46",
   "packaging::rpm: 0 results, expected at least 221",
@@ -47,13 +48,14 @@
  "totals": {
   "records": 163,
   "by_status": {
-   "pass": 139,
-   "fail": 15,
+   "pass": 138,
+   "fail": 16,
    "error": 9
   },
   "by_class": {
-   "pass": 129,
+   "pass": 128,
    "still_failing": 10,
+   "new_failure": 1,
    "fixed": 10,
    "known_fail": 5,
    "infra_error": 9
@@ -86,17 +88,18 @@
    "suite": "packaging",
    "missing": false,
    "no_gpu": false,
-   "wall_seconds": 88,
+   "wall_seconds": 80,
    "total": 154,
    "classes": {
-    "pass": 129,
+    "pass": 128,
     "still_failing": 10,
+    "new_failure": 1,
     "fixed": 10,
     "known_fail": 5
    },
    "status_counts": {
-    "pass": 139,
-    "fail": 15,
+    "pass": 138,
+    "fail": 16,
     "error": 0,
     "skip": 0,
     "blocked": 0,
@@ -203,8 +206,8 @@
    "group": "install-deb",
    "total": 53,
    "counts": {
-    "pass": 50,
-    "fail": 3
+    "pass": 49,
+    "fail": 4
    }
   },
   {
@@ -329,6 +332,22 @@
    "result_dir": "results-packaging-install-deb/packaging-install-deb",
    "prev": "fail",
    "nights_failing": 16,
+   "duration_s": 0
+  },
+  {
+   "id": "packaging::install-deb::isolation.jpeg_std_error",
+   "suite": "packaging",
+   "group": "install-deb",
+   "status": "fail",
+   "class": "new_failure",
+   "known": null,
+   "message": "isolated libjpeg missing or does not export jpeg_std_error (#39)",
+   "repro": "",
+   "log": "",
+   "backend": "",
+   "result_dir": "results-packaging-install-deb/packaging-install-deb",
+   "prev": "pass",
+   "nights_failing": 1,
    "duration_s": 0
   },
   {
@@ -2010,7 +2029,7 @@
   "previous_night": "2026-11-09",
   "removed": [],
   "removed_count": 0,
-  "new_failure": 0,
+  "new_failure": 1,
   "still_failing": 10,
   "fixed": 10,
   "new_test": 0
@@ -2743,7 +2762,7 @@
    "key": "packaging::install-deb",
    "nights": 16,
    "title": "Nightly regression: packaging::install-deb [80da0054c7]",
-   "body": "3 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 16 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-11-10/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
+   "body": "4 result(s) in `packaging::install-deb` are failing and are not covered by `baselines/known_issues.yaml`.\nFailing for 16 night(s). Report: https://levxn.github.io/vision-pack-test/nightly/2026-11-10/\n\n- `packaging::install-deb::dpkg.verify` (fail): missing     /usr/share/doc/amdrocm-vision-sdk10.2/README.Debian missing     /usr/share/doc/amdrocm-vision-tests10.2/README.Debian missing     /usr/share/doc/amdrocm-vision10.2/README.Debian \n- `packaging::install-deb::isolation.jpeg_std_error` (fail): isolated libjpeg missing or does not export jpeg_std_error (#39)\n- `packaging::install-deb::pth.shipped` (fail): /usr/lib/python3/dist-packages/amdrocm-vision10.2.pth missing or not '/opt/rocm/lib'\n- `packaging::install-deb::pth.syspath` (fail): /opt/rocm/lib not on sys.path of Python 3.12.3: the .pth is not honoured\n\nEither fix the regression, or add a known-issue entry (with an upstream issue link) if it is an accepted upstream bug."
   },
   {
    "action": "open_or_comment",
